@@ -1,0 +1,2 @@
+#Remove .idea files generated from Webstorm
+.idea/*
