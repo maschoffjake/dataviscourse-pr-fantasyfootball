@@ -1,5 +1,4 @@
-﻿,,,,,Games,Games,Passing,Passing,Passing,Passing,Passing,Rushing,Rushing,Rushing,Rushing,Receiving,Receiving,Receiving,Receiving,Receiving,Fantasy,Fantasy,,,Fantasy
-Year,Name,Tm,FantPos,Age,G,GS,Cmp,Att,Yds,TD,Int,Att,Yds,Y/A,TD,Tgt,Rec,Yds,Y/R,TD,FantPt,PPR,PPG,PPRPG,PosRank
+﻿Year,Name,Tm,FantPos,Age,G,GS,Cmp,PassAtt,PassYds,PassTD,Int,RushAtt,RushYds,Y/A,RushTD,Tgt,Rec,RecYds,Y/R,RecTD,FantPt,PPR,PPG,PPRPG,PosRank
 2008,Drew Brees,NOR,QB,29,16,16,413,635,5069,34,17,22,-1,-0.05,0,0,0,0,,0,305,305,19.0625,19.0625,1
 2008,Aaron Rodgers,GNB,QB,25,16,16,341,536,4038,28,13,56,207,3.7,4,0,0,0,,0,296,296,18.5,18.5,2
 2008,Philip Rivers,SDG,QB,27,16,16,312,478,4009,34,11,31,84,2.71,0,0,0,0,,0,287,287,17.9375,17.9375,3
