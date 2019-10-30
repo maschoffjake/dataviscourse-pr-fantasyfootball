@@ -1,0 +1,30 @@
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+.title {
+    text-align: center;
+}
+
+.flex_col {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex_row {
+    display: flex;
+    flex-direction: row;
+}
+
+/* TAKE THIS OUT WHEN DONE*/
+.flex_row div {
+    border: 1px solid black;
+}
+
+#playerView {
+    min-width: 80%;
+}
+
+#overallView {
+    width: 20%;
+}

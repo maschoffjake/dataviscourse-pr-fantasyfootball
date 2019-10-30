@@ -1,5 +1,9 @@
 class Player {
-  constructor() {
-    
+  constructor(data) {
+    this.data = data;
+  }
+
+  createPlayerView() {
+
   }
 }
