@@ -7,4 +7,20 @@ fetch(URL)
     })
     .then(res => {
         console.log(res);
-    })
+    });
+
+/**
+ * Class used for storing past NFL Fantasy Stats (years 2008 - 2018)
+ */
+class PastData {
+
+    /**
+     * Construct the data object after being passed in a CSV file
+     * @param {*} filepath The filepath to the CSV file
+     */
+    constructor(filepath) {
+
+        
+
+    }
+}
