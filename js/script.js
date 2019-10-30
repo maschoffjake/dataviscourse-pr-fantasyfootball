@@ -31,14 +31,14 @@ async function loadFile(file) {
                         "games": row.G,
                         "gamesStarted": row.GS,
                         "passing": {
-                            "completionYards": row.Cmp,
-                            "attempted": row.PassAtt,
+                            "completions": row.Cmp,
+                            "attempts": row.PassAtt,
                             "passingYards": row.PassYds,
                             "touchdownPasses": row.PassTD,
                             "interceptions": row.Int
                         },
                         "rushing": {
-                            "attempted": row.RushAtt,
+                            "attempts": row.RushAtt,
                             "rushingYards": row.RushYds,
                             "yardsPerAttempt": row["Y/A"],
                             "rushingTouchdowns": row.RushTD
