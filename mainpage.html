@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&display=swap">
 
     <!-- Javascript -->
-    <script src="js/script.js" async></script>
-    <script src="js/main.js" async></script>
     <script src="js/player.js" async></script>
     <script src="js/overall.js" async></script>
+    <script src="js/script.js" async></script>
+    <script src="js/main.js" async></script>
 
     <!-- D3 -->
     <script src="https://d3js.org/d3.v5.js"></script>
@@ -26,11 +26,12 @@
     <h2>Fantasy Football</h2>
 </div>
 <div class="flex_row">
-    <div id="playerView">
+    <div id="playerView" class="flex_col">
         <div id="playerSelect">
             <h4>Button and Player Picture</h4>
         </div>
-        Player View
+        <div id="playerViewSVGDiv">
+        </div>
     </div>
     <div id="overallView">
         Overall View
