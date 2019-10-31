@@ -13,9 +13,23 @@ async function loadFile(file) {
         let playerNames = d.map(row => {
             return row.Name;
         });
+
+
         //Remove the duplicates of player names for each year
         let removeDuplicateNames = (names) => names.filter((v,i) => names.indexOf(v) === i);
-        playerNames = removeDuplicateNames(playerNames);
+        playerNames = removeDuplicateNames(playerNames).sort();
+
+        // Render the dropdown menu with all the player names
+        let options = [];
+
+        for (let player of playerNames) {
+            let option = "<option>" + player + "</option>";
+            options.push(option);
+        }
+
+        $('.selectpicker').html(options);
+        $('.selectpicker').selectpicker('refresh');
+
         //For each player, iterate through and create data objects for each year that the player played in the NFL
         let pastData = [];
         for(let player of playerNames) {

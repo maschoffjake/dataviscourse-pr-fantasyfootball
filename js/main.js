@@ -11,6 +11,13 @@ class Main {
         this.data = data;
         this.playerView = new Player();
         this.overallView = new Overall(this.data);
+
+
+        // Setup dropdown player selection event listener
+        $('.selectpicker').on('change', function(){
+            let selected = $('.selectpicker').val()
+            this.playerView.updateCurrentPlayers(selected);
+        });
     }
 
     setupView() {
