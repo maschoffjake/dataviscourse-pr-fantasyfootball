@@ -1,5 +1,9 @@
 loadFile('data/Raw_Data_10yrs.csv').then(data => {
-    console.log(data);
+    let mainView = new Main(data);
+
+    mainView.setupView();
+    mainView.updatePlayerView(data);
+    mainView.updateOverallView();
 });
 
 async function loadFile(file) {
