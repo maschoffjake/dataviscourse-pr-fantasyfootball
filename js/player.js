@@ -91,6 +91,10 @@ class Player {
       .duration(1000)
       .style('opacity', 0)
       .remove();
+
+    // TODO: add labels for each block
+    // TODO: add brush, reset brush when a new player is selected
+    // TODO: change color of selected block w/ brush
   }
 
   /**
