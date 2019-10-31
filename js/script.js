@@ -1,5 +1,9 @@
 loadFile('data/Raw_Data_10yrs.csv').then(data => {
-    console.log(data);
+    let mainView = new Main(data);
+
+    mainView.setupView();
+    mainView.updatePlayerView(data);
+    mainView.updateOverallView();
 });
 
 async function loadFile(file) {
@@ -34,7 +38,7 @@ async function loadFile(file) {
                 return row.Name === player;
             });
             //Data for each year for current player parsed into an object
-            let yearList =[];
+            let yearList = [];
             for(let row of yearData) {
                 let year = row.Year;
                 let obj = {
@@ -80,7 +84,7 @@ async function loadFile(file) {
                 "years": yearList
             };
             pastData.push(playerObj);
-            };
+        };
         return pastData;
     });
     return data;
