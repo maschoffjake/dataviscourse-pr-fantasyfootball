@@ -1,10 +1,3 @@
-// loadFile('data/Raw_Data_10yrs.csv').then((data) => {
-//   let player = new Player();
-//   player.createPlayerView();
-//   player.updateCurrentPlayers(data[0]);
-//   player.updatePlayerView();
-// });
-
 class Main {
 
     constructor(data) {
@@ -12,11 +5,22 @@ class Main {
         this.playerView = new Player();
         this.overallView = new Overall(this.data);
 
+        this.player1 = {};
+        this.player2 = {};
+
+        console.log(this.data);
+
+        let that = this;
 
         // Setup dropdown player selection event listener
         $('.selectpicker').on('change', function(){
-            let selected = $('.selectpicker').val()
-            this.playerView.updateCurrentPlayers(selected);
+            let selectedPlayer = $('.selectpicker').val();
+            that.player1 = that.data.find((d) => {
+                if (d.name === selectedPlayer) {
+                    return d;
+                }
+            });
+            that.updateView();
         });
     }
 
@@ -25,11 +29,17 @@ class Main {
         this.overallView.createChart();
     }
 
-    updatePlayerView(playerData) {
-        //just hardcoded for now
-        this.playerView.updateCurrentPlayers(this.data[0], this.data[1]);
-        //this function call has an error: Player.updateYearBarAndBrush (player.js:87)
-        // this.playerView.updatePlayerView();
+    updateView() {
+        // Update player view.
+        this.updatePlayerView();
+
+        // Update overall view.
+        this.updateOverallView();
+    }
+
+    updatePlayerView() {
+        this.playerView.updateCurrentPlayers(this.player1, this.player2);
+        this.playerView.updatePlayerView();
     }
 
     updateOverallView() {

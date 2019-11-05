@@ -48,12 +48,9 @@ class Player {
   }
 
   updateYearBarAndBrush () {
-    let minDomain = parseInt(d3.min(this.player1.years, d => Object.keys(d)));
-    let maxDomain = parseInt(d3.max(this.player1.years, d => Object.keys(d)));
-
     let yearScale = d3
       .scaleLinear()
-      .domain([minDomain, maxDomain + 1])
+      .domain([0, this.player1.years.length])
       .range([0, 500]);
 
     let yearAxis = d3.axisBottom()
@@ -76,21 +73,69 @@ class Player {
 
     let newLines = lines.enter()
       .append('line')
-      .attr('x1', d => yearScale(Object.keys(d)))
+      .attr('x1', 500)
+      .attr('x2', 500)
       .attr('y1', 0)
-      .attr('x2', d => yearScale(Object.keys(d)))
-      .attr('y2', 0)
-      .transition()
-      .duration(1000)
-      .attr('y2', 50);
-
-    lines = newLines.merge(lines);
+      .attr('y2', 50)
+      .style('opacity', 0);
 
     lines.exit()
       .transition()
       .duration(1000)
+      .attr('x1', 500)
+      .attr('x2', 500)
       .style('opacity', 0)
       .remove();
+
+    lines = newLines.merge(lines);
+
+    lines
+      .transition()
+      .duration(1000)
+      .attr('x1', (d, i) => { return yearScale(i); })
+      .attr('x2', (d, i) => { return yearScale(i); })
+      .style('opacity', 1);
+
+    let centerOffset = yearScale(1) / 2;
+
+    let labels = yearGroup
+      .selectAll('text')
+      .data(this.player1.years);
+
+    let newLables = labels.enter()
+      .append('text')
+      .attr("text-anchor", "middle")
+      .attr('x', 500)
+      .attr('y', 30)
+      .style('opacity', 0);
+
+    labels.exit()
+      .transition()
+      .duration(1000)
+      .attr('x', 500)
+      .style('opacity', 0)
+      .remove();
+
+    labels = newLables.merge(labels);
+
+    labels
+      .transition()
+      .duration(1000)
+      .text(d => Object.keys(d))
+      .attr('x', (d, i) => { return yearScale(i) + centerOffset; })
+      .style('opacity', 1);
+
+    let that = this;
+    let brush = d3.brushX()
+      .extent([[0, 0], [500, 50]])
+      .on('brush', function () {
+        console.log('here');
+      });
+
+    yearGroup
+      .append('g')
+      .attr('class', 'brush')
+      .call(brush);
 
     // TODO: add labels for each block
     // TODO: add brush, reset brush when a new player is selected
