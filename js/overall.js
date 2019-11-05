@@ -31,14 +31,14 @@ class Overall {
         let yAxisGroup = overallDiv
             .select('svg')
             .append('g')
-            .attr('transform', 'translate(30,0)');//translate transform to get axis in proper spot
+            .attr('transform', 'translate(30,0) scale(1,1)');//translate transform to get axis in proper spot
 
         //max is not working properly so will need to find a way to get max points from each player
         const max = d3.max(this.data.map(d => d.years.filter(d => d.FantPt)));
         this.yScale = d3
             .scaleLinear()
             .domain([0, 500])
-            .range([10, 340]);
+            .range([340, 10]);
 
         this.yAxis = d3.axisLeft();
         this.yAxis.scale(this.yScale);
