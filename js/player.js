@@ -6,6 +6,12 @@ class Player {
 
     this.svgWidth = 1000;
     this.svgHeight = 1000;
+
+    this.player1Brush = d3.brushX()
+      .extent([[0, 0], [500, 50]])
+      .on('brush', function () {
+        console.log('here');
+      });
   }
 
   /**
@@ -45,9 +51,16 @@ class Player {
     yearGroup.append('g')
       .attr('id', 'yearGroupAxis')
       .style('opacity', 0);
+
+    yearGroup
+      .append('g')
+      .attr('class', 'brush')
+      .call(this.player1Brush);
   }
 
   updateYearBarAndBrush () {
+    d3.selectAll(".brush").call(this.player1Brush.move, null);
+
     let yearScale = d3
       .scaleLinear()
       .domain([0, this.player1.years.length])
@@ -124,18 +137,6 @@ class Player {
       .text(d => Object.keys(d))
       .attr('x', (d, i) => { return yearScale(i) + centerOffset; })
       .style('opacity', 1);
-
-    let that = this;
-    let brush = d3.brushX()
-      .extent([[0, 0], [500, 50]])
-      .on('brush', function () {
-        console.log('here');
-      });
-
-    yearGroup
-      .append('g')
-      .attr('class', 'brush')
-      .call(brush);
 
     // TODO: add labels for each block
     // TODO: add brush, reset brush when a new player is selected
