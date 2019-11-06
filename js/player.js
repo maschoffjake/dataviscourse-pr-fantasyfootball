@@ -181,19 +181,19 @@ class Player {
 
     // Create scales
     let axisTDScale = d3.scaleLinear()
-      .domain([d3.max(TDData), 0])
+      .domain([this.getMax(TDData), 0])
       .range([0,200]);
 
     let TDBarScale = d3.scaleLinear()
-      .domain([0, d3.max(TDData)])
+      .domain([0, this.getMax(TDData)])
       .range([0,200]);
 
     let axisYardsScale = d3.scaleLinear()
-      .domain([d3.max(yardData), 0])
+      .domain([this.getMax(yardData), 0])
       .range([0,200]);
 
     let yardsBarScale = d3.scaleLinear()
-      .domain([0, d3.max(yardData)])
+      .domain([0, this.getMax(yardData)])
       .range([0,200]);
 
     // Update the bars
@@ -234,6 +234,17 @@ class Player {
           g.select('.domain').remove();
       });
       
+  }
+
+  /**
+   * Used for getting the max for scales. Sometimes all the values are 0, so we need the max value to be 1 actually
+   * @param {Array} arr Array to get the max of 
+   */
+  getMax(arr) {
+    const max = d3.max(arr);
+    if (max === 0)
+      return 1;
+    return max;
   }
 
   /**
