@@ -22,6 +22,13 @@ class Main {
             });
             that.updateView();
         });
+
+        // Setup compare button event listener
+        d3.select('#compareButton')
+            .on('click', function() {
+
+                // Raj put method here
+            });
     }
 
     setupView() {

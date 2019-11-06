@@ -18,11 +18,12 @@ class Player {
    * Creates all the component for player view.
    */
   createPlayerView() {
-    let svg = d3.select('#playerViewSVGDiv').append('svg')
+    this.svg = d3.select('#playerViewSVGDiv').append('svg')
       .attr('width', this.svgWidth)
       .attr('height', this.svgHeight);
 
     this.createYearBarAndBrush();
+    this.createBarCharts1Player1Year();
   }
 
   /**
@@ -58,6 +59,24 @@ class Player {
       .call(this.player1Brush);
   }
 
+  /**
+   * Creates the default view of a single player for a single view (2 bar charts and text for other stats)
+   */
+  createBarCharts() {
+
+    // Create TDs bar chart
+    let TDXScale = d3.scaleLinear()
+      .domain([0,0])
+      .range([0,0]);
+
+    this.svg.append('g')
+      .attr('id', 'tdBarChart')
+
+  }
+
+  /**
+   * Updates the year bar to a player's years that they've played
+   */
   updateYearBarAndBrush () {
     d3.selectAll(".brush").call(this.player1Brush.move, null);
 
