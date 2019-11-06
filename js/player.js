@@ -13,7 +13,7 @@ class Player {
         console.log('here');
       });
 
-    this.rectWidth = 20;
+    this.rectWidth = 80;
     this.transitionTime = 1000;
   }
 
@@ -278,19 +278,19 @@ class Player {
 
     // Create scales
     let axisTDScale = d3.scaleLinear()
-      .domain([d3.max(TDData), 0])
+      .domain([this.getMax(TDData), 0])
       .range([0,200]);
 
     let TDBarScale = d3.scaleLinear()
-      .domain([0, d3.max(TDData)])
+      .domain([0, this.getMax(TDData)])
       .range([0,200]);
 
     let axisYardsScale = d3.scaleLinear()
-      .domain([d3.max(yardData), 0])
+      .domain([this.getMax(yardData), 0])
       .range([0,200]);
 
     let yardsBarScale = d3.scaleLinear()
-      .domain([0, d3.max(yardData)])
+      .domain([0, this.getMax(yardData)])
       .range([0,200]);
 
     // Update the bars
@@ -331,6 +331,107 @@ class Player {
           g.select('.domain').remove();
       });
       
+  }
+
+  /**
+   * Used for getting the max for scales. Sometimes all the values are 0, so we need the max value to be 1 actually
+   * @param {Array} arr Array to get the max of 
+   */
+  getMax(arr) {
+    const max = d3.max(arr);
+    if (max === 0)
+      return 1;
+    return max;
+  }
+
+  /**
+   * Updates the year bar to a player's years that they've played
+   */
+  updateYearBarAndBrush () {
+    d3.selectAll(".brush").call(this.player1Brush.move, null);
+
+    let yearScale1 = d3
+      .scaleLinear()
+      .domain([0, this.player1.years.length])
+      .range([0, 500]);
+
+    let yearAxis = d3.axisBottom()
+      .tickValues([])
+      .scale(yearScale1);
+
+    d3.select('#yearGroup1Axis')
+      .call(yearAxis);
+
+    let yearGroup = d3.select('#yearGroup1');
+
+    yearGroup
+      .transition()
+      .duration(1000)
+      .style('opacity', 1);
+
+    let yearGroupLines = d3.select('#yearGroup1Lines');
+
+    let lines = yearGroupLines
+      .selectAll('line')
+      .data(this.player1.years);
+
+    let newLines = lines.enter()
+      .append('line')
+      .attr('x1', 500)
+      .attr('x2', 500)
+      .attr('y1', 0)
+      .attr('y2', 50)
+      .style('opacity', 0);
+
+    lines.exit()
+      .transition()
+      .duration(1000)
+      .attr('x1', 500)
+      .attr('x2', 500)
+      .style('opacity', 0)
+      .remove();
+
+    lines = newLines.merge(lines);
+
+    lines
+      .transition()
+      .duration(1000)
+      .attr('x1', (d, i) => { return yearScale1(i); })
+      .attr('x2', (d, i) => { return yearScale1(i); })
+      .style('opacity', 1);
+
+    let centerOffset = yearScale1(1) / 2;
+
+    let yearGroupLabels = d3.select('#yearGroup1Labels');
+
+    let labels = yearGroupLabels
+      .selectAll('text')
+      .data(this.player1.years);
+
+    let newLables = labels.enter()
+      .append('text')
+      .attr("text-anchor", "middle")
+      .attr('x', 500)
+      .attr('y', 30)
+      .style('opacity', 0);
+
+    labels.exit()
+      .transition()
+      .duration(1000)
+      .attr('x', 500)
+      .style('opacity', 0)
+      .remove();
+
+    labels = newLables.merge(labels);
+
+    labels
+      .transition()
+      .duration(1000)
+      .text(d => Object.keys(d))
+      .attr('x', (d, i) => { return yearScale1(i) + centerOffset; })
+      .style('opacity', 1);
+
+    // TODO: change color of selected block w/ brush
   }
 
   /**
