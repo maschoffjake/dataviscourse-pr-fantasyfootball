@@ -31,8 +31,8 @@ class Player {
       .attr('width', this.svgWidth)
       .attr('height', this.svgHeight);
 
-    this.createYearBarAndBrush('Player1', this.player1Brush);
     this.createYearBarAndBrush('Player2', this.player2Brush);
+    this.createYearBarAndBrush('Player1', this.player1Brush);
     this.createBarCharts();
 
   }
@@ -47,8 +47,8 @@ class Player {
     let y = 50;
 
     if (this.compareEnable) {
-      xPlayer1 = 50;
-      xPlayer2 = 600;
+      xPlayer1 = 90;
+      xPlayer2 = 770;
     }
     this.updateYearBarAndBrush('Player1', this.player1, this.player1Brush, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, this.player2Brush, xPlayer2, y);
