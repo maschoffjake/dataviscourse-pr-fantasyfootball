@@ -13,7 +13,7 @@ class Player {
         console.log('here');
       });
 
-    this.rectWidth = 20;
+    this.rectWidth = 80;
     this.transitionTime = 1000;
   }
 
