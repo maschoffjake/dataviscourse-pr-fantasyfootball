@@ -97,12 +97,7 @@ class Player {
 
     this.svg.append('g')
       .attr('id', 'tdYBarChartAxis')
-      .attr('transform', `translate(${this.svgWidth/12},180)`)
-      .call(d3.axisLeft(ylinearScale))
-      .call(g => {
-          // Remove the line
-          g.select('.domain').remove();
-      });
+      .attr('transform', `translate(${this.svgWidth/12},180)`);
 
     // Create rects
     let group = this.svg
@@ -146,12 +141,7 @@ class Player {
 
   this.svg.append('g')
     .attr('id', 'yardsYBarChartAxis')
-    .attr('transform', `translate(${this.svgWidth/12 + this.svgWidth/2},180)`)
-    .call(d3.axisLeft(ylinearScale))
-    .call(g => {
-        // Remove the line
-        g.select('.domain').remove();
-    });
+    .attr('transform', `translate(${this.svgWidth/12 + this.svgWidth/2},180)`);
 
     // Create rects
     group = this.svg
@@ -208,7 +198,6 @@ class Player {
       .transition()
       .duration(this.transitionTime)
       .attr('height', d => {
-        console.log('TDdata', d);
         return TDBarScale(d);
       });
 
@@ -218,7 +207,6 @@ class Player {
       .transition()
       .duration(this.transitionTime)
       .attr('height', d => {
-        console.log('yardData', d);
         return yardsBarScale(d);
       });
 
