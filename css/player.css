@@ -1,9 +1,9 @@
-.yearBar {
+.year_bar {
     fill: none;
     stroke-width: 2px;
     stroke: black;
 }
 
-#yearGroup line {
+.year_group_lines {
     stroke: black;
 }
