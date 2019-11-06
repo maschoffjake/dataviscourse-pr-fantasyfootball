@@ -23,7 +23,7 @@ class Player {
       .attr('height', this.svgHeight);
 
     this.createYearBarAndBrush();
-    this.createBarCharts1Player1Year();
+    this.createBarCharts();
   }
 
   /**
@@ -65,12 +65,25 @@ class Player {
   createBarCharts() {
 
     // Create TDs bar chart
-    let TDXScale = d3.scaleLinear()
-      .domain([0,0])
-      .range([0,0]);
+    let xAxisLabels = ['Passing', 'Rushing', 'Receiving']
 
+    let linearScale = d3.scaleLinear()
+      .domain([0, 2])
+      .range([this.svgWidth/10, this.svgWidth/2 - this.svgWidth/10]);
+    
     this.svg.append('g')
       .attr('id', 'tdBarChart')
+      .attr('transform', 'translate(50,400)')
+      .selectAll('text')
+      .data(xAxisLabels)
+      .enter()
+      .append('text')
+      .attr('x', function(d, i) {
+        return linearScale(i);
+      })
+      .text(function(d) {
+        return d;
+      });
 
   }
 
