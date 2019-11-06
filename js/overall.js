@@ -68,9 +68,22 @@ class Overall {
         this.data.map(function(player){
             let x = Object.values(player.years);
             let keys = x.filter(d => Object.keys(d)[0] == year);
-            if(keys.length > 0){
-                updateData.push(keys);
-            }
+
+            keys.forEach(function(yearData) {
+                const pos = Object.values(yearData);
+                const vals = pos[0].position;
+                if(vals === position) {
+                    let playerObj = {
+                        "name": player.name,
+                        "points": pos[0].fantasyPoints
+                    };
+                    updateData.push(playerObj)
+                }
+            });
+            // if(keys.length > 0){
+                // updateData.push(keys);
+
+            // }
             // if(Object.keys(player.years).includes(year)) {
             //     updateData.push(player.years.filter(d => Object.keys(d)[0] === year));
             // }
