@@ -2,6 +2,7 @@ class Overall {
 
     constructor(data) {
         this.data = data;
+        this.overallData = data;
     }
 
     createChart() {
@@ -38,21 +39,41 @@ class Overall {
         let ptList = [];
         this.data.forEach(function(player) {
             player.years.forEach(function(year){
-                ptList.push(year);
+                Object.values(year).forEach(function(key) {
+                    ptList.push((key.fantasyPoints != '') ? key.fantasyPoints : '0');
+                })
             });
         });
         this.yScale = d3
             .scaleLinear()
-            .domain([0, 500])
-            .range([340, 10]);
+            .domain([0, Math.max(...ptList)])
+            .range([340, 10])
+            .nice();
 
         this.yAxis = d3.axisLeft();
         this.yAxis.scale(this.yScale);
 
         yAxisGroup.call(this.yAxis);
+        this.parseDataForYear("2016", "QB");
     }
 
     updateChart() {
 
+    }
+
+    parseDataForYear(year, position) {
+        // let updateData = this.data.map(player => player.years.filter(d => Object.keys(d)[0] === year));
+
+        let updateData = [];
+        this.data.map(function(player){
+            let x = Object.values(player.years);
+            let keys = x.filter(d => Object.keys(d)[0] == year);
+            if(keys.length > 0){
+                updateData.push(keys);
+            }
+            // if(Object.keys(player.years).includes(year)) {
+            //     updateData.push(player.years.filter(d => Object.keys(d)[0] === year));
+            // }
+        });
     }
 }
