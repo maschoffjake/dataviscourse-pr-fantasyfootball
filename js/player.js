@@ -1,7 +1,7 @@
 class Player {
   constructor() {
-    this.player1 = [];
-    this.player2 = [];
+    this.player1 = null;
+    this.player2 = null;
     this.compareEnable = false;
 
     this.svgWidth = 1300;
@@ -10,7 +10,13 @@ class Player {
     this.player1Brush = d3.brushX()
       .extent([[0, 0], [500, 50]])
       .on('brush', function () {
-        console.log('here');
+        console.log('Player 1');
+      });
+
+    this.player2Brush = d3.brushX()
+      .extent([[0, 0], [500, 50]])
+      .on('brush', function () {
+        console.log('Player 2');
       });
 
     this.rectWidth = 80;
@@ -25,78 +31,98 @@ class Player {
       .attr('width', this.svgWidth)
       .attr('height', this.svgHeight);
 
-    this.createYearBarAndBrush();
+    this.createYearBarAndBrush('Player1', this.player1Brush);
+    this.createYearBarAndBrush('Player2', this.player2Brush);
     this.createBarCharts();
+
   }
 
   /**
    *  Updates the player view with the current data values.
    */
   updatePlayerView() {
-    this.updateYearBarAndBrush();
+    console.log('here');
+    let xPlayer1 = 430;
+    let xPlayer2 = 430;
+    let y = 50;
+
+    if (this.compareEnable) {
+      xPlayer1 = 50;
+      xPlayer2 = 600;
+    }
+    this.updateYearBarAndBrush('Player1', this.player1, this.player1Brush, xPlayer1, y);
+    this.updateYearBarAndBrush('Player2', this.player2, this.player2Brush, xPlayer2, y);
     this.updateBarCharts();
   }
 
   /**
    * Creates year bar scale and brush.
    */
-  createYearBarAndBrush () {
-    let yearGroup1 = this.svg.append('g')
-      .attr('id', 'yearGroup1')
+  createYearBarAndBrush (player, brush) {
+    let yearGroup = this.svg.append('g')
+      .attr('id', `yearGroup${player}`)
       .style('opacity', 0)
       .attr('transform', `translate(430, 50)`);
 
-    yearGroup1.append('rect')
+    yearGroup.append('rect')
       .attr('width', 500)
       .attr('height', 50)
       .classed('year_bar', true);
 
-    yearGroup1.append('g')
-      .attr('id', 'yearGroup1Axis')
+    yearGroup.append('g')
+      .attr('id', `yearGroupAxis${player}`)
       .style('opacity', 0);
 
-    yearGroup1.append('g')
-      .attr('id', 'yearGroup1Labels');
+    yearGroup.append('g')
+      .attr('id', `yearGroupLabels${player}`);
 
-    yearGroup1.append('g')
-      .attr('id', 'yearGroup1Lines');
+    yearGroup.append('g')
+      .attr('id', `yearGroupLines${player}`);
 
-    yearGroup1
+    yearGroup
       .append('g')
       .attr('class', 'brush')
-      .call(this.player1Brush);
+      .call(brush);
   }
 
   /**
    * Updates the year bar to a player's years that they've played
    */
-  updateYearBarAndBrush () {
-    d3.selectAll(".brush").call(this.player1Brush.move, null);
+  updateYearBarAndBrush (player, playerData, brush, x, y) {
+    let opacity = 1;
+    if ((player === 'Player2' && !this.compareEnable) || !playerData) {
+      opacity = 0;
+    }
+    let yearGroup = d3.select(`#yearGroup${player}`);
+    yearGroup
+      .transition()
+      .duration(1000)
+      .attr('transform', `translate(${x}, ${y})`)
+      .style('opacity', opacity);
 
-    let yearScale1 = d3
+    yearGroup.selectAll(".brush").call(brush.move, null);
+
+    if (opacity === 0) {
+      return;
+    }
+
+    let yearScale = d3
       .scaleLinear()
-      .domain([0, this.player1.years.length])
+      .domain([0, playerData.years.length])
       .range([0, 500]);
 
     let yearAxis = d3.axisBottom()
       .tickValues([])
-      .scale(yearScale1);
+      .scale(yearScale);
 
-    d3.select('#yearGroup1Axis')
+    d3.select(`#yearGroupAxis${player}`)
       .call(yearAxis);
 
-    let yearGroup = d3.select('#yearGroup1');
-
-    yearGroup
-      .transition()
-      .duration(1000)
-      .style('opacity', 1);
-
-    let yearGroupLines = d3.select('#yearGroup1Lines');
+    let yearGroupLines = d3.select(`#yearGroupLines${player}`);
 
     let lines = yearGroupLines
       .selectAll('line')
-      .data(this.player1.years);
+      .data(playerData.years);
 
     let newLines = lines.enter()
       .append('line')
@@ -121,20 +147,20 @@ class Player {
       .transition()
       .duration(1000)
       .attr('x1', (d, i) => {
-        return yearScale1(i);
+        return yearScale(i);
       })
       .attr('x2', (d, i) => {
-        return yearScale1(i);
+        return yearScale(i);
       })
       .style('opacity', 1);
 
-    let centerOffset = yearScale1(1) / 2;
+    let centerOffset = yearScale(1) / 2;
 
-    let yearGroupLabels = d3.select('#yearGroup1Labels');
+    let yearGroupLabels = d3.select(`#yearGroupLabels${player}`);
 
     let labels = yearGroupLabels
       .selectAll('text')
-      .data(this.player1.years);
+      .data(playerData.years);
 
     let newLables = labels.enter()
       .append('text')
@@ -157,7 +183,7 @@ class Player {
       .duration(1000)
       .text(d => Object.keys(d))
       .attr('x', (d, i) => {
-        return yearScale1(i) + centerOffset;
+        return yearScale(i) + centerOffset;
       })
       .style('opacity', 1);
 

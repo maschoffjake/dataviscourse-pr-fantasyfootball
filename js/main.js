@@ -5,8 +5,8 @@ class Main {
         this.playerView = new Player();
         this.overallView = new Overall(this.data);
 
-        this.player1 = {};
-        this.player2 = {};
+        this.player1 = null;
+        this.player2 = null;
 
         this.compareEnable = false;
 
@@ -15,9 +15,20 @@ class Main {
         let that = this;
 
         // Setup dropdown player selection event listener
-        $('.selectpicker').on('change', function(){
-            let selectedPlayer = $('.selectpicker').val();
+        $('#player1Dropdown').on('change', function(){
+            let selectedPlayer = $('#player1Dropdown').val();
             that.player1 = that.data.find((d) => {
+                if (d.name === selectedPlayer) {
+                    return d;
+                }
+            });
+            that.updateView();
+        });
+
+        // Setup dropdown player selection event listener
+        $('#player2Dropdown').on('change', function(){
+            let selectedPlayer = $('#player2Dropdown').val();
+            that.player2 = that.data.find((d) => {
                 if (d.name === selectedPlayer) {
                     return d;
                 }
@@ -34,6 +45,7 @@ class Main {
             } else {
                 that.removePlayer2Dropdown();
             }
+            that.updateView();
         });
     }
 
