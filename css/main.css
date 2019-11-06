@@ -6,6 +6,10 @@ body {
     text-align: center;
 }
 
+.title h2 {
+    margin: 15px;
+}
+
 .flex_col {
     display: flex;
     flex-direction: column;
@@ -16,22 +20,40 @@ body {
     flex-direction: row;
 }
 
-/* Player selector styling */
-.cmp_btn {
-    margin-right: 20px;
-    max-width: 100px;
-    font-size: 8px;
+.flex_center {
+    justify-content: center;
 }
 
-/* TAKE THIS OUT WHEN DONE*/
-.flex_row div {
-    border: 1px solid black;
+/* Player selector styling */
+#compareButton {
+    width: 140px;
+    font-size: 12px;
+    padding: 3px 6px 3px 6px;
 }
 
 #playerView {
-    min-width: 80%;
+    min-width: 1360px;
+    margin: 11.25px;
+}
+
+/* PLAYER SELECT STYLES*/
+#playerSelect {
+    width: 100%;
+}
+
+#player1DropdownContainer {
+    margin: 0 200px 0 200px;
+}
+
+#player2DropdownContainer {
+    margin: 0 200px 0 200px;
+}
+
+#player2DropdownContainer {
+    display: none;
 }
 
 #overallView {
-    width: 20%;
+    margin: 11.25px;
+    width: 500px;
 }
