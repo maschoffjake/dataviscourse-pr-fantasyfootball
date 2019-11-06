@@ -100,7 +100,7 @@ class Player {
       .attr('transform', `translate(${this.svgWidth/12},180)`);
 
     // Create rects
-    let group = this.svg
+    this.svg
       .append('g')
       .attr('id', 'tdBars')
       .attr('transform', 'translate(0, 380) scale(1,-1)')
@@ -144,7 +144,7 @@ class Player {
     .attr('transform', `translate(${this.svgWidth/12 + this.svgWidth/2},180)`);
 
     // Create rects
-    group = this.svg
+    this.svg
       .append('g')
       .attr('id', 'yardsBars')
       .attr('transform', 'translate(0, 380) scale(1,-1)')
