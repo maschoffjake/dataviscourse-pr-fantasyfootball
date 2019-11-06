@@ -65,7 +65,7 @@ class Overall {
         let updateData = [];
         this.allData.map(function(player){
             let x = Object.values(player.years);
-            let keys = x.filter(d => Object.keys(d)[0] == year);
+            let keys = x.filter(d => Object.keys(d)[0] === year);
 
             keys.forEach(function(yearData) {
                 const givenYear = Object.values(yearData);
