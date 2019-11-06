@@ -288,11 +288,11 @@ class Player {
     lines
       .transition()
       .duration(1000)
-      .attr('x1', (d, i) => { return yearScale(i); })
-      .attr('x2', (d, i) => { return yearScale(i); })
+      .attr('x1', (d, i) => { return yearScale1(i); })
+      .attr('x2', (d, i) => { return yearScale1(i); })
       .style('opacity', 1);
 
-    let centerOffset = yearScale(1) / 2;
+    let centerOffset = yearScale1(1) / 2;
 
     let yearGroupLabels = d3.select('#yearGroup1Labels');
 
@@ -320,7 +320,7 @@ class Player {
       .transition()
       .duration(1000)
       .text(d => Object.keys(d))
-      .attr('x', (d, i) => { return yearScale(i) + centerOffset; })
+      .attr('x', (d, i) => { return yearScale1(i) + centerOffset; })
       .style('opacity', 1);
 
     // TODO: change color of selected block w/ brush
