@@ -34,7 +34,13 @@ class Overall {
             .attr('transform', 'translate(30,0) scale(1,1)');//translate transform to get axis in proper spot
 
         //max is not working properly so will need to find a way to get max points from each player
-        const max = d3.max(this.data.map(d => d.years.filter(d => d.FantPt)));
+        // const max = d3.max(this.data.map(d => d.years.FantPt));
+        let ptList = [];
+        this.data.forEach(function(player) {
+            player.years.forEach(function(year){
+                ptList.push(year);
+            });
+        });
         this.yScale = d3
             .scaleLinear()
             .domain([0, 500])
