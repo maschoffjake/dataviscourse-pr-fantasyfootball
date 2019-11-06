@@ -8,6 +8,8 @@ class Main {
         this.player1 = {};
         this.player2 = {};
 
+        this.compareEnable = false;
+
         console.log(this.data);
 
         let that = this;
@@ -21,6 +23,17 @@ class Main {
                 }
             });
             that.updateView();
+        });
+
+        // Setup compare button event listener
+        d3.select('#compareButton').on('click', function() {
+            that.compareEnable = !that.compareEnable;
+            that.playerView.compareMode(that.compareEnable);
+            if (that.compareEnable) {
+                that.addPlayer2Dropdown();
+            } else {
+                that.removePlayer2Dropdown();
+            }
         });
     }
 
@@ -44,5 +57,13 @@ class Main {
 
     updateOverallView() {
 
+    }
+
+    addPlayer2Dropdown() {
+        $('#player2DropdownContainer').show('slow');
+    }
+
+    removePlayer2Dropdown() {
+        $('#player2DropdownContainer').hide('slow');
     }
 }
