@@ -14,6 +14,7 @@ class Player {
       });
 
     this.rectWidth = 20;
+    this.transitionTime = 1000;
   }
 
   /**
@@ -171,13 +172,10 @@ class Player {
    * Used to update the bar charts and the axis for the new player
    */
   updateBarCharts() {
-    console.log('updating');
-    console.log(this.player1);
 
     // Just update on first year, since we can't select years yet
     // TODO: change this to dynamically grab correct year
     let playerStats = this.player1.years[0][[Object.keys(this.player1.years[0])[0]]];
-    console.log(playerStats);
 
     let passing = playerStats.passing;
     let receiving = playerStats.receiving;
@@ -185,9 +183,6 @@ class Player {
 
     let TDData = [Number(passing.touchdownPasses), Number(rushing.rushingTouchdowns), Number(receiving.receivingTouchdowns)];
     let yardData = [Number(passing.passingYards), Number(rushing.rushingYards), Number(receiving.receivingYards)];
-
-    console.log(TDData);
-    console.log(yardData);
 
     // Create scales
     let axisTDScale = d3.scaleLinear()
@@ -210,6 +205,8 @@ class Player {
     d3.select('#tdBars')
       .selectAll('rect')
       .data(TDData)
+      .transition()
+      .duration(this.transitionTime)
       .attr('height', d => {
         console.log('TDdata', d);
         return TDBarScale(d);
@@ -218,6 +215,8 @@ class Player {
     d3.select('#yardsBars')
       .selectAll('rect')
       .data(yardData)
+      .transition()
+      .duration(this.transitionTime)
       .attr('height', d => {
         console.log('yardData', d);
         return yardsBarScale(d);
@@ -225,6 +224,8 @@ class Player {
 
     // Update the axis
     d3.select('#tdYBarChartAxis')
+      .transition()
+      .duration(this.transitionTime)
       .call(d3.axisLeft(axisTDScale))
       .call(g => {
           // Remove the line
@@ -232,6 +233,8 @@ class Player {
       });
 
     d3.select('#yardsYBarChartAxis')
+      .transition()
+      .duration(this.transitionTime)
       .call(d3.axisLeft(axisYardsScale))
       .call(g => {
           // Remove the line
