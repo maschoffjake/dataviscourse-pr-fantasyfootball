@@ -49,7 +49,7 @@ class Player {
     yearGroup1.append('rect')
       .attr('width', 500)
       .attr('height', 50)
-      .classed('yearBar', true);
+      .classed('year_bar', true);
 
     yearGroup1.append('g')
       .attr('id', 'yearGroup1Axis')
@@ -68,6 +68,103 @@ class Player {
   }
 
   /**
+   * Updates the year bar to a player's years that they've played
+   */
+  updateYearBarAndBrush () {
+    d3.selectAll(".brush").call(this.player1Brush.move, null);
+
+    let yearScale1 = d3
+      .scaleLinear()
+      .domain([0, this.player1.years.length])
+      .range([0, 500]);
+
+    let yearAxis = d3.axisBottom()
+      .tickValues([])
+      .scale(yearScale1);
+
+    d3.select('#yearGroup1Axis')
+      .call(yearAxis);
+
+    let yearGroup = d3.select('#yearGroup1');
+
+    yearGroup
+      .transition()
+      .duration(1000)
+      .style('opacity', 1);
+
+    let yearGroupLines = d3.select('#yearGroup1Lines');
+
+    let lines = yearGroupLines
+      .selectAll('line')
+      .data(this.player1.years);
+
+    let newLines = lines.enter()
+      .append('line')
+      .classed('year_group_lines', true)
+      .attr('x1', 500)
+      .attr('x2', 500)
+      .attr('y1', 0)
+      .attr('y2', 50)
+      .style('opacity', 0);
+
+    lines.exit()
+      .transition()
+      .duration(1000)
+      .attr('x1', 500)
+      .attr('x2', 500)
+      .style('opacity', 0)
+      .remove();
+
+    lines = newLines.merge(lines);
+
+    lines
+      .transition()
+      .duration(1000)
+      .attr('x1', (d, i) => {
+        return yearScale1(i);
+      })
+      .attr('x2', (d, i) => {
+        return yearScale1(i);
+      })
+      .style('opacity', 1);
+
+    let centerOffset = yearScale1(1) / 2;
+
+    let yearGroupLabels = d3.select('#yearGroup1Labels');
+
+    let labels = yearGroupLabels
+      .selectAll('text')
+      .data(this.player1.years);
+
+    let newLables = labels.enter()
+      .append('text')
+      .attr("text-anchor", "middle")
+      .attr('x', 500)
+      .attr('y', 30)
+      .style('opacity', 0);
+
+    labels.exit()
+      .transition()
+      .duration(1000)
+      .attr('x', 500)
+      .style('opacity', 0)
+      .remove();
+
+    labels = newLables.merge(labels);
+
+    labels
+      .transition()
+      .duration(1000)
+      .text(d => Object.keys(d))
+      .attr('x', (d, i) => {
+        return yearScale1(i) + centerOffset;
+      })
+      .style('opacity', 1);
+
+    // TODO: change color of selected block w/ brush
+  }
+
+    /**
    * Creates the default view of a single player for a single view (2 bar charts and text for other stats)
    */
   createBarCharts() {
