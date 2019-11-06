@@ -12,6 +12,9 @@ class Player {
       .on('brush', function () {
         console.log('here');
       });
+
+    this.rectWidth = 20;
+    this.transitionTime = 1000;
   }
 
   /**
@@ -31,6 +34,7 @@ class Player {
    */
   updatePlayerView() {
     this.updateYearBarAndBrush();
+    this.updateBarCharts();
   }
 
   /**
@@ -73,24 +77,163 @@ class Player {
     // Create TDs bar chart
     let xAxisLabels = ['Passing', 'Rushing', 'Receiving'];
 
-    let linearScale = d3.scaleLinear()
+    let xlinearScale = d3.scaleLinear()
       .domain([0, 2])
       .range([this.svgWidth/10, this.svgWidth/2 - this.svgWidth/10]);
     
     this.svg.append('g')
-      .attr('id', 'tdBarChart')
-      .attr('transform', 'translate(50,400)')
+      .attr('id', 'tdXBarChartAxis')
+      .attr('transform', 'translate(0,400)')
       .selectAll('text')
       .data(xAxisLabels)
       .enter()
       .append('text')
       .attr('x', function(d, i) {
-        return linearScale(i);
+        return xlinearScale(i);
       })
       .text(function(d) {
         return d;
       });
 
+    // Y labels
+    let ylinearScale = d3.scaleLinear()
+      .domain([60, 0])
+      .range([0,200]);
+
+    this.svg.append('g')
+      .attr('id', 'tdYBarChartAxis')
+      .attr('transform', `translate(${this.svgWidth/12},180)`);
+
+    // Create rects
+    this.svg
+      .append('g')
+      .attr('id', 'tdBars')
+      .attr('transform', 'translate(0, 380) scale(1,-1)')
+      .selectAll('rect')
+      .data(xAxisLabels)
+      .enter()
+      .append('rect')
+      .attr('x', (d,i) => {
+        return xlinearScale(i);
+      })
+      .attr('width', this.rectWidth);
+
+
+    // Create yards bar chart
+    // X labels
+    xlinearScale = d3.scaleLinear()
+      .domain([0, 2])
+      .range([this.svgWidth/2 + this.svgWidth/10, this.svgWidth - this.svgWidth/10]);
+    
+    this.svg.append('g')
+      .attr('id', 'yardsBarChart')
+      .attr('transform', 'translate(0,400)')
+      .selectAll('text')
+      .data(xAxisLabels)
+      .enter()
+      .append('text')
+      .attr('x', function(d, i) {
+        return xlinearScale(i);
+      })
+      .text(function(d) {
+        return d;
+      });
+
+    // Y labels
+    ylinearScale = d3.scaleLinear()
+      .domain([5000, 0])
+      .range([0,200]);
+
+  this.svg.append('g')
+    .attr('id', 'yardsYBarChartAxis')
+    .attr('transform', `translate(${this.svgWidth/12 + this.svgWidth/2},180)`);
+
+    // Create rects
+    this.svg
+      .append('g')
+      .attr('id', 'yardsBars')
+      .attr('transform', 'translate(0, 380) scale(1,-1)')
+      .selectAll('rect')
+      .data(xAxisLabels)
+      .enter()
+      .append('rect')
+      .attr('x', (d,i) => {
+        return xlinearScale(i);
+      })
+      .attr('width', this.rectWidth);
+  }
+
+  /**
+   * Used to update the bar charts and the axis for the new player
+   */
+  updateBarCharts() {
+
+    // Just update on first year, since we can't select years yet
+    // TODO: change this to dynamically grab correct year
+    let playerStats = this.player1.years[0][[Object.keys(this.player1.years[0])[0]]];
+
+    let passing = playerStats.passing;
+    let receiving = playerStats.receiving;
+    let rushing = playerStats.rushing;
+
+    let TDData = [Number(passing.touchdownPasses), Number(rushing.rushingTouchdowns), Number(receiving.receivingTouchdowns)];
+    let yardData = [Number(passing.passingYards), Number(rushing.rushingYards), Number(receiving.receivingYards)];
+
+    // Create scales
+    let axisTDScale = d3.scaleLinear()
+      .domain([d3.max(TDData), 0])
+      .range([0,200]);
+
+    let TDBarScale = d3.scaleLinear()
+      .domain([0, d3.max(TDData)])
+      .range([0,200]);
+
+    let axisYardsScale = d3.scaleLinear()
+      .domain([d3.max(yardData), 0])
+      .range([0,200]);
+
+    let yardsBarScale = d3.scaleLinear()
+      .domain([0, d3.max(yardData)])
+      .range([0,200]);
+
+    // Update the bars
+    d3.select('#tdBars')
+      .selectAll('rect')
+      .data(TDData)
+      .transition()
+      .duration(this.transitionTime)
+      .attr('height', d => {
+        return TDBarScale(d);
+      });
+
+    d3.select('#yardsBars')
+      .selectAll('rect')
+      .data(yardData)
+      .transition()
+      .duration(this.transitionTime)
+      .attr('height', d => {
+        return yardsBarScale(d);
+      });
+
+    // Update the axis
+    d3.select('#tdYBarChartAxis')
+      .transition()
+      .duration(this.transitionTime)
+      .call(d3.axisLeft(axisTDScale))
+      .call(g => {
+          // Remove the line
+          g.select('.domain').remove();
+      });
+
+    d3.select('#yardsYBarChartAxis')
+      .transition()
+      .duration(this.transitionTime)
+      .call(d3.axisLeft(axisYardsScale))
+      .call(g => {
+          // Remove the line
+          g.select('.domain').remove();
+      });
+      
   }
 
   /**
