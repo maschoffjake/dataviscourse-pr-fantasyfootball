@@ -9,22 +9,52 @@ class Overall {
 
         let overallDiv = d3.select('#overallView');
         overallDiv
+            .append('g')
+            .attr('id', 'overallChartGroup');
+
+        overallDiv
+            .select('#overallChartGroup')
+            // .append('g')
             .append('svg')
-            .attr('width', 360)
-            .attr('height', 360);
+            .attr('width', 500)
+            .attr('height', 700)
+            // .append('g')
+            // .attr('id', 'overallChartHeaderGroup')
+            .append('text')
+            .text('Overall Data for Year')
+            .style('font-size', '38px')
+            .attr('x', 100)
+            .attr('y', 80);
+
+        overallDiv
+            .select('#overallChartGroup')
+            .select('svg')
+            .append('text')
+            .attr('id', 'xAxisLabel')
+            .attr('transform', 'translate(255, 150)')
+            .text('Players')
+            .classed('axisLabel', true);
+        overallDiv
+            .select('#overallChartGroup')
+            .select('svg')
+            .append('text')
+            .attr('id', 'yAxisLabel')
+            .attr('transform', 'translate(30, 470) rotate(90) scale(-1,-1)')
+            .text('Fantasy Points')
+            .classed('axisLabel', true);
 
         let xAxisGroup = overallDiv
             .select('svg')
             .append('g')
-            .attr('transform', 'translate(0,340)');
+            .attr('transform', 'translate(0,210)');
 
         this.xScale = d3
             .scaleLinear()
             .domain([0, this.allData.length])
-            .range([30, 340])
+            .range([80, 480])
             .nice();
 
-        this.xAxis = d3.axisBottom();
+        this.xAxis = d3.axisTop();
         this.xAxis.scale(this.xScale);
 
         xAxisGroup.call(this.xAxis);
@@ -32,7 +62,7 @@ class Overall {
         let yAxisGroup = overallDiv
             .select('svg')
             .append('g')
-            .attr('transform', 'translate(30,0) scale(1,1)');//translate transform to get axis in proper spot
+            .attr('transform', 'translate(80,0)');//translate transform to get axis in proper spot
 
         //max is not working properly so will need to find a way to get max points from each player
         // const max = d3.max(this.allData.map(d => d.years.FantPt));
@@ -47,7 +77,7 @@ class Overall {
         this.yScale = d3
             .scaleLinear()
             .domain([0, Math.max(...ptList)])
-            .range([340, 10])
+            .range([210, 630])
             .nice();
 
         this.yAxis = d3.axisLeft();
