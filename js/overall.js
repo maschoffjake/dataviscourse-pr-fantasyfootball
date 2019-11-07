@@ -6,7 +6,7 @@ class Overall {
     }
 
     createChart() {
-
+        this.parseDataForYear("2016", "QB"); //this may need to be called earlier in the function
         let overallDiv = d3.select('#overallView');
         overallDiv
             .append('g')
@@ -50,7 +50,7 @@ class Overall {
 
         this.xScale = d3
             .scaleLinear()
-            .domain([0, this.allData.length])
+            .domain([0, this.overallData.length])
             .range([80, 480])
             .nice();
 
@@ -67,12 +67,15 @@ class Overall {
         //max is not working properly so will need to find a way to get max points from each player
         // const max = d3.max(this.allData.map(d => d.years.FantPt));
         let ptList = [];
-        this.allData.forEach(function(player) {
-            player.years.forEach(function(year){
-                Object.values(year).forEach(function(key) {
-                    ptList.push((key.fantasyPoints != '') ? key.fantasyPoints : '0');
-                })
-            });
+        // this.overallData.forEach(function(player) {
+        //     player.years.forEach(function(year){
+        //         Object.values(year).forEach(function(key) {
+        //             ptList.push((key.fantasyPoints != '') ? key.fantasyPoints : '0');
+        //         })
+        //     });
+        // });
+        this.overallData.forEach(function(player) {
+            ptList.push(player.year.fantasyPoints);
         });
         this.yScale = d3
             .scaleLinear()
@@ -84,7 +87,6 @@ class Overall {
         this.yAxis.scale(this.yScale);
 
         yAxisGroup.call(this.yAxis);
-        this.parseDataForYear("2016", "QB"); //this may need to be called earlier in the function
     }
 
     updateChart() {
@@ -102,9 +104,8 @@ class Overall {
                 const pos = givenYear[0].position;
                 if(pos === position) {
                     let playerObj = {
-                        "name": player.name,
-                        "points": givenYear[0].fantasyPoints,
-                        "position": position
+                        'name': player.name,
+                        'year': givenYear[0]
                     };
                     updateData.push(playerObj)
                 }
