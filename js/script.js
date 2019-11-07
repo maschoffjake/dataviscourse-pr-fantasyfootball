@@ -65,7 +65,7 @@ async function loadFile(file) {
                             "yardsPerReception": row["Y/R"],
                             "receivingTouchdowns": row.RecTD
                         },
-                        "fantasyPoints": row.FantPt,
+                        "fantasyPoints": (row.FantPt !== '') ? row.FantPt : '0',
                         "ppr": row.PPR,
                         "ppg": row.PPG,
                         "pprpg": row.PPRPG,
