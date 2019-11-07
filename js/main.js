@@ -40,11 +40,14 @@ class Main {
         d3.select('#compareButton').on('click', function() {
             that.compareEnable = !that.compareEnable;
             that.playerView.compareMode(that.compareEnable);
+            let html = 'Compare Player';
             if (that.compareEnable) {
                 that.addPlayer2Dropdown();
+                html = 'Single Player';
             } else {
                 that.removePlayer2Dropdown();
             }
+            $('#compareButton').html(html);
             that.updateView();
         });
     }

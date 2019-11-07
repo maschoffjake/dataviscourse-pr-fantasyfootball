@@ -7,16 +7,15 @@ class Player {
     this.svgWidth = 1300;
     this.svgHeight = 1000;
 
-    this.player1Brush = d3.brushX()
-      .extent([[0, 0], [500, 50]])
-      .on('brush', function () {
-        console.log('Player 1');
-      });
+    this.yearSelectorWidth = 500;
+    this.yearSelectorHeight = 50;
 
-    this.player2Brush = d3.brushX()
+    let that = this;
+
+    this.brush = d3.brushX()
       .extent([[0, 0], [500, 50]])
       .on('brush', function () {
-        console.log('Player 2');
+        that.updateSelectedYears(this.parentNode.id);
       });
 
     this.rectWidth = 80;
@@ -31,8 +30,8 @@ class Player {
       .attr('width', this.svgWidth)
       .attr('height', this.svgHeight);
 
-    this.createYearBarAndBrush('Player1', this.player1Brush);
-    this.createYearBarAndBrush('Player2', this.player2Brush);
+    this.createYearBarAndBrush('Player2');
+    this.createYearBarAndBrush('Player1');
     this.createBarCharts();
 
   }
@@ -41,32 +40,31 @@ class Player {
    *  Updates the player view with the current data values.
    */
   updatePlayerView() {
-    console.log('here');
     let xPlayer1 = 430;
     let xPlayer2 = 430;
     let y = 50;
 
     if (this.compareEnable) {
-      xPlayer1 = 50;
-      xPlayer2 = 600;
+      xPlayer1 = 90;
+      xPlayer2 = 770;
     }
-    this.updateYearBarAndBrush('Player1', this.player1, this.player1Brush, xPlayer1, y);
-    this.updateYearBarAndBrush('Player2', this.player2, this.player2Brush, xPlayer2, y);
+    this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
+    this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
     this.updateBarCharts();
   }
 
   /**
    * Creates year bar scale and brush.
    */
-  createYearBarAndBrush (player, brush) {
+  createYearBarAndBrush (player) {
     let yearGroup = this.svg.append('g')
       .attr('id', `yearGroup${player}`)
       .style('opacity', 0)
       .attr('transform', `translate(430, 50)`);
 
     yearGroup.append('rect')
-      .attr('width', 500)
-      .attr('height', 50)
+      .attr('width', this.yearSelectorWidth)
+      .attr('height',this.yearSelectorHeight)
       .classed('year_bar', true);
 
     yearGroup.append('g')
@@ -82,13 +80,13 @@ class Player {
     yearGroup
       .append('g')
       .attr('class', 'brush')
-      .call(brush);
+      .call(this.brush);
   }
 
   /**
    * Updates the year bar to a player's years that they've played
    */
-  updateYearBarAndBrush (player, playerData, brush, x, y) {
+  updateYearBarAndBrush (player, playerData, x, y) {
     let opacity = 1;
     if ((player === 'Player2' && !this.compareEnable) || !playerData) {
       opacity = 0;
@@ -100,7 +98,7 @@ class Player {
       .attr('transform', `translate(${x}, ${y})`)
       .style('opacity', opacity);
 
-    yearGroup.selectAll(".brush").call(brush.move, null);
+    yearGroup.selectAll(".brush").call(this.brush.move, null);
 
     if (opacity === 0) {
       return;
@@ -127,17 +125,17 @@ class Player {
     let newLines = lines.enter()
       .append('line')
       .classed('year_group_lines', true)
-      .attr('x1', 500)
-      .attr('x2', 500)
+      .attr('x1', this.yearSelectorWidth)
+      .attr('x2', this.yearSelectorWidth)
       .attr('y1', 0)
-      .attr('y2', 50)
+      .attr('y2', this.yearSelectorHeight)
       .style('opacity', 0);
 
     lines.exit()
       .transition()
       .duration(1000)
-      .attr('x1', 500)
-      .attr('x2', 500)
+      .attr('x1', this.yearSelectorWidth)
+      .attr('x2', this.yearSelectorWidth)
       .style('opacity', 0)
       .remove();
 
@@ -165,14 +163,14 @@ class Player {
     let newLables = labels.enter()
       .append('text')
       .attr("text-anchor", "middle")
-      .attr('x', 500)
+      .attr('x', this.yearSelectorWidth)
       .attr('y', 30)
       .style('opacity', 0);
 
     labels.exit()
       .transition()
       .duration(1000)
-      .attr('x', 500)
+      .attr('x', this.yearSelectorWidth)
       .style('opacity', 0)
       .remove();
 
@@ -387,5 +385,25 @@ class Player {
    */
   compareMode(compareEnable) {
     this.compareEnable = compareEnable;
+  }
+
+  /**
+   * Update the selected years with brush over.
+   * @param playerGroup - Player group ID.
+   */
+  updateSelectedYears(playerGroup) {
+    let s = d3.event.selection;
+    if (!s) {
+      return;
+    }
+    let selectedPlayer = this.player1;
+    if (playerGroup.includes('Player2')) {
+      selectedPlayer = this.player2;
+    }
+    let yearBlockSize = this.yearSelectorWidth/selectedPlayer.years.length;
+    let startIndex = Math.floor(s[0] / yearBlockSize);
+    let endIndex = Math.floor(s[1] / yearBlockSize);
+
+    console.log(startIndex, endIndex);
   }
 }
