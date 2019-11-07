@@ -75,10 +75,10 @@ class Main {
     }
 
     addPlayer2Dropdown() {
-        $('#player2DropdownContainer').show('slow');
+        $('#player2DropdownContainer').show(1000);
     }
 
     removePlayer2Dropdown() {
-        $('#player2DropdownContainer').hide('slow');
+        $('#player2DropdownContainer').hide(1000);
     }
 }
