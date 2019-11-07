@@ -31,8 +31,8 @@ class Overall {
             .select('svg')
             .append('text')
             .attr('id', 'xAxisLabel')
-            .attr('transform', 'translate(255, 150)')
-            .text('Players')
+            .attr('transform', 'translate(225, 150)')
+            .text('Fantasy Points')
             .classed('axisLabel', true);
         overallDiv
             .select('#overallChartGroup')
@@ -40,8 +40,13 @@ class Overall {
             .append('text')
             .attr('id', 'yAxisLabel')
             .attr('transform', 'translate(30, 470) rotate(90) scale(-1,-1)')
-            .text('Fantasy Points')
+            .text('Player Names')
             .classed('axisLabel', true);
+
+        let ptList = [];
+        this.overallData.forEach(function(player) {
+            ptList.push(player.year.fantasyPoints);
+        });
 
         let xAxisGroup = overallDiv
             .select('svg')
@@ -50,7 +55,7 @@ class Overall {
 
         this.xScale = d3
             .scaleLinear()
-            .domain([0, this.overallData.length])
+            .domain([0, Math.max(...ptList)])
             .range([80, 480])
             .nice();
 
@@ -64,17 +69,18 @@ class Overall {
             .append('g')
             .attr('transform', 'translate(80,0)');//translate transform to get axis in proper spot
 
-        //max is not working properly so will need to find a way to get max points from each player
-        // const max = d3.max(this.allData.map(d => d.years.FantPt));
-        let ptList = [];
-        this.overallData.forEach(function(player) {
-            ptList.push(player.year.fantasyPoints);
-        });
+        // const tickVals = this.overallData.map(d => d.name).filter(function(d, i) {
+        //     if(this.overallData.length < 20) {
+        //         return i;
+        //     }
+        //     else{
+        //         return i%10;
+        //     }
+        // });
         this.yScale = d3
-            .scaleLinear()
-            .domain([0, Math.max(...ptList)])
-            .range([210, 630])
-            .nice();
+            .scaleBand()
+            .domain(this.overallData.map(d => d.name))
+            .range([210, 680]);
 
         this.yAxis = d3.axisLeft();
         this.yAxis.scale(this.yScale);
