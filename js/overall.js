@@ -67,13 +67,6 @@ class Overall {
         //max is not working properly so will need to find a way to get max points from each player
         // const max = d3.max(this.allData.map(d => d.years.FantPt));
         let ptList = [];
-        // this.overallData.forEach(function(player) {
-        //     player.years.forEach(function(year){
-        //         Object.values(year).forEach(function(key) {
-        //             ptList.push((key.fantasyPoints != '') ? key.fantasyPoints : '0');
-        //         })
-        //     });
-        // });
         this.overallData.forEach(function(player) {
             ptList.push(player.year.fantasyPoints);
         });
