@@ -1,6 +1,21 @@
 loadFile('data/Raw_Data_10yrs.csv').then(data => {
     let mainView = new Main(data);
     mainView.setupView();
+
+    // Used for finding duplicates if need be...
+    // for (let item of data) {
+    //     let playerYears = [];
+    //     for (let years of item.years) {
+    //         let year = Object.keys(years)[0];
+    //         playerYears.push(year);
+    //     }
+    //     // console.log(playerYears);
+    //     let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index);
+    //     let dups = findDuplicates(playerYears);
+    //     if (dups.length > 0) {
+    //         console.log(item.name);
+    //     }
+    // }
 });
 
 async function loadFile(file) {
