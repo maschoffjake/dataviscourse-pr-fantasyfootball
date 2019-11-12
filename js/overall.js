@@ -69,23 +69,40 @@ class Overall {
         xAxisGroup.call(this.xAxis);
 
         //Create the y-axis group and scale
+        // let yAxisGroup = overallDiv
+        //     .select('svg')
+        //     .append('g')
+        //     .attr('transform', 'translate(100,0)');//translate transform to get axis in proper spot
+        //
+        // // const tickVals = this.overallData.map(d => d.name).filter(function(d, i) {
+        // //     if(this.overallData.length < 20) {
+        // //         return i;
+        // //     }
+        // //     else{
+        // //         return i%10;
+        // //     }
+        // // });
+        // this.yScale = d3
+        //     .scaleBand()
+        //     .domain(this.overallData.map(d => d.name))
+        //     .range([210, this.overallData.length * 15]);
+
         let yAxisGroup = overallDiv
             .select('svg')
             .append('g')
-            .attr('transform', 'translate(100,0)');//translate transform to get axis in proper spot
+            .attr('transform', 'translate(80,0)');//translate transform to get axis in proper spot
 
-        // const tickVals = this.overallData.map(d => d.name).filter(function(d, i) {
-        //     if(this.overallData.length < 20) {
-        //         return i;
-        //     }
-        //     else{
-        //         return i%10;
-        //     }
-        // });
+        //max is not working properly so will need to find a way to get max points from each player
+        // const max = d3.max(this.allData.map(d => d.years.FantPt));
+        let ptList = [];
+        this.overallData.forEach(function(player) {
+            ptList.push(player.year.fantasyPoints);
+        });
         this.yScale = d3
-            .scaleBand()
-            .domain(this.overallData.map(d => d.name))
-            .range([210, this.overallData.length * 15]);
+            .scaleLinear()
+            .domain([0, Math.max(...ptList)])
+            .range([210, 630])
+            .nice();
 
         this.yAxis = d3.axisLeft();
         this.yAxis.scale(this.yScale);
