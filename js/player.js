@@ -35,7 +35,7 @@ class Player {
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
-    this.createBarCharts();
+    this.createSpiderCharts();
 
   }
 
@@ -51,9 +51,9 @@ class Player {
       xPlayer1 = 90;
       xPlayer2 = 770;
     }
+    console.log(this.player1);
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
-    this.updateBarCharts();
   }
 
   /**
@@ -208,99 +208,11 @@ class Player {
   }
 
     /**
-   * Creates the default view of a single player for a single view (2 bar charts and text for other stats)
+   * Creates the spider charts for the categories of a player's stats
    */
-  createBarCharts() {
+  createSpiderCharts() {
 
-    // 90
-
-    // Create TDs bar chart
-    let xAxisLabels = ['Passing', 'Rushing', 'Receiving'];
-
-    let xlinearScale = d3.scaleLinear()
-      .domain([0, 2])
-      .range([this.svgWidth/10, this.svgWidth/2 - this.svgWidth/10]);
-    
-    this.svg.append('g')
-      .attr('id', 'tdXBarChartAxis')
-      .attr('transform', 'translate(0,400)')
-      .selectAll('text')
-      .data(xAxisLabels)
-      .enter()
-      .append('text')
-      .attr('x', function(d, i) {
-        return xlinearScale(i);
-      })
-      .text(function(d) {
-        return d;
-      });
-
-    // Y labels
-    let ylinearScale = d3.scaleLinear()
-      .domain([60, 0])
-      .range([0,200]);
-
-    this.svg.append('g')
-      .attr('id', 'tdYBarChartAxis')
-      .attr('transform', `translate(${this.svgWidth/12},180)`);
-
-    // Create rects
-    this.svg
-      .append('g')
-      .attr('id', 'tdBars')
-      .attr('transform', 'translate(0, 380) scale(1,-1)')
-      .selectAll('rect')
-      .data(xAxisLabels)
-      .enter()
-      .append('rect')
-      .attr('x', (d,i) => {
-        return xlinearScale(i);
-      })
-      .attr('width', this.rectWidth);
-
-
-    // Create yards bar chart
-    // X labels
-    xlinearScale = d3.scaleLinear()
-      .domain([0, 2])
-      .range([this.svgWidth/2 + this.svgWidth/10, this.svgWidth - this.svgWidth/10]);
-    
-    this.svg.append('g')
-      .attr('id', 'yardsBarChart')
-      .attr('transform', 'translate(0,400)')
-      .selectAll('text')
-      .data(xAxisLabels)
-      .enter()
-      .append('text')
-      .attr('x', function(d, i) {
-        return xlinearScale(i);
-      })
-      .text(function(d) {
-        return d;
-      });
-
-    // Y labels
-    ylinearScale = d3.scaleLinear()
-      .domain([5000, 0])
-      .range([0,200]);
-
-  this.svg.append('g')
-    .attr('id', 'yardsYBarChartAxis')
-    .attr('transform', `translate(${this.svgWidth/12 + this.svgWidth/2},180)`);
-
-    // Create rects
-    this.svg
-      .append('g')
-      .attr('id', 'yardsBars')
-      .attr('transform', 'translate(0, 380) scale(1,-1)')
-      .selectAll('rect')
-      .data(xAxisLabels)
-      .enter()
-      .append('rect')
-      .attr('x', (d,i) => {
-        return xlinearScale(i);
-      })
-      .attr('width', this.rectWidth);
+   
   }
 
   /**

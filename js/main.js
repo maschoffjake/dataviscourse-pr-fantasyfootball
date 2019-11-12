@@ -5,8 +5,10 @@ class Main {
         this.playerView = new Player();
         this.overallView = new Overall(this.data);
 
-        this.player1 = null;
+        this.player1 = this.data[0];
         this.player2 = null;
+
+        this.updateView();
 
         this.compareEnable = false;
 
@@ -58,6 +60,7 @@ class Main {
     }
 
     updateView() {
+
         // Update player view.
         this.updatePlayerView();
 
