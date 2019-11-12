@@ -6,7 +6,7 @@ class Overall {
     }
 
     createChart() {
-        this.parseDataForYear("2016", "QB");
+        this.parseDataForYear("2016", 'QB');
 
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
@@ -19,7 +19,7 @@ class Overall {
             .select('#overallChartGroup')
             .append('svg')
             .attr('width', 500)
-            .attr('height', 700)
+            .attr('height', this.overallData.length * 25)
             .append('text')
             .text('Overall Data for Year')
             .style('font-size', '38px')
@@ -85,7 +85,7 @@ class Overall {
         this.yScale = d3
             .scaleBand()
             .domain(this.overallData.map(d => d.name))
-            .range([210, 680]);
+            .range([210, this.overallData.length * 15]);
 
         this.yAxis = d3.axisLeft();
         this.yAxis.scale(this.yScale);
