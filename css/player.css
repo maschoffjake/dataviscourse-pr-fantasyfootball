@@ -1,9 +1,10 @@
-.year_bar {
-    fill: none;
+.year_line {
     stroke-width: 2px;
     stroke: black;
 }
 
-.year_group_lines {
+.year_group_circles {
     stroke: black;
+    stroke-width: 2px;
+    fill: none;
 }

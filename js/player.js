@@ -13,7 +13,7 @@ class Player {
     let that = this;
 
     this.brush = d3.brushX()
-      .extent([[0, 0], [500, 50]])
+      .extent([[0, 20], [this.yearSelectorWidth, this.yearSelectorHeight]])
       .on('brush', function () {
         that.updateSelectedYears(this.parentNode.id);
       });
@@ -62,10 +62,12 @@ class Player {
       .style('opacity', 0)
       .attr('transform', `translate(430, 50)`);
 
-    yearGroup.append('rect')
-      .attr('width', this.yearSelectorWidth)
-      .attr('height',this.yearSelectorHeight)
-      .classed('year_bar', true);
+    yearGroup.append('line')
+      .attr('x1', 0)
+      .attr('y1', this.yearSelectorHeight*.7)
+      .attr('x2', this.yearSelectorWidth)
+      .attr('y2', this.yearSelectorHeight*.7)
+      .classed('year_line', true);
 
     yearGroup.append('g')
       .attr('id', `yearGroupAxis${player}`)
@@ -74,13 +76,13 @@ class Player {
     yearGroup.append('g')
       .attr('id', `yearGroupLabels${player}`);
 
-    yearGroup.append('g')
-      .attr('id', `yearGroupLines${player}`);
-
     yearGroup
       .append('g')
       .attr('class', 'brush')
       .call(this.brush);
+
+    yearGroup.append('g')
+      .attr('id', `yearGroupCircles${player}`);
   }
 
   /**
@@ -116,43 +118,40 @@ class Player {
     d3.select(`#yearGroupAxis${player}`)
       .call(yearAxis);
 
-    let yearGroupLines = d3.select(`#yearGroupLines${player}`);
+    let centerOffset = yearScale(1) / 2;
 
-    let lines = yearGroupLines
-      .selectAll('line')
+    let yearGroupCircles = d3.select(`#yearGroupCircles${player}`);
+
+    let circles = yearGroupCircles
+      .selectAll('circle')
       .data(playerData.years);
 
-    let newLines = lines.enter()
-      .append('line')
-      .classed('year_group_lines', true)
-      .attr('x1', this.yearSelectorWidth)
-      .attr('x2', this.yearSelectorWidth)
-      .attr('y1', 0)
-      .attr('y2', this.yearSelectorHeight)
+    let newCircles = circles.enter()
+      .append('circle')
+      .classed('year_group_circles', true)
+      .attr('cx', this.yearSelectorWidth)
+      .attr('cy', this.yearSelectorHeight*.7)
+      .attr('r', 0)
       .style('opacity', 0);
 
-    lines.exit()
+    circles.exit()
       .transition()
       .duration(1000)
-      .attr('x1', this.yearSelectorWidth)
-      .attr('x2', this.yearSelectorWidth)
+      .attr('cx', this.yearSelectorWidth)
+      .attr('r', 0)
       .style('opacity', 0)
       .remove();
 
-    lines = newLines.merge(lines);
+    circles = newCircles.merge(circles);
 
-    lines
+    circles
       .transition()
       .duration(1000)
-      .attr('x1', (d, i) => {
-        return yearScale(i);
+      .attr('cx', (d, i) => {
+        return yearScale(i) + centerOffset;
       })
-      .attr('x2', (d, i) => {
-        return yearScale(i);
-      })
+      .attr('r', 10)
       .style('opacity', 1);
-
-    let centerOffset = yearScale(1) / 2;
 
     let yearGroupLabels = d3.select(`#yearGroupLabels${player}`);
 
@@ -164,7 +163,7 @@ class Player {
       .append('text')
       .attr("text-anchor", "middle")
       .attr('x', this.yearSelectorWidth)
-      .attr('y', 30)
+      .attr('y', 15)
       .style('opacity', 0);
 
     labels.exit()
