@@ -1,9 +1,23 @@
-.year_bar {
-    fill: none;
+.year_line {
     stroke-width: 2px;
-    stroke: black;
+    stroke: grey;
 }
 
-.year_group_lines {
+.year_group_circles {
     stroke: black;
+    stroke-width: 1px;
+}
+
+.year_group_circles:hover {
+    cursor: pointer;
+}
+
+.year_group_circles_selected {
+    r: 12px;
+    stroke-width: 2px;
+}
+
+.selected_years {
+    font-weight: bold;
+    font-size: 1.1rem;
 }

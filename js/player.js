@@ -10,16 +10,21 @@ class Player {
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
+    this.minIndex = null;
+    this.maxIndex = null;
+
     let that = this;
 
     this.brush = d3.brushX()
-      .extent([[0, 0], [500, 50]])
-      .on('brush', function () {
+      .extent([[0, 20], [this.yearSelectorWidth, this.yearSelectorHeight]])
+      .on('start brush end', function () {
         that.updateSelectedYears(this.parentNode.id);
       });
 
     this.rectWidth = 80;
     this.transitionTime = 1000;
+
+    this.colorPaired = d3.scaleOrdinal(d3.schemePaired);
   }
 
   /**
@@ -32,7 +37,7 @@ class Player {
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
-    this.createBarCharts();
+    this.createSpiderCharts();
 
   }
 
@@ -48,9 +53,9 @@ class Player {
       xPlayer1 = 90;
       xPlayer2 = 770;
     }
+    console.log(this.player1);
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
-    this.updateBarCharts();
   }
 
   /**
@@ -62,10 +67,12 @@ class Player {
       .style('opacity', 0)
       .attr('transform', `translate(430, 50)`);
 
-    yearGroup.append('rect')
-      .attr('width', this.yearSelectorWidth)
-      .attr('height',this.yearSelectorHeight)
-      .classed('year_bar', true);
+    yearGroup.append('line')
+      .attr('x1', 0)
+      .attr('y1', this.yearSelectorHeight*.7)
+      .attr('x2', this.yearSelectorWidth)
+      .attr('y2', this.yearSelectorHeight*.7)
+      .classed('year_line', true);
 
     yearGroup.append('g')
       .attr('id', `yearGroupAxis${player}`)
@@ -74,13 +81,13 @@ class Player {
     yearGroup.append('g')
       .attr('id', `yearGroupLabels${player}`);
 
-    yearGroup.append('g')
-      .attr('id', `yearGroupLines${player}`);
-
     yearGroup
       .append('g')
       .attr('class', 'brush')
       .call(this.brush);
+
+    yearGroup.append('g')
+      .attr('id', `yearGroupCircles${player}`);
   }
 
   /**
@@ -116,43 +123,49 @@ class Player {
     d3.select(`#yearGroupAxis${player}`)
       .call(yearAxis);
 
-    let yearGroupLines = d3.select(`#yearGroupLines${player}`);
+    let centerOffset = yearScale(1) / 2;
 
-    let lines = yearGroupLines
-      .selectAll('line')
+    let yearGroupCircles = d3.select(`#yearGroupCircles${player}`);
+
+    let circles = yearGroupCircles
+      .selectAll('circle')
       .data(playerData.years);
 
-    let newLines = lines.enter()
-      .append('line')
-      .classed('year_group_lines', true)
-      .attr('x1', this.yearSelectorWidth)
-      .attr('x2', this.yearSelectorWidth)
-      .attr('y1', 0)
-      .attr('y2', this.yearSelectorHeight)
-      .style('opacity', 0);
+    let newCircles = circles.enter()
+      .append('circle')
+      .attr('cx', this.yearSelectorWidth)
+      .attr('cy', this.yearSelectorHeight*.7)
+      .attr('r', 0)
+      .style('opacity', 0)
+      .style('fill', this.colorPaired(0));
 
-    lines.exit()
+    circles.exit()
       .transition()
       .duration(1000)
-      .attr('x1', this.yearSelectorWidth)
-      .attr('x2', this.yearSelectorWidth)
+      .attr('cx', this.yearSelectorWidth)
+      .attr('r', 0)
       .style('opacity', 0)
       .remove();
 
-    lines = newLines.merge(lines);
+    circles = newCircles.merge(circles);
 
-    lines
+    circles
+      .on('click', function (d, i) {
+        console.log(i);
+      })
+      .attr('class', (d, i) => {
+        if (i === 0) {
+          return 'year_group_circles_selected';
+        }
+      })
+      .classed('year_group_circles', true)
       .transition()
       .duration(1000)
-      .attr('x1', (d, i) => {
-        return yearScale(i);
+      .attr('cx', (d, i) => {
+        return yearScale(i) + centerOffset;
       })
-      .attr('x2', (d, i) => {
-        return yearScale(i);
-      })
+      .attr('r', 10)
       .style('opacity', 1);
-
-    let centerOffset = yearScale(1) / 2;
 
     let yearGroupLabels = d3.select(`#yearGroupLabels${player}`);
 
@@ -164,7 +177,7 @@ class Player {
       .append('text')
       .attr("text-anchor", "middle")
       .attr('x', this.yearSelectorWidth)
-      .attr('y', 30)
+      .attr('y', 15)
       .style('opacity', 0);
 
     labels.exit()
@@ -189,99 +202,11 @@ class Player {
   }
 
     /**
-   * Creates the default view of a single player for a single view (2 bar charts and text for other stats)
+   * Creates the spider charts for the categories of a player's stats
    */
-  createBarCharts() {
+  createSpiderCharts() {
 
-    // 90
-
-    // Create TDs bar chart
-    let xAxisLabels = ['Passing', 'Rushing', 'Receiving'];
-
-    let xlinearScale = d3.scaleLinear()
-      .domain([0, 2])
-      .range([this.svgWidth/10, this.svgWidth/2 - this.svgWidth/10]);
-    
-    this.svg.append('g')
-      .attr('id', 'tdXBarChartAxis')
-      .attr('transform', 'translate(0,400)')
-      .selectAll('text')
-      .data(xAxisLabels)
-      .enter()
-      .append('text')
-      .attr('x', function(d, i) {
-        return xlinearScale(i);
-      })
-      .text(function(d) {
-        return d;
-      });
-
-    // Y labels
-    let ylinearScale = d3.scaleLinear()
-      .domain([60, 0])
-      .range([0,200]);
-
-    this.svg.append('g')
-      .attr('id', 'tdYBarChartAxis')
-      .attr('transform', `translate(${this.svgWidth/12},180)`);
-
-    // Create rects
-    this.svg
-      .append('g')
-      .attr('id', 'tdBars')
-      .attr('transform', 'translate(0, 380) scale(1,-1)')
-      .selectAll('rect')
-      .data(xAxisLabels)
-      .enter()
-      .append('rect')
-      .attr('x', (d,i) => {
-        return xlinearScale(i);
-      })
-      .attr('width', this.rectWidth);
-
-
-    // Create yards bar chart
-    // X labels
-    xlinearScale = d3.scaleLinear()
-      .domain([0, 2])
-      .range([this.svgWidth/2 + this.svgWidth/10, this.svgWidth - this.svgWidth/10]);
-    
-    this.svg.append('g')
-      .attr('id', 'yardsBarChart')
-      .attr('transform', 'translate(0,400)')
-      .selectAll('text')
-      .data(xAxisLabels)
-      .enter()
-      .append('text')
-      .attr('x', function(d, i) {
-        return xlinearScale(i);
-      })
-      .text(function(d) {
-        return d;
-      });
-
-    // Y labels
-    ylinearScale = d3.scaleLinear()
-      .domain([5000, 0])
-      .range([0,200]);
-
-  this.svg.append('g')
-    .attr('id', 'yardsYBarChartAxis')
-    .attr('transform', `translate(${this.svgWidth/12 + this.svgWidth/2},180)`);
-
-    // Create rects
-    this.svg
-      .append('g')
-      .attr('id', 'yardsBars')
-      .attr('transform', 'translate(0, 380) scale(1,-1)')
-      .selectAll('rect')
-      .data(xAxisLabels)
-      .enter()
-      .append('rect')
-      .attr('x', (d,i) => {
-        return xlinearScale(i);
-      })
-      .attr('width', this.rectWidth);
+   
   }
 
   /**
@@ -393,17 +318,40 @@ class Player {
    */
   updateSelectedYears(playerGroup) {
     let s = d3.event.selection;
+    d3.select(`#${playerGroup}`).selectAll('circle')
+      .style('fill', this.colorPaired(0));
+    d3.select(`#${playerGroup}`).selectAll('text')
+      .classed('selected_years', false);
     if (!s) {
       return;
     }
-    let selectedPlayer = this.player1;
-    if (playerGroup.includes('Player2')) {
-      selectedPlayer = this.player2;
-    }
-    let yearBlockSize = this.yearSelectorWidth/selectedPlayer.years.length;
-    let startIndex = Math.floor(s[0] / yearBlockSize);
-    let endIndex = Math.floor(s[1] / yearBlockSize);
 
-    console.log(startIndex, endIndex);
+    let minIndex = 50;
+    let maxIndex = 0;
+    d3.select(`#${playerGroup}`).selectAll('circle')
+      .filter(function (d, i) {
+        let xMin = parseInt(this.attributes.cx.value) - parseInt(this.attributes.r.value);
+        let xMax = parseInt(this.attributes.cx.value) + parseInt(this.attributes.r.value);
+        let validCircle = (xMin >= s[0] && xMin <= s[1]) || (xMax >= s[0] && xMax <= s[1]);
+        if (validCircle) {
+          if (i < minIndex) {
+            minIndex = i;
+          }
+          if (i > maxIndex) {
+            maxIndex = i;
+          }
+        }
+        return validCircle;
+      })
+      .style('fill', this.colorPaired(1));
+
+    d3.select(`#${playerGroup}`).selectAll('text')
+      .filter(function(d, i) {
+        return minIndex <= i && i <= maxIndex;
+      })
+      .classed('selected_years', true);
+
+    this.minIndex = minIndex;
+    this.maxIndex = maxIndex;
   }
 }
