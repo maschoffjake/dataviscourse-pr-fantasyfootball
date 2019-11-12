@@ -10,16 +10,21 @@ class Player {
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
+    this.minIndex = null;
+    this.maxIndex = null;
+
     let that = this;
 
     this.brush = d3.brushX()
       .extent([[0, 20], [this.yearSelectorWidth, this.yearSelectorHeight]])
-      .on('brush', function () {
+      .on('start brush end', function () {
         that.updateSelectedYears(this.parentNode.id);
       });
 
     this.rectWidth = 80;
     this.transitionTime = 1000;
+
+    this.colorPaired = d3.scaleOrdinal(d3.schemePaired);
   }
 
   /**
@@ -128,11 +133,11 @@ class Player {
 
     let newCircles = circles.enter()
       .append('circle')
-      .classed('year_group_circles', true)
       .attr('cx', this.yearSelectorWidth)
       .attr('cy', this.yearSelectorHeight*.7)
       .attr('r', 0)
-      .style('opacity', 0);
+      .style('opacity', 0)
+      .style('fill', this.colorPaired(0));
 
     circles.exit()
       .transition()
@@ -145,6 +150,15 @@ class Player {
     circles = newCircles.merge(circles);
 
     circles
+      .on('click', function (d, i) {
+        console.log(i);
+      })
+      .attr('class', (d, i) => {
+        if (i === 0) {
+          return 'year_group_circles_selected';
+        }
+      })
+      .classed('year_group_circles', true)
       .transition()
       .duration(1000)
       .attr('cx', (d, i) => {
@@ -392,17 +406,40 @@ class Player {
    */
   updateSelectedYears(playerGroup) {
     let s = d3.event.selection;
+    d3.select(`#${playerGroup}`).selectAll('circle')
+      .style('fill', this.colorPaired(0));
+    d3.select(`#${playerGroup}`).selectAll('text')
+      .classed('selected_years', false);
     if (!s) {
       return;
     }
-    let selectedPlayer = this.player1;
-    if (playerGroup.includes('Player2')) {
-      selectedPlayer = this.player2;
-    }
-    let yearBlockSize = this.yearSelectorWidth/selectedPlayer.years.length;
-    let startIndex = Math.floor(s[0] / yearBlockSize);
-    let endIndex = Math.floor(s[1] / yearBlockSize);
 
-    console.log(startIndex, endIndex);
+    let minIndex = 50;
+    let maxIndex = 0;
+    d3.select(`#${playerGroup}`).selectAll('circle')
+      .filter(function (d, i) {
+        let xMin = parseInt(this.attributes.cx.value) - parseInt(this.attributes.r.value);
+        let xMax = parseInt(this.attributes.cx.value) + parseInt(this.attributes.r.value);
+        let validCircle = (xMin >= s[0] && xMin <= s[1]) || (xMax >= s[0] && xMax <= s[1]);
+        if (validCircle) {
+          if (i < minIndex) {
+            minIndex = i;
+          }
+          if (i > maxIndex) {
+            maxIndex = i;
+          }
+        }
+        return validCircle;
+      })
+      .style('fill', this.colorPaired(1));
+
+    d3.select(`#${playerGroup}`).selectAll('text')
+      .filter(function(d, i) {
+        return minIndex <= i && i <= maxIndex;
+      })
+      .classed('selected_years', true);
+
+    this.minIndex = minIndex;
+    this.maxIndex = maxIndex;
   }
 }
