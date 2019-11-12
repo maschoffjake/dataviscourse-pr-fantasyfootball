@@ -1,6 +1,7 @@
 loadFile('data/Raw_Data_10yrs.csv').then(data => {
     let mainView = new Main(data);
     mainView.setupView();
+    mainView.updateView();
 
     // Used for finding duplicates if need be...
     // for (let item of data) {

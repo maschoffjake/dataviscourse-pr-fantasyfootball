@@ -51,7 +51,6 @@ class Player {
       xPlayer1 = 90;
       xPlayer2 = 770;
     }
-    console.log(this.player1);
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
   }
@@ -152,7 +151,17 @@ class Player {
         d3.select(`#${this.parentNode.id}`).selectAll('circle')
           .classed('selected_year_circle', false);
         d3.select(this).classed('selected_year_circle', true);
-        let grandpaNode = d3.select(`#${this.parentNode.id}`);
+        let grandpaNode = d3.select(`#${this.parentNode.id}`).select(function () {
+          return this.parentNode;
+        });
+        grandpaNode.selectAll('text')
+          .classed('selected_year_circle', false);
+        grandpaNode.selectAll('text')
+          .attr('class', (d, j) => {
+            if (j === i) {
+              return 'selected_year_circle';
+            }
+          });
       })
       .attr('class', (d, i) => {
         if (i === 0) {
