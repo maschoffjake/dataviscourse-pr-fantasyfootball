@@ -2,8 +2,8 @@ class Main {
 
     constructor(data) {
         this.data = data;
-        this.playerView = new Player();
-        this.overallView = new Overall(this.data);
+        this.playerView = new Player(this.updateSelectedYear);
+        this.overallView = new Overall(this.data, this.updateSelectedPlayer);
 
         this.player1 = this.data[0];
         this.player2 = this.data[0];
@@ -39,7 +39,7 @@ class Main {
         // Setup compare button event listener
         d3.select('#compareButton').on('click', function() {
             that.compareEnable = !that.compareEnable;
-            that.playerView.compareMode(that.compareEnable);
+            that.setCompareMode();
             let html = 'Compare Player';
             if (that.compareEnable) {
                 that.addPlayer2Dropdown();
@@ -67,11 +67,12 @@ class Main {
 
     updatePlayerView() {
         this.playerView.updateCurrentPlayers(this.player1, this.player2);
-        this.playerView.updatePlayerView();
+        this.playerView.updateView();
     }
 
     updateOverallView() {
-
+        this.overallView.updateCurrentPlayers(this.player1, this.player2);
+        this.overallView.updateView();
     }
 
     addPlayer2Dropdown() {
@@ -80,5 +81,19 @@ class Main {
 
     removePlayer2Dropdown() {
         $('#player2DropdownContainer').hide(1000);
+    }
+
+    updateSelectedPlayer(player1) {
+        this.player1 = player1;
+        this.updateView();
+    }
+
+    setCompareMode() {
+        this.playerView.setCompareMode(this.compareEnable);
+        this.overallView.setCompareMode(this.compareEnable);
+    }
+
+    updateSelectedYear(yearIndex) {
+        this.overallView.updateSelectedYear();
     }
 }

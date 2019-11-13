@@ -1,8 +1,11 @@
 class Player {
-  constructor() {
+  constructor(updateSelectedYearOverallView) {
     this.player1 = null;
     this.player2 = null;
     this.compareEnable = false;
+
+    // Callbacks
+    this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
     this.svgHeight = 1000;
@@ -42,7 +45,7 @@ class Player {
   /**
    *  Updates the player view with the current data values.
    */
-  updatePlayerView() {
+  updateView() {
     let xPlayer1 = 430;
     let xPlayer2 = 430;
     let y = 50;
@@ -56,7 +59,8 @@ class Player {
   }
 
   /**
-   * Creates year bar scale and brush.
+   *  Creates a new year selector for the specified players (for both single player and compare player).
+   * @param player - Player ID
    */
   createYearBarAndBrush (player) {
     let yearGroup = this.svg.append('g')
@@ -88,7 +92,11 @@ class Player {
   }
 
   /**
-   * Updates the year bar to a player's years that they've played
+   *
+   * @param player
+   * @param playerData
+   * @param x
+   * @param y
    */
   updateYearBarAndBrush (player, playerData, x, y) {
     let opacity = 1;
@@ -107,6 +115,8 @@ class Player {
     if (opacity === 0) {
       return;
     }
+
+    let that = this;
 
     let yearScale = d3
       .scaleLinear()
@@ -148,9 +158,12 @@ class Player {
 
     circles
       .on('click', function (d, i) {
+        // Update selected circle.
         d3.select(`#${this.parentNode.id}`).selectAll('circle')
           .classed('selected_year_circle', false);
         d3.select(this).classed('selected_year_circle', true);
+
+        // Update the selected text.
         let grandpaNode = d3.select(`#${this.parentNode.id}`).select(function () {
           return this.parentNode;
         });
@@ -162,6 +175,9 @@ class Player {
               return 'selected_year_circle';
             }
           });
+
+        // Update selected circle in overall view.
+        that.updateSelectedYearOverallView(i);
       })
       .attr('class', (d, i) => {
         if (i === 0) {
@@ -323,7 +339,7 @@ class Player {
    * Set the player view in compare mode with another player.
    * @param compareEnable - Boolean. True for compare mode and false for single player view.
    */
-  compareMode(compareEnable) {
+  setCompareMode(compareEnable) {
     this.compareEnable = compareEnable;
   }
 
