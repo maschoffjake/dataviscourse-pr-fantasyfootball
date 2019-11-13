@@ -42,18 +42,20 @@ body {
 }
 
 #player1DropdownContainer {
-    margin: 0 230px 0 230px;
+    margin: 0 215px 0 215px;
 }
 
 #player2DropdownContainer {
-    margin: 0 230px 0 230px;
-}
-
-#player2DropdownContainer {
+    margin: 0 215px 0 215px;
     display: none;
 }
 
 #overallView {
     margin: 11.25px;
     width: 500px;
+}
+
+/*Center text in player selector*/
+.filter-option-inner-inner {
+    text-align: center;
 }
