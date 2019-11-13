@@ -176,7 +176,8 @@ class Player {
             }
           });
 
-        // Update selected circle in overall view.
+        // Update selected circle in overall view only for player 1.
+        console.log(this);
         that.updateSelectedYearOverallView(i);
       })
       .attr('class', (d, i) => {

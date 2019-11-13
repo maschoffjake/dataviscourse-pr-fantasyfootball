@@ -2,8 +2,15 @@ class Main {
 
     constructor(data) {
         this.data = data;
-        this.playerView = new Player(this.updateSelectedYear);
-        this.overallView = new Overall(this.data, this.updateSelectedPlayer);
+        let playerView = new Player(updateSelectedYear);
+        let overallView = new Overall(this.data, this.updateSelectedPlayer);
+
+        this.playerView = playerView;
+        this.overallView = overallView;
+
+        function updateSelectedYear(yearIndex) {
+            overallView.updateSelectedYear(yearIndex);
+        }
 
         this.player1 = this.data[0];
         this.player2 = this.data[0];
@@ -11,7 +18,9 @@ class Main {
         this.compareEnable = false;
 
         console.log(this.data);
+    }
 
+    setupView() {
         let that = this;
 
         // Setup dropdown player selection event listener
@@ -50,9 +59,7 @@ class Main {
             $('#compareButton').html(html);
             that.updateView();
         });
-    }
 
-    setupView() {
         this.playerView.createPlayerView();
         this.overallView.createChart();
     }
@@ -91,9 +98,5 @@ class Main {
     setCompareMode() {
         this.playerView.setCompareMode(this.compareEnable);
         this.overallView.setCompareMode(this.compareEnable);
-    }
-
-    updateSelectedYear(yearIndex) {
-        this.overallView.updateSelectedYear();
     }
 }
