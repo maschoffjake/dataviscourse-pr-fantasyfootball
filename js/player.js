@@ -28,6 +28,9 @@ class Player {
     this.spiderChartRadius = 100;
     this.circleBuffer = 10;
     this.transitionTime = 1000;
+
+    this.maxValues = loadMaxes('data/Raw_Data_10yrs.csv');
+    console.log(this.maxValues);
   }
 
   /**
@@ -255,7 +258,6 @@ class Player {
     // Create circles which go around the spider chart
     let numberOfCircles = 5;
     let ticks = [...Array(numberOfCircles).keys()];
-    console.log(ticks);
     let cirleRadiusScale = d3.scaleLinear()
                               .domain([0, numberOfCircles])
                               .range([0, this.spiderChartRadius]);
