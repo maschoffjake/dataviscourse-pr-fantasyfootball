@@ -57,38 +57,37 @@ async function loadFile(file) {
             for(let row of yearData) {
                 let year = row.Year;
                 let obj = {
-                    [year] : {
-                        "team": row.Tm,
-                        "position": row.FantPos,
-                        "age": row.Age,
-                        "games": row.G,
-                        "gamesStarted": row.GS,
-                        "passing": {
-                            "completions": row.Cmp,
-                            "attempts": row.PassAtt,
-                            "passingYards": row.PassYds,
-                            "touchdownPasses": row.PassTD,
-                            "interceptions": row.Int
-                        },
-                        "rushing": {
-                            "attempts": row.RushAtt,
-                            "rushingYards": row.RushYds,
-                            "yardsPerAttempt": row["Y/A"],
-                            "rushingTouchdowns": row.RushTD
-                        },
-                        "receiving": {
-                            "target": row.Tgt,
-                            "receptions": row.Rec,
-                            "receivingYards": row.RecYds,
-                            "yardsPerReception": row["Y/R"],
-                            "receivingTouchdowns": row.RecTD
-                        },
-                        "fantasyPoints": (row.FantPt !== '' || row.Fantpt > 0) ? row.FantPt : '0',
-                        "ppr": row.PPR,
-                        "ppg": row.PPG,
-                        "pprpg": row.PPRPG,
-                        "positionRank": row.PosRank
-                    }
+                    "year": year,
+                    "team": row.Tm,
+                    "position": row.FantPos,
+                    "age": row.Age,
+                    "games": row.G,
+                    "gamesStarted": row.GS,
+                    "passing": {
+                        "completions": row.Cmp,
+                        "attempts": row.PassAtt,
+                        "passingYards": row.PassYds,
+                        "touchdownPasses": row.PassTD,
+                        "interceptions": row.Int
+                    },
+                    "rushing": {
+                        "attempts": row.RushAtt,
+                        "rushingYards": row.RushYds,
+                        "yardsPerAttempt": row["Y/A"],
+                        "rushingTouchdowns": row.RushTD
+                    },
+                    "receiving": {
+                        "target": row.Tgt,
+                        "receptions": row.Rec,
+                        "receivingYards": row.RecYds,
+                        "yardsPerReception": row["Y/R"],
+                        "receivingTouchdowns": row.RecTD
+                    },
+                    "fantasyPoints": (row.FantPt !== '' || row.Fantpt > 0) ? row.FantPt : '0',
+                    "ppr": row.PPR,
+                    "ppg": row.PPG,
+                    "pprpg": row.PPRPG,
+                    "positionRank": row.PosRank
                 };
                 //update the year list for given year for player
                 yearList.push(obj);

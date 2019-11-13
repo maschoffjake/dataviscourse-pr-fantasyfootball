@@ -49,6 +49,8 @@ class Player {
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
     this.createSpiderChart('Points', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
+
+
   }
 
   /**
@@ -243,7 +245,7 @@ class Player {
       })
       .transition()
       .duration(1000)
-      .text(d => Object.keys(d))
+      .text(d => d.year)
       .attr('x', (d, i) => {
         return yearScale(i) + centerOffset;
       })
@@ -291,6 +293,10 @@ class Player {
   updateSpiderChart(id, data1, data2, x, y) {
     let spiderChart = d3.select(`#spiderChart${id}`);
     
+  }
+
+  createLineGraph() {
+
   }
 
   /**
