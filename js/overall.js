@@ -59,7 +59,7 @@ class Overall {
         this.xScale = d3
             .scaleLinear()
             .domain([0, Math.max(...ptList)])
-            .range([100, 480])
+            .range([60, 480])
             .nice();
 
         this.xAxis = d3.axisBottom();
@@ -70,7 +70,7 @@ class Overall {
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
             .append('g')
-            .attr('transform', 'translate(100,0)');//translate transform to get axis in proper spot
+            .attr('transform', 'translate(60,0)');//translate transform to get axis in proper spot
 
         this.yScale = d3
             .scaleLinear()
@@ -156,10 +156,16 @@ class Overall {
         this.player2 = player2;
     }
 
-    updateSelectedYear(year) {
+    updateSelectedYear(yearIndex) {
         //will receive an index, so access year via this.player1.years
+        //will need to parse the data set for the year and position again
         // this.selectedYear = year;
-        console.log(`Update Selected Year: ${year}`);
+        console.log(`Update Selected Year: ${yearIndex}`);
+        let yearObj = this.player1.years[yearIndex];
+        let year = Object.keys(yearObj)[0];
+        let position = Object.values(yearObj)[0].position;
+        this.parseDataForYear(year, position);
+        this.updateChart();
     }
 
     updateView() {
