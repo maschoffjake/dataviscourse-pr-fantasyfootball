@@ -34,17 +34,6 @@ async function loadFile(file) {
         let removeDuplicateNames = (names) => names.filter((v,i) => names.indexOf(v) === i);
         playerNames = removeDuplicateNames(playerNames).sort();
 
-        // Render the dropdown menu with all the player names
-        let options = [];
-
-        for (let player of playerNames) {
-            let option = "<option>" + player + "</option>";
-            options.push(option);
-        }
-
-        $('.selectpicker').html(options);
-        $('.selectpicker').selectpicker('refresh');
-
         //For each player, iterate through and create data objects for each year that the player played in the NFL
         let pastData = [];
         for(let player of playerNames) {
@@ -99,6 +88,23 @@ async function loadFile(file) {
             };
             pastData.push(playerObj);
         };
+
+        // Render the dropdown menu with all the player names
+        let options = [];
+        for (let player of pastData) {
+            // Based on first year the player played
+            const playerData = player.years[0];
+
+            // For duplicate players, they have there names different with an underscore, so we want to just display the actual name
+            const actualName = player.name.split('_')[0];
+
+            let option = `<option value="${player.name}" data-subtext="${playerData.team} ${playerData.position}">${actualName}</option>`;
+            options.push(option);
+        }
+
+        $('.selectpicker').html(options);
+        $('.selectpicker').selectpicker('refresh');
+
         return pastData;
     });
     return data;

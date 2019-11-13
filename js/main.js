@@ -25,6 +25,8 @@ class Main {
 
         // Setup dropdown player selection event listener
         $('#player1Dropdown').on('change', function(){
+            console.log($('select[name=selValue]').val(1));
+            $('.selectpicker').selectpicker('refresh')
             let selectedPlayer = $('#player1Dropdown').val();
             that.player1 = that.data.find((d) => {
                 if (d.name === selectedPlayer) {
