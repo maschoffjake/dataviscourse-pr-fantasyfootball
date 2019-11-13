@@ -13,9 +13,16 @@ class Player {
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
-    this.minYearIndex = null;
-    this.maxYearIndex = null;
-    this.selectedYearIndex = 0;
+    this.yearRangeIndexPlayer1 = {
+      min: 0,
+      max: 10
+    };
+    this.yearRangeIndexPlayer2 = {
+      min: 0,
+      max: 10
+    };
+    this.selectedYearIndexPlayer1 = 0;
+    this.selectedYearIndexPlayer2 = 0;
 
     let that = this;
 
@@ -45,10 +52,16 @@ class Player {
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
+
     this.createSpiderChart('Points', spiderChartX, spiderChartY, 5);
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), 5);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, 4);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, 5);
+
+    this.createLineGraphs();
+    this.createLineGraphs();
+    this.createLineGraphs();
+    this.createLineGraphs();
   }
 
   /**
@@ -68,7 +81,6 @@ class Player {
 
     // Update spider charts
     const playerData = this.player1.years[this.selectedYearIndex];
-
     // Create data points for each spider chart
     const player1Score = [
       { 'Fantasy Points': playerData.fantasyPoints },
@@ -100,7 +112,6 @@ class Player {
       { 'Targets': playerData.receiving.target },
       { 'Yards Per Reception': playerData.receiving.yardsPerReception }
     ];
-
 
     if (this.compareEnable) {
 
@@ -231,16 +242,27 @@ class Player {
             }
           });
 
-        // Update selected circle in overall view only for player 1.
-        that.updateSelectedYearOverallView(i);
-        that.selectedYearIndex = i;
+        if (this.id.includes('Player1')) {
+          // Update selected circle in overall view only for player 1.
+          that.updateSelectedYearOverallView(i);
+          that.selectedYearIndexPlayer1 = i;
+        } else {
+          that.selectedYearIndexPlayer2 = i;
+        }
+      });
+
+    circles
+      .attr('id', (d, i) => {
+        return `circle${i}${player}`;
       })
       .attr('class', (d, i) => {
         if (i === 0) {
           return 'selected_year_circle';
         }
       })
-      .classed('year_group_circles', true)
+      .classed('year_group_circles', true);
+
+    circles
       .transition()
       .duration(1000)
       .attr('cx', (d, i) => {
@@ -337,7 +359,11 @@ class Player {
     console.log(data1);
   }
 
-  createLineGraph() {
+  createLineGraphs() {
+
+  }
+
+  updateLineGraphs() {
 
   }
 
@@ -410,7 +436,12 @@ class Player {
       })
       .classed('selected_years_brush', true);
 
-    this.minYearIndex = minIndex;
-    this.maxYearIndex = maxIndex;
+    if (playerGroup.includes('Player1')) {
+      this.yearRangeIndexPlayer1.min = minIndex;
+      this.yearRangeIndexPlayer1.max = maxIndex;
+    } else {
+      this.yearRangeIndexPlayer2.min = minIndex;
+      this.yearRangeIndexPlayer2.max = maxIndex;
+    }
   }
 }
