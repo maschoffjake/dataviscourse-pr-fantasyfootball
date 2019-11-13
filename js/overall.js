@@ -6,7 +6,7 @@ class Overall {
         this.player1 = null;
         this.player2 = null;
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
-        this.selectedYear = null;
+        this.selectedYear = 0;
         this.compareEnable = false;
     }
 
@@ -131,12 +131,14 @@ class Overall {
 
     updateCurrentPlayers(player1, player2) {
         //update player data and highlighting if needed
+        // original player objects from parsed csv
         this.player1 = player1;
         this.player2 = player2;
     }
 
     updateSelectedYear(year) {
-        this.selectedYear = year;
+        //will receive an index, so access year via this.player1.years
+        // this.selectedYear = year;
         console.log(`Update Selected Year: ${year}`);
     }
 
