@@ -1,8 +1,11 @@
 class Player {
-  constructor() {
+  constructor(updateSelectedYearOverallView) {
     this.player1 = null;
     this.player2 = null;
     this.compareEnable = false;
+
+    // Callbacks
+    this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
     this.svgHeight = 1000;
@@ -10,8 +13,9 @@ class Player {
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
-    this.minIndex = null;
-    this.maxIndex = null;
+    this.minYearIndex = null;
+    this.maxYearIndex = null;
+    this.selectedYearIndex = 0;
 
     let that = this;
 
@@ -24,8 +28,6 @@ class Player {
     this.spiderChartRadius = 100;
     this.circleBuffer = 10;
     this.transitionTime = 1000;
-
-    this.colorPaired = d3.scaleOrdinal(d3.schemePaired);
   }
 
   /**
@@ -50,7 +52,7 @@ class Player {
   /**
    *  Updates the player view with the current data values.
    */
-  updatePlayerView() {
+  updateView() {
     let xPlayer1 = 430;
     let xPlayer2 = 430;
     let y = 50;
@@ -59,14 +61,14 @@ class Player {
       xPlayer1 = 90;
       xPlayer2 = 770;
     }
-    console.log(this.player1);
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
     this.updateSpiderChart('Passing', this.player1)
   }
 
   /**
-   * Creates year bar scale and brush.
+   *  Creates a new year selector for the specified players (for both single player and compare player).
+   * @param player - Player ID
    */
   createYearBarAndBrush (player) {
     let yearGroup = this.svg.append('g')
@@ -98,7 +100,11 @@ class Player {
   }
 
   /**
-   * Updates the year bar to a player's years that they've played
+   *
+   * @param player
+   * @param playerData
+   * @param x
+   * @param y
    */
   updateYearBarAndBrush (player, playerData, x, y) {
     let opacity = 1;
@@ -117,6 +123,8 @@ class Player {
     if (opacity === 0) {
       return;
     }
+
+    let that = this;
 
     let yearScale = d3
       .scaleLinear()
@@ -144,7 +152,7 @@ class Player {
       .attr('cy', this.yearSelectorHeight*.7)
       .attr('r', 0)
       .style('opacity', 0)
-      .style('fill', this.colorPaired(0));
+      .style('fill', d3.schemePaired[0]);
 
     circles.exit()
       .transition()
@@ -158,11 +166,31 @@ class Player {
 
     circles
       .on('click', function (d, i) {
-        console.log(i);
+        // Update selected circle.
+        d3.select(`#${this.parentNode.id}`).selectAll('circle')
+          .classed('selected_year_circle', false);
+        d3.select(this).classed('selected_year_circle', true);
+
+        // Update the selected text.
+        let grandpaNode = d3.select(`#${this.parentNode.id}`).select(function () {
+          return this.parentNode;
+        });
+        grandpaNode.selectAll('text')
+          .classed('selected_year_circle', false);
+        grandpaNode.selectAll('text')
+          .attr('class', (d, j) => {
+            if (j === i) {
+              return 'selected_year_circle';
+            }
+          });
+
+        // Update selected circle in overall view only for player 1.
+        that.updateSelectedYearOverallView(i);
+        that.selectedYearIndex = i;
       })
       .attr('class', (d, i) => {
         if (i === 0) {
-          return 'year_group_circles_selected';
+          return 'selected_year_circle';
         }
       })
       .classed('year_group_circles', true)
@@ -197,6 +225,11 @@ class Player {
     labels = newLables.merge(labels);
 
     labels
+      .attr('class', (d, i) => {
+        if (i === 0) {
+          return 'selected_year_circle';
+        }
+      })
       .transition()
       .duration(1000)
       .text(d => Object.keys(d))
@@ -276,7 +309,7 @@ class Player {
    * Set the player view in compare mode with another player.
    * @param compareEnable - Boolean. True for compare mode and false for single player view.
    */
-  compareMode(compareEnable) {
+  setCompareMode(compareEnable) {
     this.compareEnable = compareEnable;
   }
 
@@ -287,9 +320,9 @@ class Player {
   updateSelectedYears(playerGroup) {
     let s = d3.event.selection;
     d3.select(`#${playerGroup}`).selectAll('circle')
-      .style('fill', this.colorPaired(0));
+      .style('fill', d3.schemePaired[0]);
     d3.select(`#${playerGroup}`).selectAll('text')
-      .classed('selected_years', false);
+      .classed('selected_years_brush', false);
     if (!s) {
       return;
     }
@@ -311,15 +344,15 @@ class Player {
         }
         return validCircle;
       })
-      .style('fill', this.colorPaired(1));
+      .style('fill', d3.schemePaired[1]);
 
     d3.select(`#${playerGroup}`).selectAll('text')
       .filter(function(d, i) {
         return minIndex <= i && i <= maxIndex;
       })
-      .classed('selected_years', true);
+      .classed('selected_years_brush', true);
 
-    this.minIndex = minIndex;
-    this.maxIndex = maxIndex;
+    this.minYearIndex = minIndex;
+    this.maxYearIndex = maxIndex;
   }
 }

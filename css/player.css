@@ -12,12 +12,12 @@
     cursor: pointer;
 }
 
-.year_group_circles_selected {
-    r: 12px;
-    stroke-width: 2px;
+.selected_year_circle {
+    fill: #6a3d9a !important;
+    font-weight: bold;
 }
 
-.selected_years {
+.selected_years_brush {
     font-weight: bold;
     font-size: 1.1rem;
 }
