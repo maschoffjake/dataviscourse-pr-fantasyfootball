@@ -29,6 +29,8 @@ body {
     width: 140px;
     font-size: 12px;
     padding: 3px 6px 3px 6px;
+    color: white;
+    background-color: #b3e2cd;
 }
 
 #playerView {
@@ -41,12 +43,18 @@ body {
     width: 100%;
 }
 
+#playerSelect button {
+    color: white;
+    font-weight: bold;
+    background-color: #b3e2cd;
+}
+
 #player1DropdownContainer {
-    margin: 0 215px 0 215px;
+    margin: 0 188px 0 188px;
 }
 
 #player2DropdownContainer {
-    margin: 0 215px 0 215px;
+    margin: 0 188px 0 188px;
     display: none;
 }
 
@@ -58,4 +66,9 @@ body {
 /*Center text in player selector*/
 .filter-option-inner-inner {
     text-align: center;
+}
+
+.text-muted {
+    color: grey !important;
+    margin-left: 5px;
 }
