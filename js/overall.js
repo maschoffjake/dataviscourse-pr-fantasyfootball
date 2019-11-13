@@ -12,7 +12,7 @@ class Overall {
 
     createChart() {
         this.parseDataForYear("2016", 'QB');
-        
+
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
 
@@ -82,6 +82,7 @@ class Overall {
         this.yAxis.scale(this.yScale);
 
         yAxisGroup.call(this.yAxis);
+        this.updateChart();
     }
 
     /**
@@ -90,7 +91,27 @@ class Overall {
      * the correct data can be represented.
      */
     updateChart() {
+        let circles = d3.select('#overallChartGroup')
+            .selectAll('circle')
+            .data(this.overallData);
 
+        let newCircles = circles
+            .enter()
+            .append("circle");
+
+        circles.exit()
+            .remove();
+
+        circles = newCircles.merge(circles);
+
+        let that = this; //If reference to Overall class is needed for click events
+        circles
+            //insert click events here when time comes
+            .transition()
+            .duration(1500)
+            .attr('cx', (d) => this.xScale(d.year.fantasyPoints))
+            .attr('cy', (d) => this.yScale(d.year.fantasyPoints))
+            .attr('r', 3)
     }
 
     /**
