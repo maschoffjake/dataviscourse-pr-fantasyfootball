@@ -8,26 +8,28 @@ class Overall {
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
         this.selectedYear = 0;
         this.compareEnable = false;
-        this.dropdownData = {
-            'team': 'Team',
-            'age': 'Age',
-            'games': 'Games',
-            'gamesStarted': 'Games Started',
-            'PASScompletions': 'Pass Completions',
-            'PASSattempts': 'Pass Attempts',
-            'PASSpassingYards': 'Passing Yards',
-            'PASStouchdownPasses': 'Touchdown Passes',
-            'PASSinterceptions': 'Interceptions',
-            'RUSHattempts': 'Rush Attempts',
-            "RUSHrushingYards": 'Rushing Yards',
-            'RUSHyardsPerAttempt': 'Yards Per Attempt',
-            'RUSHrushingTouchdowns': 'Rushing Touchdowns',
-            "RECtarget": 'Target',
-            "RECreceptions": 'Receptions',
-            "RECreceivingYards": 'Receiving Yards',
-            "RECyardsPerReception": 'Yards / Reception',
-            "RECreceivingTouchdowns": 'Receiving Touchdowns'
-        }
+        this.xIndicator = 'fantasyPoints';
+        this.yIndicator = 'gamesStarted';
+        this.dropdownData = [
+            ['team', 'Team'],
+            ['age', 'Age'],
+            ['games', 'Games'],
+            ['gamesStarted', 'Games Started'],
+            ['PASScompletions', 'Pass Completions'],
+            ['PASSattempts', 'Pass Attempts'],
+            ['PASSpassingYards', 'Passing Yards'],
+            ['PASStouchdownPasses', 'Touchdown Passes'],
+            ['PASSinterceptions', 'Interceptions'],
+            ['RUSHattempts', 'Rush Attempts'],
+            ['RUSHrushingYards', 'Rushing Yards'],
+            ['RUSHyardsPerAttempt', 'Yards Per Attempt'],
+            ['RUSHrushingTouchdowns', 'Rushing Touchdowns'],
+            ['RECtarget', 'Target'],
+            ['RECreceptions', 'Receptions'],
+            ['RECreceivingYards', 'Receiving Yards'],
+            ['RECyardsPerReception', 'Yards / Reception'],
+            ['RECreceivingTouchdowns', 'Receiving Touchdowns']
+        ];
     }
 
     createChart() {
@@ -122,6 +124,34 @@ class Overall {
 
     drawDropDowns() {
 
+        let that = this;
+        let dropX = d3.select('#xDropdown').select('.dropdownContent').select('select');
+
+        let optionsX = dropX.selectAll('option')
+            .data(this.dropdownData);
+
+        optionsX.exit().remove();
+
+        let optionsXEnter = optionsX.enter()
+            .append('option')
+            .attr('value', (d) => d[0]);
+
+        optionsXEnter.append('text')
+            .text((d) => d[1]);
+
+        optionsX = optionsXEnter.merge(optionsX);
+
+        let selectedX = optionsX.filter(d => d[0] === this.xIndicator)
+            .attr('selected', true);
+
+        dropX.on('change', function(d, i) {
+            that.updateChart();
+            // let xValue = this.options[this.selectedIndex].value;
+            // let yValue = dropY.node().value;
+            // let cValue = dropC.node().value;
+            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
+            // that.updateCountry
+        });
     }
 
     /**
@@ -150,8 +180,8 @@ class Overall {
             //insert click events here when time comes
             .transition()
             .duration(1500)
-            .attr('cx', (d) => this.xScale(d.year.fantasyPoints))
-            .attr('cy', (d) => this.yScale(d.year.fantasyPoints))
+            .attr('cx', (d) => this.xScale(d.year[this.xIndicator]))
+            .attr('cy', (d) => this.yScale(d.year[this.yIndicator]))
             .attr('r', 3);
 
         circles
