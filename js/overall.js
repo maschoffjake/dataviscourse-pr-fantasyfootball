@@ -24,7 +24,7 @@ class Overall {
             .text('Overall Data for Year')
             .style('font-size', '38px')
             .attr('x', 100)
-            .attr('y', 80);
+            .attr('y', 150);
 
         //Create the x-axis label to display the data being represented
         overallDiv
@@ -32,7 +32,7 @@ class Overall {
             .select('svg')
             .append('text')
             .attr('id', 'xAxisLabel')
-            .attr('transform', 'translate(225, 150)')
+            .attr('transform', 'translate(225, 700)')
             .text('Fantasy Points')
             .classed('axisLabel', true);
         //Create the y-axis label to display the data being represented (should always be player name)
@@ -55,7 +55,7 @@ class Overall {
         let xAxisGroup = overallDiv
             .select('svg')
             .append('g')
-            .attr('transform', 'translate(0,210)');
+            .attr('transform', 'translate(0,630)');
 
         this.xScale = d3
             .scaleLinear()
@@ -63,7 +63,7 @@ class Overall {
             .range([100, 480])
             .nice();
 
-        this.xAxis = d3.axisTop();
+        this.xAxis = d3.axisBottom();
         this.xAxis.scale(this.xScale);
 
         xAxisGroup.call(this.xAxis);
@@ -90,14 +90,10 @@ class Overall {
         let yAxisGroup = overallDiv
             .select('svg')
             .append('g')
-            .attr('transform', 'translate(80,0)');//translate transform to get axis in proper spot
+            .attr('transform', 'translate(100,0)');//translate transform to get axis in proper spot
 
         //max is not working properly so will need to find a way to get max points from each player
         // const max = d3.max(this.allData.map(d => d.years.FantPt));
-        let ptList = [];
-        this.overallData.forEach(function(player) {
-            ptList.push(player.year.fantasyPoints);
-        });
         this.yScale = d3
             .scaleLinear()
             .domain([0, Math.max(...ptList)])
