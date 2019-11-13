@@ -159,7 +159,8 @@ class Overall {
             .attr('selected', true);
 
         dropX.on('change', function(d, i) {
-            //TODO: update x axis label as well
+            d3.select('#xAxisLabel')
+                .text(this.options[this.selectedIndex].label);
             that.xIndicator = this.options[this.selectedIndex].value;
             that.updateChart();
             // let xValue = this.options[this.selectedIndex].value;
@@ -189,7 +190,8 @@ class Overall {
             .attr('selected', true);
 
         dropY.on('change', function(d, i) {
-            //TODO: update x axis label as well
+            d3.select('#yAxisLabel')
+                .text(this.options[this.selectedIndex].label);
             that.yIndicator = this.options[this.selectedIndex].value;
             that.updateChart();
             // let xValue = this.options[this.selectedIndex].value;
