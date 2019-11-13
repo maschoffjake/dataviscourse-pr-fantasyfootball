@@ -1,5 +1,5 @@
 class Player {
-  constructor(updateSelectedYearOverallView) {
+  constructor(updateSelectedYearOverallView, maxData) {
     this.player1 = null;
     this.player2 = null;
     this.compareEnable = false;
@@ -29,8 +29,7 @@ class Player {
     this.circleBuffer = 10;
     this.transitionTime = 1000;
 
-    this.maxValues = loadMaxes('data/Raw_Data_10yrs.csv');
-    console.log(this.maxValues);
+    this.maxData = maxData;
   }
 
   /**
@@ -50,6 +49,8 @@ class Player {
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
     this.createSpiderChart('Points', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
+
+
   }
 
   /**
@@ -66,6 +67,15 @@ class Player {
     }
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
+
+    // Update spider charts
+    const playerData = this.player1.years[this.selectedYearIndex];
+    const player1Receving = playerData
+
+
+    if (this.compareEnable) {
+
+    }
     this.updateSpiderChart('Passing', this.player1)
   }
 
@@ -235,7 +245,7 @@ class Player {
       })
       .transition()
       .duration(1000)
-      .text(d => Object.keys(d))
+      .text(d => d.year)
       .attr('x', (d, i) => {
         return yearScale(i) + centerOffset;
       })
@@ -283,6 +293,10 @@ class Player {
   updateSpiderChart(id, data1, data2, x, y) {
     let spiderChart = d3.select(`#spiderChart${id}`);
     
+  }
+
+  createLineGraph() {
+
   }
 
   /**

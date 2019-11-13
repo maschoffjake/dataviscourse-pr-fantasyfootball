@@ -1,8 +1,8 @@
 class Main {
 
-    constructor(data) {
+    constructor(data, maxData) {
         this.data = data;
-        let playerView = new Player(updateSelectedYear);
+        let playerView = new Player(updateSelectedYear, maxData);
         let overallView = new Overall(this.data, this.updateSelectedPlayer);
 
         this.playerView = playerView;
@@ -25,6 +25,8 @@ class Main {
 
         // Setup dropdown player selection event listener
         $('#player1Dropdown').on('change', function(){
+            console.log($('select[name=selValue]').val(1));
+            $('.selectpicker').selectpicker('refresh')
             let selectedPlayer = $('#player1Dropdown').val();
             that.player1 = that.data.find((d) => {
                 if (d.name === selectedPlayer) {
