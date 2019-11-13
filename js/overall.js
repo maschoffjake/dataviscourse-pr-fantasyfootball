@@ -12,21 +12,17 @@ class Overall {
 
     createChart() {
         this.parseDataForYear("2016", 'QB');
-
-        //TODO: 1) update chart so that everything is in a group
-        //      2) remove group surrounding svg (redundant)
+        
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
-        overallDiv
-            .append('g')
-            .attr('id', 'overallChartGroup');
 
         //Create an svg for the chart and add a header
         overallDiv
-            .select('#overallChartGroup')
             .append('svg')
             .attr('width', 500)
-            .attr('height', this.overallData.length * 25)
+            .attr('height', 800)
+            .append('g')
+            .attr('id', 'overallChartGroup')
             .append('text')
             .text('Overall Data for Year')
             .style('font-size', '38px')
@@ -34,18 +30,15 @@ class Overall {
             .attr('y', 150);
 
         //Create the x-axis label to display the data being represented
-        overallDiv
-            .select('#overallChartGroup')
-            .select('svg')
+        let chartGroup = overallDiv.select('g');
+        chartGroup
             .append('text')
             .attr('id', 'xAxisLabel')
             .attr('transform', 'translate(225, 700)')
             .text('Fantasy Points')
             .classed('axisLabel', true);
         //Create the y-axis label to display the data being represented (should always be player name)
-        overallDiv
-            .select('#overallChartGroup')
-            .select('svg')
+        chartGroup
             .append('text')
             .attr('id', 'yAxisLabel')
             .attr('transform', 'translate(20, 470) rotate(90) scale(-1,-1)')
@@ -59,8 +52,7 @@ class Overall {
         });
 
         //Create the x-axis group and scale
-        let xAxisGroup = overallDiv
-            .select('svg')
+        let xAxisGroup = chartGroup
             .append('g')
             .attr('transform', 'translate(0,630)');
 
@@ -76,8 +68,7 @@ class Overall {
         xAxisGroup.call(this.xAxis);
 
         //Create the y-axis group and scale
-        let yAxisGroup = overallDiv
-            .select('svg')
+        let yAxisGroup = chartGroup
             .append('g')
             .attr('transform', 'translate(100,0)');//translate transform to get axis in proper spot
 
