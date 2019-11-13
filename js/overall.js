@@ -11,6 +11,7 @@ class Overall {
         this.xIndicator = 'fantasyPoints';
         this.yIndicator = 'gamesStarted';
         this.dropdownData = [
+            ['fantasyPoints', 'Fantasy Points'],
             ['age', 'Age'],
             ['games', 'Games'],
             ['gamesStarted', 'Games Started'],
@@ -118,6 +119,16 @@ class Overall {
             .text('X Axis Data');
 
         xWrapper.append('div').attr('id', 'xDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
+            .append('select');
+
+        let yWrapper = dropdownWrapper.append('div')
+            .classed('dropdownPanel', true);
+
+        yWrapper.append('div').classed('dropdownLabel', true)
+            .append('text')
+            .text('Y Axis Data');
+
+        yWrapper.append('div').attr('id', 'yDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
             .append('select');
 
         this.drawDropDowns();
