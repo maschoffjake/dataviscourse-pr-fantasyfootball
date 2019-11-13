@@ -1,10 +1,29 @@
+circle {
+    stroke-width: 1px;
+    stroke: #000000;
+    fill: #ff7885;
+}
+
 .axisLabel {
     font-size: 24px;
     fill: slategrey;
 }
 
-circle {
-    stroke-width: 1px;
-    stroke: #000000;
-    fill: #ff7885;
+div.dropdownWrapper {
+    display: inline-block;
+    margin-left: 75px;
+    width: 320px;
+    height: 130px;
+    padding: 2px;
+}
+
+.dropdown {
+    float: right;
+}
+
+.dropdownLabel {
+    width: 1%7;
+    display: inline-block;
+    float: left;
+    padding-right: 5px;
 }

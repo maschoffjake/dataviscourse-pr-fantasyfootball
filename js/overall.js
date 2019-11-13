@@ -8,6 +8,28 @@ class Overall {
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
         this.selectedYear = 0;
         this.compareEnable = false;
+        this.xIndicator = 'fantasyPoints';
+        this.yIndicator = 'gamesStarted';
+        this.dropdownData = [
+            ['fantasyPoints', 'Fantasy Points'],
+            ['age', 'Age'],
+            ['games', 'Games'],
+            ['gamesStarted', 'Games Started'],
+            ['PASScompletions', 'Pass Completions'],
+            ['PASSattempts', 'Pass Attempts'],
+            ['PASSpassingYards', 'Passing Yards'],
+            ['PASStouchdownPasses', 'Touchdown Passes'],
+            ['PASSinterceptions', 'Interceptions'],
+            ['RUSHattempts', 'Rush Attempts'],
+            ['RUSHrushingYards', 'Rushing Yards'],
+            ['RUSHyardsPerAttempt', 'Yards Per Attempt'],
+            ['RUSHrushingTouchdowns', 'Rushing Touchdowns'],
+            ['RECtarget', 'Target'],
+            ['RECreceptions', 'Receptions'],
+            ['RECreceivingYards', 'Receiving Yards'],
+            ['RECyardsPerReception', 'Yards / Reception'],
+            ['RECreceivingTouchdowns', 'Receiving Touchdowns']
+        ];
     }
 
     createChart() {
@@ -54,12 +76,13 @@ class Overall {
         //Create the x-axis group and scale
         let xAxisGroup = chartGroup
             .append('g')
+            .attr('id', 'xAxis')
             .attr('transform', 'translate(0,630)');
 
         this.xScale = d3
             .scaleLinear()
             .domain([0, Math.max(...ptList)])
-            .range([100, 480])
+            .range([60, 480])
             .nice();
 
         this.xAxis = d3.axisBottom();
@@ -70,7 +93,8 @@ class Overall {
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
             .append('g')
-            .attr('transform', 'translate(100,0)');//translate transform to get axis in proper spot
+            .attr('id', 'yAxis')
+            .attr('transform', 'translate(60,0)');//translate transform to get axis in proper spot
 
         this.yScale = d3
             .scaleLinear()
@@ -83,6 +107,99 @@ class Overall {
 
         yAxisGroup.call(this.yAxis);
         this.updateChart();
+
+        let dropdownWrapper = overallDiv.append('div')
+            .classed('dropdownWrapper', true);
+
+        let xWrapper = dropdownWrapper.append('div')
+            .classed('dropdownPanel', true);
+
+        xWrapper.append('div').classed('dropdownLabel', true)
+            .append('text')
+            .text('X Axis Data');
+
+        xWrapper.append('div').attr('id', 'xDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
+            .append('select');
+
+        let yWrapper = dropdownWrapper.append('div')
+            .classed('dropdownPanel', true);
+
+        yWrapper.append('div').classed('dropdownLabel', true)
+            .append('text')
+            .text('Y Axis Data');
+
+        yWrapper.append('div').attr('id', 'yDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
+            .append('select');
+
+        this.drawDropDowns();
+    }
+
+    drawDropDowns() {
+
+        let that = this;
+
+        //Set up the x axis dropdown
+        let dropX = d3.select('#xDropdown').select('.dropdownContent').select('select');
+
+        let optionsX = dropX.selectAll('option')
+            .data(this.dropdownData);
+
+        optionsX.exit().remove();
+
+        let optionsXEnter = optionsX.enter()
+            .append('option')
+            .attr('value', (d) => d[0]);
+
+        optionsXEnter.append('text')
+            .text((d) => d[1]);
+
+        optionsX = optionsXEnter.merge(optionsX);
+
+        let selectedX = optionsX.filter(d => d[0] === this.xIndicator)
+            .attr('selected', true);
+
+        dropX.on('change', function(d, i) {
+            d3.select('#xAxisLabel')
+                .text(this.options[this.selectedIndex].label);
+            that.xIndicator = this.options[this.selectedIndex].value;
+            that.updateChart();
+            // let xValue = this.options[this.selectedIndex].value;
+            // let yValue = dropY.node().value;
+            // let cValue = dropC.node().value;
+            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
+            // that.updateCountry
+        });
+
+        let dropY = d3.select('#yDropdown').select('.dropdownContent').select('select');
+
+        let optionsY = dropY.selectAll('option')
+            .data(this.dropdownData);
+
+        optionsY.exit().remove();
+
+        let optionsYEnter = optionsY.enter()
+            .append('option')
+            .attr('value', (d) => d[0]);
+
+        optionsYEnter.append('text')
+            .text((d) => d[1]);
+
+        optionsY = optionsYEnter.merge(optionsY);
+
+        let selectedY = optionsY.filter(d => d[0] === this.yIndicator)
+            .attr('selected', true);
+
+        dropY.on('change', function(d, i) {
+            d3.select('#yAxisLabel')
+                .text(this.options[this.selectedIndex].label);
+            that.yIndicator = this.options[this.selectedIndex].value;
+            that.updateChart();
+            // let xValue = this.options[this.selectedIndex].value;
+            // let yValue = dropY.node().value;
+            // let cValue = dropC.node().value;
+            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
+            // that.updateCountry
+        });
     }
 
     /**
@@ -91,6 +208,9 @@ class Overall {
      * the correct data can be represented.
      */
     updateChart() {
+        //Update scales for the chart
+        this.updateScales();
+
         let circles = d3.select('#overallChartGroup')
             .selectAll('circle')
             .data(this.overallData);
@@ -111,8 +231,41 @@ class Overall {
             //insert click events here when time comes
             .transition()
             .duration(1500)
-            .attr('cx', (d) => this.xScale(d.year.fantasyPoints))
-            .attr('cy', (d) => this.yScale(d.year.fantasyPoints))
+            // .attr('cx', (d) => this.xScale(d.year[this.xIndicator]))
+            .attr('cx', (d) => {
+                if(that.xIndicator.includes('PASS')) {
+                    let key = that.xIndicator.replace('PASS', '');
+                    return that.xScale(d.year.passing[key]);
+                }
+                else if(that.xIndicator.includes('RUSH')) {
+                    let key = that.xIndicator.replace('RUSH', '');
+                    return that.xScale(d.year.rushing[key]);
+                }
+                else if(that.xIndicator.includes('REC')) {
+                    let key = that.xIndicator.replace('REC', '');
+                    return that.xScale(d.year.receiving[key]);
+                }
+                else {
+                    return that.xScale(d.year[that.xIndicator]);
+                }
+            })
+            .attr('cy', (d) => {
+                if (that.yIndicator.includes('PASS')) {
+                    let key = that.yIndicator.replace('PASS', '');
+                    return that.yScale(d.year.passing[key]);
+                }
+                else if (that.yIndicator.includes('RUSH')) {
+                    let key = that.yIndicator.replace('RUSH', '');
+                    return that.yScale(d.year.rushing[key]);
+                }
+                else if (that.yIndicator.includes('REC')) {
+                    let key = that.yIndicator.replace('REC', '');
+                    return that.yScale(d.year.receiving[key]);
+                }
+                else {
+                    return that.yScale(d.year[that.yIndicator]);
+                }
+            })
             .attr('r', 3);
 
         circles
@@ -120,6 +273,69 @@ class Overall {
             .text(function(d) {
                 return `${d.name}: ${d.year.fantasyPoints} pts`
             })
+    }
+
+    updateScales() {
+        let that = this;
+        let xValueList = [];
+        this.overallData.forEach(function(player) {
+            if(that.xIndicator.includes('PASS')) {
+                let key = that.xIndicator.replace('PASS', '');
+                xValueList.push(player.year.passing[key]);
+            }
+            else if(that.xIndicator.includes('RUSH')) {
+                let key = that.xIndicator.replace('RUSH', '');
+                xValueList.push(player.year.rushing[key]);
+            }
+            else if(that.xIndicator.includes('REC')) {
+                let key = that.xIndicator.replace('REC', '');
+                xValueList.push(player.year.receiving[key]);
+            }
+            else {
+                xValueList.push(player.year[that.xIndicator]);
+            }
+        });
+
+        this.xScale = d3
+            .scaleLinear()
+            .domain([0, Math.max(...xValueList)])
+            .range([60, 480])
+            .nice();
+
+        this.xAxis = d3.axisBottom();
+        this.xAxis.scale(this.xScale);
+
+        d3.select('#xAxis').call(this.xAxis);
+
+        let yValueList = [];
+        this.overallData.forEach(function(player) {
+            if(that.yIndicator.includes('PASS')) {
+                let key = that.yIndicator.replace('PASS', '');
+                yValueList.push(player.year.passing[key]);
+            }
+            else if(that.yIndicator.includes('RUSH')) {
+                let key = that.yIndicator.replace('RUSH', '');
+                yValueList.push(player.year.rushing[key]);
+            }
+            else if(that.yIndicator.includes('REC')) {
+                let key = that.yIndicator.replace('REC', '');
+                yValueList.push(player.year.receiving[key]);
+            }
+            else {
+                yValueList.push(player.year[that.yIndicator]);
+            }
+        });
+
+        this.yScale = d3
+            .scaleLinear()
+            .domain([Math.max(...yValueList), 0])
+            .range([210, 630])
+            .nice();
+
+        this.yAxis = d3.axisLeft();
+        this.yAxis.scale(this.yScale);
+
+        d3.select('#yAxis').call(this.yAxis);
     }
 
     /**
@@ -156,10 +372,16 @@ class Overall {
         this.player2 = player2;
     }
 
-    updateSelectedYear(year) {
+    updateSelectedYear(yearIndex) {
         //will receive an index, so access year via this.player1.years
+        //will need to parse the data set for the year and position again
         // this.selectedYear = year;
-        console.log(`Update Selected Year: ${year}`);
+        console.log(`Update Selected Year: ${yearIndex}`);
+        let yearObj = this.player1.years[yearIndex];
+        let year = Object.keys(yearObj)[0];
+        let position = Object.values(yearObj)[0].position;
+        this.parseDataForYear(year, position);
+        this.updateChart();
     }
 
     updateView() {
