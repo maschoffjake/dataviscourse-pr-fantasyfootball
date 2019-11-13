@@ -1,7 +1,9 @@
 loadFile('data/Raw_Data_10yrs.csv').then(data => {
-    let mainView = new Main(data);
-    mainView.setupView();
-    mainView.updateView();
+    loadMaxes('data/Raw_Data_10yrs.csv').then(data2 => {
+        let mainView = new Main(data, data2);
+        mainView.setupView();
+        mainView.updateView();
+    });
 
     // Used for finding duplicates if need be...
     // for (let item of data) {
@@ -180,8 +182,6 @@ async function loadMaxes(file) {
             yearData.scoring.pprpg = yearData.scoring.pprpg > Number(((row.PPRPG !== '') ? row.PPRPG : 0)) ? yearData.scoring.pprpg : Number(((row.PPRPG !== '') ? row.PPRPG : 0));
             yearData.scoring.positionRank = yearData.scoring.positionRank > Number(((row.PosRank !== '') ? row.PosRank : 0)) ? yearData.scoring.positionRank : Number(((row.PosRank !== '') ? row.PosRank : 0));
         }
-
-        console.log(returnObj);
         return returnObj;
     });
     return data;

@@ -1,8 +1,8 @@
 class Main {
 
-    constructor(data) {
+    constructor(data, maxData) {
         this.data = data;
-        let playerView = new Player(updateSelectedYear);
+        let playerView = new Player(updateSelectedYear, maxData);
         let overallView = new Overall(this.data, this.updateSelectedPlayer);
 
         this.playerView = playerView;

@@ -1,5 +1,5 @@
 class Player {
-  constructor(updateSelectedYearOverallView) {
+  constructor(updateSelectedYearOverallView, maxData) {
     this.player1 = null;
     this.player2 = null;
     this.compareEnable = false;
@@ -29,8 +29,7 @@ class Player {
     this.circleBuffer = 10;
     this.transitionTime = 1000;
 
-    this.maxValues = loadMaxes('data/Raw_Data_10yrs.csv');
-    console.log(this.maxValues);
+    this.maxData = maxData;
   }
 
   /**
@@ -66,6 +65,15 @@ class Player {
     }
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
+
+    // Update spider charts
+    const playerData = this.player1.years[this.selectedYearIndex];
+    const player1Receving = playerData
+
+
+    if (this.compareEnable) {
+
+    }
     this.updateSpiderChart('Passing', this.player1)
   }
 
