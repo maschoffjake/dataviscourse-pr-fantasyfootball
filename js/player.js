@@ -45,12 +45,10 @@ class Player {
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
-    this.createSpiderChart('Passing', spiderChartX, spiderChartY);
-    this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
-    this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
-    this.createSpiderChart('Points', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
-
-
+    this.createSpiderChart('Points', spiderChartX, spiderChartY, 5);
+    this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), 5);
+    this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, 4);
+    this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, 5);
   }
 
   /**
@@ -70,13 +68,49 @@ class Player {
 
     // Update spider charts
     const playerData = this.player1.years[this.selectedYearIndex];
-    const player1Receving = playerData
+
+    // Create data points for each spider chart
+    const player1Score = [
+      { 'Fantasy Points': playerData.fantasyPoints },
+      { 'PPR Points': playerData.ppr },
+      { 'PPG': playerData.ppg },
+      { 'PPRPG': playerData.pprpg },
+      { 'Position Rank': playerData.positionRank }
+    ];
+
+    const player1Passing = [
+      { 'Touchdowns': playerData.passing.touchdownPasses },
+      { 'Interceptions': playerData.passing.interceptions },
+      { 'Passing Yards': playerData.passing.passingYards },
+      { 'Completions': playerData.passing.completions },
+      { 'Attempts': playerData.passing.attempts }
+    ];
+
+    const player1Rushing = [
+      { 'Touchdowns': playerData.rushing.rushingTouchdowns },
+      { 'Rushing Yards': playerData.rushing.rushingYards },
+      { 'Attempts': playerData.rushing.attempts },
+      { 'Yards Per Attempt': playerData.rushing.yardsPerAttempt }
+    ];
+
+    const player1Receiving = [
+      { 'Touchdowns': playerData.receiving.receivingTouchdowns },
+      { 'Receiving Yards': playerData.receiving.receivingYards },
+      { 'Receptions': playerData.receiving.receptions },
+      { 'Targets': playerData.receiving.target },
+      { 'Yards Per Reception': playerData.receiving.yardsPerReception }
+    ];
 
 
     if (this.compareEnable) {
 
     }
-    this.updateSpiderChart('Passing', this.player1)
+    else {    
+      this.updateSpiderChart('Passing', player1Passing);
+      this.updateSpiderChart('Rushing', player1Rushing);
+      this.updateSpiderChart('Receiving', player1Receiving);
+      this.updateSpiderChart('Points', player1Score);
+    }
   }
 
   /**
@@ -257,18 +291,18 @@ class Player {
     /**
    * Creates the spider charts for the categories of a player's stats
    */
-  createSpiderChart(id, x, y) {
+  createSpiderChart(id, x, y, numberOfPoints) {
 
     // Create the passing spider chart
-    let spiderGroup = this.svg
+    const spiderGroup = this.svg
       .append('g')
       .attr('id', `spiderChart${id}`)
       .attr('transform', `translate(${x}, ${y})`);
 
     // Create circles which go around the spider chart
-    let numberOfCircles = 5;
-    let ticks = [...Array(numberOfCircles).keys()];
-    let cirleRadiusScale = d3.scaleLinear()
+    const numberOfCircles = 5;
+    const ticks = [...Array(numberOfCircles).keys()];
+    const cirleRadiusScale = d3.scaleLinear()
                               .domain([0, numberOfCircles])
                               .range([0, this.spiderChartRadius]);
 
@@ -283,16 +317,24 @@ class Player {
         return cirleRadiusScale(d + 1)
       })
       .classed('spider-chart-circles', true);
+
+    // Create lines
+    
   }
 
-  c
+  calculateAngle(angle, centerRadius, outerRadius, scale){
+    const x = Math.cos(angle) * scale(outerRadius);
+    const y = Math.sin(angle) * scale(outerRadius);
+    return {"x": centerRadius + x, "y": centerRadius - y};
+  }
 
   /**
    * Used to update the bar charts and the axis for the new player
    */
   updateSpiderChart(id, data1, data2, x, y) {
     let spiderChart = d3.select(`#spiderChart${id}`);
-    
+    console.log(spiderChart);
+    console.log(data1);
   }
 
   createLineGraph() {
