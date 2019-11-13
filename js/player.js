@@ -13,8 +13,9 @@ class Player {
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
-    this.minIndex = null;
-    this.maxIndex = null;
+    this.minYearIndex = null;
+    this.maxYearIndex = null;
+    this.selectedYearIndex = 0;
 
     let that = this;
 
@@ -177,8 +178,8 @@ class Player {
           });
 
         // Update selected circle in overall view only for player 1.
-        console.log(this);
         that.updateSelectedYearOverallView(i);
+        that.selectedYearIndex = i;
       })
       .attr('class', (d, i) => {
         if (i === 0) {
@@ -383,7 +384,7 @@ class Player {
       })
       .classed('selected_years_brush', true);
 
-    this.minIndex = minIndex;
-    this.maxIndex = maxIndex;
+    this.minYearIndex = minIndex;
+    this.maxYearIndex = maxIndex;
   }
 }
