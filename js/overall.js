@@ -8,6 +8,26 @@ class Overall {
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
         this.selectedYear = 0;
         this.compareEnable = false;
+        this.dropdownData = {
+            'team': 'Team',
+            'age': 'Age',
+            'games': 'Games',
+            'gamesStarted': 'Games Started',
+            'PASScompletions': 'Pass Completions',
+            'PASSattempts': 'Pass Attempts',
+            'PASSpassingYards': 'Passing Yards',
+            'PASStouchdownPasses': 'Touchdown Passes',
+            'PASSinterceptions': 'Interceptions',
+            'RUSHattempts': 'Rush Attempts',
+            "RUSHrushingYards": 'Rushing Yards',
+            'RUSHyardsPerAttempt': 'Yards Per Attempt',
+            'RUSHrushingTouchdowns': 'Rushing Touchdowns',
+            "RECtarget": 'Target',
+            "RECreceptions": 'Receptions',
+            "RECreceivingYards": 'Receiving Yards',
+            "RECyardsPerReception": 'Yards / Reception',
+            "RECreceivingTouchdowns": 'Receiving Touchdowns'
+        }
     }
 
     createChart() {
@@ -96,6 +116,12 @@ class Overall {
 
         xWrapper.append('div').attr('id', 'xDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
             .append('select');
+
+        this.drawDropDowns();
+    }
+
+    drawDropDowns() {
+
     }
 
     /**
