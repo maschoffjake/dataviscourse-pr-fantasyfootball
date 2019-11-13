@@ -1,13 +1,20 @@
 class Overall {
 
-    constructor(data) {
+    constructor(data, updateSelectedPlayer) {
         this.allData = data;
         this.overallData = data;
+        this.player1 = null;
+        this.player2 = null;
+        this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
+        this.selectedYear = null;
+        this.compareEnable = false;
     }
 
     createChart() {
         this.parseDataForYear("2016", 'QB');
 
+        //TODO: 1) update chart so that everything is in a group
+        //      2) remove group surrounding svg (redundant)
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
         overallDiv
@@ -120,5 +127,24 @@ class Overall {
             });
         });
         this.overallData = updateData;
+    }
+
+    updateCurrentPlayers(player1, player2) {
+        //update player data and highlighting if needed
+        this.player1 = player1;
+        this.player2 = player2;
+    }
+
+    updateSelectedYear(year) {
+        this.selectedYear = year;
+        console.log(`Update Selected Year: ${year}`);
+    }
+
+    updateView() {
+        //updateChart
+    }
+
+    setCompareMode(compareEnable) {
+        this.compareEnable = compareEnable;
     }
 }
