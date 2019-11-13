@@ -98,6 +98,8 @@ class Overall {
         let newCircles = circles
             .enter()
             .append("circle");
+        newCircles
+            .append('title');
 
         circles.exit()
             .remove();
@@ -111,7 +113,13 @@ class Overall {
             .duration(1500)
             .attr('cx', (d) => this.xScale(d.year.fantasyPoints))
             .attr('cy', (d) => this.yScale(d.year.fantasyPoints))
-            .attr('r', 3)
+            .attr('r', 3);
+
+        circles
+            .select('title')
+            .text(function(d) {
+                return `${d.name}: ${d.year.fantasyPoints} pts`
+            })
     }
 
     /**
