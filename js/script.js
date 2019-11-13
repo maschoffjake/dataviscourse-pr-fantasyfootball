@@ -81,7 +81,7 @@ async function loadFile(file) {
                             "yardsPerReception": row["Y/R"],
                             "receivingTouchdowns": row.RecTD
                         },
-                        "fantasyPoints": (row.FantPt !== '') ? row.FantPt : '0',
+                        "fantasyPoints": (row.FantPt !== '' || row.Fantpt > 0) ? row.FantPt : '0',
                         "ppr": row.PPR,
                         "ppg": row.PPG,
                         "pprpg": row.PPRPG,
@@ -99,6 +99,90 @@ async function loadFile(file) {
             pastData.push(playerObj);
         };
         return pastData;
+    });
+    return data;
+}
+
+async function loadMaxes(file) {
+    let data = await d3.csv(file).then(d => {
+        let returnObj = {};
+
+        // Add filter for all positions too
+        let positions = ['QB', 'RB', 'WR', 'TE'];
+
+        // Intialize object 
+        for (let i = 2008; i <= 2018; i++) {
+            returnObj[i] = {};
+            for (let pos of positions) {
+                returnObj[i][pos] = {
+                    "passing": {
+                        "completions": 0,
+                        "attempts": 0,
+                        "passingYards": 0,
+                        "touchdownPasses": 0,
+                        "interceptions": 0
+                    },
+                    "rushing": {
+                        "attempts": 0,
+                        "rushingYards": 0,
+                        "yardsPerAttempt": 0,
+                        "rushingTouchdowns": 0,
+                    },
+                    "receiving": {
+                        "target": 0,
+                        "receptions": 0,
+                        "receivingYards": 0,
+                        "yardsPerReception": 0,
+                        "receivingTouchdowns": 0
+                    },
+                    "scoring": {
+                        "fantasyPoints": 0,
+                        "ppr": 0,
+                        "ppg": 0,
+                        "pprpg": 0,
+                        "positionRank": 0
+                    }
+                }
+            }
+        }
+
+        for (let row of d) {
+            let yearData = returnObj[row.Year][row.FantPos];
+
+            // Un used players have no position, just continue
+            if (row.FantPos === '')
+                continue;
+
+            // Passing
+            yearData.passing.completions = yearData.passing.completions > Number(row.Cmp) ? yearData.passing.completions : Number(row.Cmp);
+            yearData.passing.attempts = yearData.passing.attempts > Number(row.PassAtt) ? yearData.passing.attempts : Number(row.PassAtt);
+            yearData.passing.passingYards = yearData.passing.passingYards > Number(row.PassYds) ? yearData.passing.passingYards : Number(row.PassYds);
+            yearData.passing.touchdownPasses = yearData.passing.touchdownPasses > Number(row.PassTD) ? yearData.passing.touchdownPasses : Number(row.PassTD);
+            yearData.passing.interceptions = yearData.passing.interceptions > Number(row.Int) ? yearData.passing.interceptions : Number(row.Int);
+
+            // Rushing
+            yearData.rushing.attempts = yearData.rushing.attempts > Number(row.RushAtt) ? yearData.rushing.attempts : Number(row.RushAtt);
+            yearData.rushing.rushingYards = yearData.rushing.rushingYards > Number(row.RushYds) ? yearData.rushing.rushingYards : Number(row.RushYds);
+            yearData.rushing.yardsPerAttempt = yearData.rushing.yardsPerAttempt > Number(row["Y/A"]) ? yearData.rushing.yardsPerAttempt : Number(row["Y/A"]);
+            yearData.rushing.rushingTouchdowns = yearData.rushing.rushingTouchdowns > Number(row.RushTD) ? yearData.rushing.rushingTouchdowns : Number(row.RushTD);
+
+            // Receiving
+            yearData.receiving.target = yearData.receiving.target > Number(row.Tgt) ? yearData.receiving.target : Number(row.Tgt);
+            yearData.receiving.receptions = yearData.receiving.receptions > Number(row.Rec) ? yearData.receiving.receptions : Number(row.Rec);
+            yearData.receiving.receivingYards = yearData.receiving.receivingYards > Number(row.RecYds) ? yearData.receiving.receivingYards : Number(row.RecYds);
+            yearData.receiving.yardsPerReception = yearData.receiving.yardsPerReception > Number(row["Y/R"]) ? yearData.receiving.yardsPerReception : Number(row["Y/R"]);
+            yearData.receiving.receivingTouchdowns = yearData.receiving.receivingTouchdowns > Number(row.RecTD) ? yearData.receiving.receivingTouchdowns : Number(row.RecTD);
+
+            // Scoring
+            yearData.scoring.fantasyPoints = yearData.scoring.fantasyPoints > Number(((row.FantPt !== '') ? row.FantPt : 0)) ? yearData.scoring.fantasyPoints : Number(((row.FantPt !== '') ? row.FantPt : 0));
+            yearData.scoring.ppr = yearData.scoring.ppr > Number(((row.PPR !== '') ? row.PPR : 0)) ? yearData.scoring.ppr : Number(((row.PPR !== '') ? row.PPR : 0));
+            yearData.scoring.ppg = yearData.scoring.ppg > Number(((row.PPG !== '') ? row.PPG : 0)) ? yearData.scoring.ppg : Number(((row.PPG !== '') ? row.PPG : 0));
+            yearData.scoring.pprpg = yearData.scoring.pprpg > Number(((row.PPRPG !== '') ? row.PPRPG : 0)) ? yearData.scoring.pprpg : Number(((row.PPRPG !== '') ? row.PPRPG : 0));
+            yearData.scoring.positionRank = yearData.scoring.positionRank > Number(((row.PosRank !== '') ? row.PosRank : 0)) ? yearData.scoring.positionRank : Number(((row.PosRank !== '') ? row.PosRank : 0));
+        }
+
+        console.log(returnObj);
+        return returnObj;
     });
     return data;
 }

@@ -25,8 +25,12 @@ class Player {
         that.updateSelectedYears(this.parentNode.id);
       });
 
-    this.rectWidth = 80;
+    this.spiderChartRadius = 100;
+    this.circleBuffer = 10;
     this.transitionTime = 1000;
+
+    this.maxValues = loadMaxes('data/Raw_Data_10yrs.csv');
+    console.log(this.maxValues);
   }
 
   /**
@@ -37,10 +41,15 @@ class Player {
       .attr('width', this.svgWidth)
       .attr('height', this.svgHeight);
 
+    let spiderChartX = 25;
+    let spiderChartY = 100;
+
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
-    this.createSpiderCharts();
-
+    this.createSpiderChart('Passing', spiderChartX, spiderChartY);
+    this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
+    this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
+    this.createSpiderChart('Points', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
   }
 
   /**
@@ -57,6 +66,7 @@ class Player {
     }
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
+    this.updateSpiderChart('Passing', this.player1)
   }
 
   /**
@@ -237,82 +247,42 @@ class Player {
     /**
    * Creates the spider charts for the categories of a player's stats
    */
-  createSpiderCharts() {
+  createSpiderChart(id, x, y) {
 
-   
+    // Create the passing spider chart
+    let spiderGroup = this.svg
+      .append('g')
+      .attr('id', `spiderChart${id}`)
+      .attr('transform', `translate(${x}, ${y})`);
+
+    // Create circles which go around the spider chart
+    let numberOfCircles = 5;
+    let ticks = [...Array(numberOfCircles).keys()];
+    let cirleRadiusScale = d3.scaleLinear()
+                              .domain([0, numberOfCircles])
+                              .range([0, this.spiderChartRadius]);
+
+    spiderGroup
+      .selectAll('circle')
+      .data(ticks)
+      .enter()
+      .append('circle')
+      .attr('cx', this.spiderChartRadius)
+      .attr('cy', this.spiderChartRadius)
+      .attr('r', d => {
+        return cirleRadiusScale(d + 1)
+      })
+      .classed('spider-chart-circles', true);
   }
+
+  c
 
   /**
    * Used to update the bar charts and the axis for the new player
    */
-  updateBarCharts() {
-
-    // Just update on first year, since we can't select years yet
-    // TODO: change this to dynamically grab correct year
-    let playerStats = this.player1.years[0][[Object.keys(this.player1.years[0])[0]]];
-
-    let passing = playerStats.passing;
-    let receiving = playerStats.receiving;
-    let rushing = playerStats.rushing;
-
-    let TDData = [Number(passing.touchdownPasses), Number(rushing.rushingTouchdowns), Number(receiving.receivingTouchdowns)];
-    let yardData = [Number(passing.passingYards), Number(rushing.rushingYards), Number(receiving.receivingYards)];
-
-    // Create scales
-    let axisTDScale = d3.scaleLinear()
-      .domain([this.getMax(TDData), 0])
-      .range([0,200]);
-
-    let TDBarScale = d3.scaleLinear()
-      .domain([0, this.getMax(TDData)])
-      .range([0,200]);
-
-    let axisYardsScale = d3.scaleLinear()
-      .domain([this.getMax(yardData), 0])
-      .range([0,200]);
-
-    let yardsBarScale = d3.scaleLinear()
-      .domain([0, this.getMax(yardData)])
-      .range([0,200]);
-
-    // Update the bars
-    d3.select('#tdBars')
-      .selectAll('rect')
-      .data(TDData)
-      .transition()
-      .duration(this.transitionTime)
-      .attr('height', d => {
-        return TDBarScale(d);
-      });
-
-    d3.select('#yardsBars')
-      .selectAll('rect')
-      .data(yardData)
-      .transition()
-      .duration(this.transitionTime)
-      .attr('height', d => {
-        return yardsBarScale(d);
-      });
-
-    // Update the axis
-    d3.select('#tdYBarChartAxis')
-      .transition()
-      .duration(this.transitionTime)
-      .call(d3.axisLeft(axisTDScale))
-      .call(g => {
-          // Remove the line
-          g.select('.domain').remove();
-      });
-
-    d3.select('#yardsYBarChartAxis')
-      .transition()
-      .duration(this.transitionTime)
-      .call(d3.axisLeft(axisYardsScale))
-      .call(g => {
-          // Remove the line
-          g.select('.domain').remove();
-      });
-      
+  updateSpiderChart(id, data1, data2, x, y) {
+    let spiderChart = d3.select(`#spiderChart${id}`);
+    
   }
 
   /**
