@@ -83,6 +83,19 @@ class Overall {
 
         yAxisGroup.call(this.yAxis);
         this.updateChart();
+
+        let dropdownWrapper = overallDiv.append('div')
+            .classed('dropdownWrapper', true);
+
+        let xWrapper = dropdownWrapper.append('div')
+            .classed('dropdownPanel', true);
+
+        xWrapper.append('div').classed('dropdownLabel', true)
+            .append('text')
+            .text('X Axis Data');
+
+        xWrapper.append('div').attr('id', 'xDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
+            .append('select');
     }
 
     /**
