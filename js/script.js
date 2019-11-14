@@ -3,6 +3,7 @@ loadFile('data/Raw_Data_10yrs.csv').then(data => {
         let mainView = new Main(data, data2);
         mainView.setupView();
         mainView.updateView();
+        console.log(d3.schemePastel2[0]);
     });
 
     // Used for finding duplicates if need be...

@@ -13,9 +13,16 @@ class Player {
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
-    this.minYearIndex = null;
-    this.maxYearIndex = null;
-    this.selectedYearIndex = 0;
+    this.yearRangeIndexPlayer1 = {
+      min: 0,
+      max: 10
+    };
+    this.yearRangeIndexPlayer2 = {
+      min: 0,
+      max: 10
+    };
+    this.selectedYearIndexPlayer1 = 0;
+    this.selectedYearIndexPlayer2 = 0;
 
     let that = this;
 
@@ -53,6 +60,10 @@ class Player {
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
+    this.createLineGraphs();
+    this.createLineGraphs();
+    this.createLineGraphs();
+    this.createLineGraphs();
   }
 
   /**
@@ -70,51 +81,15 @@ class Player {
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
 
-    // Update spider charts
-    const playerData = this.player1.years[this.selectedYearIndex];
+    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1);
+    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1);
+    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1);
+    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1);
 
-    // Create data points for each spider chart
-    const player1Score = [
-      { 'Fantasy Points': playerData.fantasyPoints },
-      { 'PPR Points': playerData.ppr },
-      { 'PPG': playerData.ppg },
-      { 'PPRPG': playerData.pprpg },
-      { 'Position Rank': playerData.positionRank }
-    ];
-
-    const player1Passing = [
-      { 'Touchdowns': playerData.passing.touchdownPasses },
-      { 'Interceptions': playerData.passing.interceptions },
-      { 'Passing Yards': playerData.passing.passingYards },
-      { 'Completions': playerData.passing.completions },
-      { 'Attempts': playerData.passing.attempts }
-    ];
-
-    const player1Rushing = [
-      { 'Touchdowns': playerData.rushing.rushingTouchdowns },
-      { 'Rushing Yards': playerData.rushing.rushingYards },
-      { 'Attempts': playerData.rushing.attempts },
-      { 'Yards Per Attempt': playerData.rushing.yardsPerAttempt }
-    ];
-
-    const player1Receiving = [
-      { 'Touchdowns': playerData.receiving.receivingTouchdowns },
-      { 'Receiving Yards': playerData.receiving.receivingYards },
-      { 'Receptions': playerData.receiving.receptions },
-      { 'Targets': playerData.receiving.target },
-      { 'Yards Per Reception': playerData.receiving.yardsPerReception }
-    ];
-
-
-    if (this.compareEnable) {
-
-    }
-    else {    
-      this.updateSpiderChart('Passing', player1Passing);
-      this.updateSpiderChart('Rushing', player1Rushing);
-      this.updateSpiderChart('Receiving', player1Receiving);
-      this.updateSpiderChart('Points', player1Score);
-    }
+    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2);
+    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2);
+    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2);
+    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2);
   }
 
   /**
@@ -235,16 +210,27 @@ class Player {
             }
           });
 
-        // Update selected circle in overall view only for player 1.
-        that.updateSelectedYearOverallView(i);
-        that.selectedYearIndex = i;
+        if (this.id.includes('Player1')) {
+          // Update selected circle in overall view only for player 1.
+          that.updateSelectedYearOverallView(i);
+          that.selectedYearIndexPlayer1 = i;
+        } else {
+          that.selectedYearIndexPlayer2 = i;
+        }
+      });
+
+    circles
+      .attr('id', (d, i) => {
+        return `circle${i}${player}`;
       })
       .attr('class', (d, i) => {
         if (i === 0) {
           return 'selected_year_circle';
         }
       })
-      .classed('year_group_circles', true)
+      .classed('year_group_circles', true);
+
+    circles
       .transition()
       .duration(1000)
       .attr('cx', (d, i) => {
@@ -358,13 +344,52 @@ class Player {
   /**
    * Used to update the bar charts and the axis for the new player
    */
-  updateSpiderChart(id, data1, data2, x, y) {
+  updateSpiderChart(id, player, playerData, selectedYearIndex, x, y) {
+    if (player === 'Player2' && !this.compareEnable) {
+      return;
+    }
+    // Update spider charts
+    const selectedYearData = playerData.years[selectedYearIndex];
+    // Create data points for each spider chart
+    const playerScore = [
+      { 'Fantasy Points': playerData.fantasyPoints },
+      { 'PPR Points': playerData.ppr },
+      { 'PPG': playerData.ppg },
+      { 'PPRPG': playerData.pprpg },
+      { 'Position Rank': playerData.positionRank }
+    ];
+
+    const playerPassing = [
+      { 'Touchdowns': playerData.passing.touchdownPasses },
+      { 'Interceptions': playerData.passing.interceptions },
+      { 'Passing Yards': playerData.passing.passingYards },
+      { 'Completions': playerData.passing.completions },
+      { 'Attempts': playerData.passing.attempts }
+    ];
+
+    const playerRushing = [
+      { 'Touchdowns': playerData.rushing.rushingTouchdowns },
+      { 'Rushing Yards': playerData.rushing.rushingYards },
+      { 'Attempts': playerData.rushing.attempts },
+      { 'Yards Per Attempt': playerData.rushing.yardsPerAttempt }
+    ];
+
+    const playerReceiving = [
+      { 'Touchdowns': playerData.receiving.receivingTouchdowns },
+      { 'Receiving Yards': playerData.receiving.receivingYards },
+      { 'Receptions': playerData.receiving.receptions },
+      { 'Targets': playerData.receiving.target },
+      { 'Yards Per Reception': playerData.receiving.yardsPerReception }
+    ];
+
     let spiderChart = d3.select(`#spiderChart${id}`);
-    console.log(spiderChart);
-    console.log(data1);
   }
 
-  createLineGraph() {
+  createLineGraphs() {
+
+  }
+
+  updateLineGraphs() {
 
   }
 
@@ -437,7 +462,12 @@ class Player {
       })
       .classed('selected_years_brush', true);
 
-    this.minYearIndex = minIndex;
-    this.maxYearIndex = maxIndex;
+    if (playerGroup.includes('Player1')) {
+      this.yearRangeIndexPlayer1.min = minIndex;
+      this.yearRangeIndexPlayer1.max = maxIndex;
+    } else {
+      this.yearRangeIndexPlayer2.min = minIndex;
+      this.yearRangeIndexPlayer2.max = maxIndex;
+    }
   }
 }
