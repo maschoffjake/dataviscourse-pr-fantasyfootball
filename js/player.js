@@ -45,10 +45,14 @@ class Player {
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
-    this.createSpiderChart('Points', spiderChartX, spiderChartY, 5);
-    this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), 5);
-    this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, 4);
-    this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, 5);
+    const pointLabels = ['Fantasy Points', 'PPR Points', 'PPG', 'PPRPG', 'Position Rank'];
+    const passingLabels = ['Touchdowns', 'Interceptions', 'Passing Yards', 'Completions', 'Attempts'];
+    const rushingLabels = ['Touchdowns', 'Rushing Yards', 'Attempts', 'Yards Per Attempt'];
+    const receivingLabels = ['Touchdowns', 'Receiving Yards', 'Receptions', 'Targets', 'Yards Per Reception'];
+    this.createSpiderChart('Points', spiderChartX, spiderChartY, pointLabels);
+    this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
+    this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
+    this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
   }
 
   /**
@@ -288,10 +292,10 @@ class Player {
     // TODO: change color of selected block w/ brush
   }
 
-    /**
+  /**
    * Creates the spider charts for the categories of a player's stats
    */
-  createSpiderChart(id, x, y, numberOfPoints) {
+  createSpiderChart(id, x, y, labels) {
 
     // Create the passing spider chart
     const spiderGroup = this.svg
@@ -318,7 +322,30 @@ class Player {
       })
       .classed('spider-chart-circles', true);
 
-    // Create lines
+    // Create lines and labels
+    let lines = spiderGroup
+      .selectAll('line')
+      .data(labels);
+
+    let newItems = lines
+              .enter();
+              
+    let newLines = newItems.append('line')
+        .attr('x1', this.spiderChartRadius)
+        .attr('y1', this.spiderChartRadius)
+        .attr('x2', 0)
+        .attr('y2', 0);
+
+    let newLabels = newItems.append('text')
+        .attr('x', this.spiderChartRadius)
+        .attr('y', this.spiderChartRadius)
+        .text(d => {
+          return d;
+        })
+        .style('opacity', 0);
+
+    
+
     
   }
 
