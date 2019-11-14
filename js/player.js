@@ -292,7 +292,7 @@ class Player {
     // Create circles which go around the spider chart
     const numberOfCircles = 5;
     const ticks = [...Array(numberOfCircles).keys()];
-    const cirleRadiusScale = d3.scaleLinear()
+    const circleRadiusScale = d3.scaleLinear()
                               .domain([0, numberOfCircles])
                               .range([0, this.spiderChartRadius]);
 
@@ -304,7 +304,7 @@ class Player {
       .attr('cx', this.spiderChartRadius)
       .attr('cy', this.spiderChartRadius)
       .attr('r', d => {
-        return cirleRadiusScale(d + 1)
+        return circleRadiusScale(d + 1)
       })
       .classed('spider-chart-circles', true);
 
@@ -313,16 +313,21 @@ class Player {
       .selectAll('line')
       .data(labels);
 
-    let newItems = lines
-              .enter();
+    let textLabels = spiderGroup
+      .selectAll('text')
+      .data(labels);
               
-    let newLines = newItems.append('line')
+    let newLines = lines
+        .enter()
+        .append('line')
         .attr('x1', this.spiderChartRadius)
         .attr('y1', this.spiderChartRadius)
         .attr('x2', 0)
         .attr('y2', 0);
 
-    let newLabels = newItems.append('text')
+    let newLabels = textLabels
+        .enter()
+        .append('text')
         .attr('x', this.spiderChartRadius)
         .attr('y', this.spiderChartRadius)
         .text(d => {
@@ -330,15 +335,29 @@ class Player {
         })
         .style('opacity', 0);
 
-    
+    lines = newLines.merge(lines);
+    textLabels = newLabels.merge(textLabels);
 
-    
+    lines
+        .attr('x2', (d,i) => {
+          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
+          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+        })
+        .attr('y2', (d,i) => {
+          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
+          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
+        });
+
   }
 
-  calculateAngle(angle, centerRadius, outerRadius, scale){
+  calculateXValue(angle, centerRadius, outerRadius, scale){
     const x = Math.cos(angle) * scale(outerRadius);
+    return centerRadius + x;
+  }
+
+  calculateYValue(angle, centerRadius, outerRadius, scale){
     const y = Math.sin(angle) * scale(outerRadius);
-    return {"x": centerRadius + x, "y": centerRadius - y};
+    return centerRadius - y;
   }
 
   /**
@@ -350,36 +369,37 @@ class Player {
     }
     // Update spider charts
     const selectedYearData = playerData.years[selectedYearIndex];
+
     // Create data points for each spider chart
     const playerScore = [
-      { 'Fantasy Points': playerData.fantasyPoints },
-      { 'PPR Points': playerData.ppr },
-      { 'PPG': playerData.ppg },
-      { 'PPRPG': playerData.pprpg },
-      { 'Position Rank': playerData.positionRank }
+      { 'Fantasy Points': selectedYearData.fantasyPoints },
+      { 'PPR Points': selectedYearData.ppr },
+      { 'PPG': selectedYearData.ppg },
+      { 'PPRPG': selectedYearData.pprpg },
+      { 'Position Rank': selectedYearData.positionRank }
     ];
 
     const playerPassing = [
-      { 'Touchdowns': playerData.passing.touchdownPasses },
-      { 'Interceptions': playerData.passing.interceptions },
-      { 'Passing Yards': playerData.passing.passingYards },
-      { 'Completions': playerData.passing.completions },
-      { 'Attempts': playerData.passing.attempts }
+      { 'Touchdowns': selectedYearData.passing.touchdownPasses },
+      { 'Interceptions': selectedYearData.passing.interceptions },
+      { 'Passing Yards': selectedYearData.passing.passingYards },
+      { 'Completions': selectedYearData.passing.completions },
+      { 'Attempts': selectedYearData.passing.attempts }
     ];
 
     const playerRushing = [
-      { 'Touchdowns': playerData.rushing.rushingTouchdowns },
-      { 'Rushing Yards': playerData.rushing.rushingYards },
-      { 'Attempts': playerData.rushing.attempts },
-      { 'Yards Per Attempt': playerData.rushing.yardsPerAttempt }
+      { 'Touchdowns': selectedYearData.rushing.rushingTouchdowns },
+      { 'Rushing Yards': selectedYearData.rushing.rushingYards },
+      { 'Attempts': selectedYearData.rushing.attempts },
+      { 'Yards Per Attempt': selectedYearData.rushing.yardsPerAttempt }
     ];
 
     const playerReceiving = [
-      { 'Touchdowns': playerData.receiving.receivingTouchdowns },
-      { 'Receiving Yards': playerData.receiving.receivingYards },
-      { 'Receptions': playerData.receiving.receptions },
-      { 'Targets': playerData.receiving.target },
-      { 'Yards Per Reception': playerData.receiving.yardsPerReception }
+      { 'Touchdowns': selectedYearData.receiving.receivingTouchdowns },
+      { 'Receiving Yards': selectedYearData.receiving.receivingYards },
+      { 'Receptions': selectedYearData.receiving.receptions },
+      { 'Targets': selectedYearData.receiving.target },
+      { 'Yards Per Reception': selectedYearData.receiving.yardsPerReception }
     ];
 
     let spiderChart = d3.select(`#spiderChart${id}`);
