@@ -33,7 +33,7 @@ class Overall {
     }
 
     createChart() {
-        this.parseDataForYear("2016", 'QB');
+        // this.parseDataForYear("2016", 'QB');
 
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
@@ -68,10 +68,10 @@ class Overall {
             .classed('axisLabel', true);
 
         //Get fantasy points from parsed data to find the max to be displayed on the x-axis
-        let ptList = [];
-        this.overallData.forEach(function(player) {
-            ptList.push(player.year.fantasyPoints);
-        });
+        // let ptList = [];
+        // this.overallData.forEach(function(player) {
+        //     ptList.push(player.year.fantasyPoints);
+        // });
 
         //Create the x-axis group and scale
         let xAxisGroup = chartGroup
@@ -79,16 +79,16 @@ class Overall {
             .attr('id', 'xAxis')
             .attr('transform', 'translate(0,630)');
 
-        this.xScale = d3
-            .scaleLinear()
-            .domain([0, Math.max(...ptList)])
-            .range([60, 480])
-            .nice();
+        // this.xScale = d3
+        //     .scaleLinear()
+        //     .domain([0, Math.max(...ptList)])
+        //     .range([60, 480])
+        //     .nice();
+        //
+        // this.xAxis = d3.axisBottom();
+        // this.xAxis.scale(this.xScale);
 
-        this.xAxis = d3.axisBottom();
-        this.xAxis.scale(this.xScale);
-
-        xAxisGroup.call(this.xAxis);
+        // xAxisGroup.call(this.xAxis);
 
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
@@ -96,17 +96,17 @@ class Overall {
             .attr('id', 'yAxis')
             .attr('transform', 'translate(60,0)');//translate transform to get axis in proper spot
 
-        this.yScale = d3
-            .scaleLinear()
-            .domain([Math.max(...ptList), 0])
-            .range([210, 630])
-            .nice();
-
-        this.yAxis = d3.axisLeft();
-        this.yAxis.scale(this.yScale);
-
-        yAxisGroup.call(this.yAxis);
-        this.updateChart();
+        // this.yScale = d3
+        //     .scaleLinear()
+        //     .domain([Math.max(...ptList), 0])
+        //     .range([210, 630])
+        //     .nice();
+        //
+        // this.yAxis = d3.axisLeft();
+        // this.yAxis.scale(this.yScale);
+        //
+        // yAxisGroup.call(this.yAxis);
+        // this.updateChart();
 
         let dropdownWrapper = overallDiv.append('div')
             .classed('dropdownWrapper', true);
