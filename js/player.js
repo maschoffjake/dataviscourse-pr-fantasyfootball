@@ -33,7 +33,7 @@ class Player {
       });
 
     this.spiderChartRadius = 100;
-    this.circleBuffer = 10;
+    this.circleBuffer = 50;
     this.transitionTime = 1000;
 
     this.maxData = maxData;
@@ -296,16 +296,16 @@ class Player {
                               .domain([0, numberOfCircles])
                               .range([0, this.spiderChartRadius]);
 
-    spiderGroup
+    let circles = spiderGroup
       .selectAll('circle')
-      .data(ticks)
+      .data(ticks);
+
+    let newCircles = circles  
       .enter()
       .append('circle')
       .attr('cx', this.spiderChartRadius)
       .attr('cy', this.spiderChartRadius)
-      .attr('r', d => {
-        return circleRadiusScale(d + 1)
-      })
+      .attr('r', 0)
       .classed('spider-chart-circles', true);
 
     // Create lines and labels
@@ -322,14 +322,20 @@ class Player {
         .append('line')
         .attr('x1', this.spiderChartRadius)
         .attr('y1', this.spiderChartRadius)
-        .attr('x2', 0)
-        .attr('y2', 0);
+        .attr('x2', this.spiderChartRadius)
+        .attr('y2', this.spiderChartRadius);
 
     let newLabels = textLabels
         .enter()
         .append('text')
-        .attr('x', this.spiderChartRadius)
-        .attr('y', this.spiderChartRadius)
+        .attr('x', (d, i) => {
+          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
+          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+        })
+        .attr('y', (d, i) => {
+          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
+          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
+        })
         .text(d => {
           return d;
         })
@@ -337,8 +343,11 @@ class Player {
 
     lines = newLines.merge(lines);
     textLabels = newLabels.merge(textLabels);
+    circles = newCircles.merge(circles);
 
     lines
+        .transition()
+        .duration(this.transitionTime)
         .attr('x2', (d,i) => {
           const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
           return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
@@ -346,7 +355,20 @@ class Player {
         .attr('y2', (d,i) => {
           const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
           return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
-        });
+        })
+        .attr('stroke','black');
+
+    circles
+      .transition()
+      .duration(this.transitionTime)
+      .attr('r', d => {
+        return circleRadiusScale(d + 1)
+      });
+
+    textLabels
+      .transition()
+      .duration(this.transitionTime)
+      .style('opacity', 1);
 
   }
 
