@@ -348,19 +348,17 @@ class Overall {
         let updateData = [];
         this.allData.map(function(player){
             let x = Object.values(player.years);
-            let keys = x.filter(d => Object.keys(d)[0] === year);
+            let val = x.filter(d => d.year === year);
 
-            keys.forEach(function(yearData) {
-                const givenYear = Object.values(yearData);
-                const pos = givenYear[0].position;
-                if(pos === position) {
+            if(val.length > 0) {
+                if(val[0].position === position) {
                     let playerObj = {
                         'name': player.name,
-                        'year': givenYear[0]
+                        'year': val[0]
                     };
-                    updateData.push(playerObj)
+                    updateData.push(playerObj);
                 }
-            });
+            }
         });
         this.overallData = updateData;
     }
@@ -378,8 +376,8 @@ class Overall {
         // this.selectedYear = year;
         console.log(`Update Selected Year: ${yearIndex}`);
         let yearObj = this.player1.years[yearIndex];
-        let year = Object.keys(yearObj)[0];
-        let position = Object.values(yearObj)[0].position;
+        let year = yearObj.year;
+        let position = yearObj.position;
         this.parseDataForYear(year, position);
         this.updateChart();
     }
