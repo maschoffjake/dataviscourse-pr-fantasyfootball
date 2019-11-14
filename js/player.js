@@ -350,36 +350,37 @@ class Player {
     }
     // Update spider charts
     const selectedYearData = playerData.years[selectedYearIndex];
+
     // Create data points for each spider chart
     const playerScore = [
-      { 'Fantasy Points': playerData.fantasyPoints },
-      { 'PPR Points': playerData.ppr },
-      { 'PPG': playerData.ppg },
-      { 'PPRPG': playerData.pprpg },
-      { 'Position Rank': playerData.positionRank }
+      { 'Fantasy Points': selectedYearData.fantasyPoints },
+      { 'PPR Points': selectedYearData.ppr },
+      { 'PPG': selectedYearData.ppg },
+      { 'PPRPG': selectedYearData.pprpg },
+      { 'Position Rank': selectedYearData.positionRank }
     ];
 
     const playerPassing = [
-      { 'Touchdowns': playerData.passing.touchdownPasses },
-      { 'Interceptions': playerData.passing.interceptions },
-      { 'Passing Yards': playerData.passing.passingYards },
-      { 'Completions': playerData.passing.completions },
-      { 'Attempts': playerData.passing.attempts }
+      { 'Touchdowns': selectedYearData.passing.touchdownPasses },
+      { 'Interceptions': selectedYearData.passing.interceptions },
+      { 'Passing Yards': selectedYearData.passing.passingYards },
+      { 'Completions': selectedYearData.passing.completions },
+      { 'Attempts': selectedYearData.passing.attempts }
     ];
 
     const playerRushing = [
-      { 'Touchdowns': playerData.rushing.rushingTouchdowns },
-      { 'Rushing Yards': playerData.rushing.rushingYards },
-      { 'Attempts': playerData.rushing.attempts },
-      { 'Yards Per Attempt': playerData.rushing.yardsPerAttempt }
+      { 'Touchdowns': selectedYearData.rushing.rushingTouchdowns },
+      { 'Rushing Yards': selectedYearData.rushing.rushingYards },
+      { 'Attempts': selectedYearData.rushing.attempts },
+      { 'Yards Per Attempt': selectedYearData.rushing.yardsPerAttempt }
     ];
 
     const playerReceiving = [
-      { 'Touchdowns': playerData.receiving.receivingTouchdowns },
-      { 'Receiving Yards': playerData.receiving.receivingYards },
-      { 'Receptions': playerData.receiving.receptions },
-      { 'Targets': playerData.receiving.target },
-      { 'Yards Per Reception': playerData.receiving.yardsPerReception }
+      { 'Touchdowns': selectedYearData.receiving.receivingTouchdowns },
+      { 'Receiving Yards': selectedYearData.receiving.receivingYards },
+      { 'Receptions': selectedYearData.receiving.receptions },
+      { 'Targets': selectedYearData.receiving.target },
+      { 'Yards Per Reception': selectedYearData.receiving.yardsPerReception }
     ];
 
     let spiderChart = d3.select(`#spiderChart${id}`);
