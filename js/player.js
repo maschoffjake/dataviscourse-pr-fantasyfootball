@@ -37,6 +37,7 @@ class Player {
     this.transitionTime = 1000;
 
     this.maxData = maxData;
+    console.log(this.maxData);
   }
 
   /**
@@ -279,7 +280,11 @@ class Player {
   }
 
   /**
-   * Creates the spider charts for the categories of a player's stats
+   * Create spider chart elements on creations of the page
+   * @param {String} id Create spider chart with this given ID
+   * @param {Number} x Create spider chart at given X
+   * @param {Number} y Create spider cahart at given Y
+   * @param {Array} labels Labels used in the spider chart
    */
   createSpiderChart(id, x, y, labels) {
 
@@ -330,11 +335,11 @@ class Player {
         .append('text')
         .attr('x', (d, i) => {
           const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+          return this.calculateXValue(angle, numberOfCircles, circleRadiusScale)
         })
         .attr('y', (d, i) => {
           const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
+          return this.calculateYValue(angle, numberOfCircles, circleRadiusScale);
         })
         .text(d => {
           return d;
@@ -350,11 +355,11 @@ class Player {
         .duration(this.transitionTime)
         .attr('x2', (d,i) => {
           const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+          return this.calculateXValue(angle, numberOfCircles, circleRadiusScale)
         })
         .attr('y2', (d,i) => {
           const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
+          return this.calculateYValue(angle, numberOfCircles, circleRadiusScale);
         })
         .attr('stroke','black');
 
@@ -372,59 +377,103 @@ class Player {
 
   }
 
-  calculateXValue(angle, centerRadius, outerRadius, scale){
-    const x = Math.cos(angle) * scale(outerRadius);
-    return centerRadius + x;
+  /**
+   * Used for calculating the X-value that lies on the line of the circle for the given angle
+   * @param {*} angle Current angle on the circle
+   * @param {*} centerRadius What the center raidus of the cicle is of the spider chart
+   * @param {*} value The value that you want to lie on the angle line
+   * @param {*} scale Scale to use
+   */
+  calculateXValue(angle, value, scale){
+    const x = Math.cos(angle) * scale(value);
+    return this.spiderChartRadius + x;
   }
 
-  calculateYValue(angle, centerRadius, outerRadius, scale){
-    const y = Math.sin(angle) * scale(outerRadius);
-    return centerRadius - y;
+  /**
+   * Used for calculating the Y
+   * -value that lies on the line of the circle for the given angle
+   * @param {*} angle Current angle on the circle
+   * @param {*} centerRadius What the center raidus of the cicle is of the spider chart
+   * @param {*} value The value that you want to lie on the angle line
+   * @param {*} scale Scale to use
+   */
+  calculateYValue(angle, value, scale){
+    const y = Math.sin(angle) * scale(value);
+    return this.spiderChartRadius - y;
   }
 
   /**
    * Used to update the bar charts and the axis for the new player
    */
   updateSpiderChart(id, player, playerData, selectedYearIndex, x, y) {
+
+    // Don't display Player2 if compare mode isn't enabled
     if (player === 'Player2' && !this.compareEnable) {
       return;
     }
     // Update spider charts
+    const spiderChart = d3.select(`#spiderChart${id}`);
     const selectedYearData = playerData.years[selectedYearIndex];
+    let data = null;
 
-    // Create data points for each spider chart
-    const playerScore = [
-      { 'Fantasy Points': selectedYearData.fantasyPoints },
-      { 'PPR Points': selectedYearData.ppr },
-      { 'PPG': selectedYearData.ppg },
-      { 'PPRPG': selectedYearData.pprpg },
-      { 'Position Rank': selectedYearData.positionRank }
-    ];
+    // Grab max data values associated with the year and position of this player
+    const maxData = this.maxData[selectedYearData.year][selectedYearData.position];
+    switch (id) {
+      case 'Points':
+        data = [
+          selectedYearData.fantasyPoints,
+          selectedYearData.ppr,
+          selectedYearData.ppg,
+          selectedYearData.pprpg,
+          selectedYearData.positionRank
+        ];
+        const maxDataScoring = maxData.scoring;
+        const fantasyPointsScale = this.createScaleForSpiderCharts(maxDataScoring.fantasyPoints);
+        const fantasyPointsScale = this.createScaleForSpiderCharts(maxDataScoring.fantasyPoints);
+        const fantasyPointsScale = this.createScaleForSpiderCharts(maxDataScoring.fantasyPoints);
+        const fantasyPointsScale = this.createScaleForSpiderCharts(maxDataScoring.fantasyPoints);
+        const fantasyPointsScale = this.createScaleForSpiderCharts(maxDataScoring.fantasyPoints);
 
-    const playerPassing = [
-      { 'Touchdowns': selectedYearData.passing.touchdownPasses },
-      { 'Interceptions': selectedYearData.passing.interceptions },
-      { 'Passing Yards': selectedYearData.passing.passingYards },
-      { 'Completions': selectedYearData.passing.completions },
-      { 'Attempts': selectedYearData.passing.attempts }
-    ];
+        break;
+      case 'Passing':
+          data = [
+            selectedYearData.passing.touchdownPasses,
+            selectedYearData.passing.interceptions,
+            selectedYearData.passing.passingYards,
+            selectedYearData.passing.completions,
+            selectedYearData.passing.attempts
+          ];
+        break;
+      case 'Rushing':
+          data = [
+            selectedYearData.rushing.rushingTouchdowns,
+            selectedYearData.rushing.rushingYards,
+            selectedYearData.rushing.attempts,
+            selectedYearData.rushing.yardsPerAttempt,
+          ];
+        break;
+      case 'Receiving':
+          data = [
+            selectedYearData.receiving.receivingTouchdowns,
+            selectedYearData.receiving.receivingYards,
+            selectedYearData.receiving.receptions,
+            selectedYearData.receiving.target,
+            selectedYearData.receiving.yardsPerReception
+          ];
+        break;
+      default:
+        break;
+    }
+  }
 
-    const playerRushing = [
-      { 'Touchdowns': selectedYearData.rushing.rushingTouchdowns },
-      { 'Rushing Yards': selectedYearData.rushing.rushingYards },
-      { 'Attempts': selectedYearData.rushing.attempts },
-      { 'Yards Per Attempt': selectedYearData.rushing.yardsPerAttempt }
-    ];
-
-    const playerReceiving = [
-      { 'Touchdowns': selectedYearData.receiving.receivingTouchdowns },
-      { 'Receiving Yards': selectedYearData.receiving.receivingYards },
-      { 'Receptions': selectedYearData.receiving.receptions },
-      { 'Targets': selectedYearData.receiving.target },
-      { 'Yards Per Reception': selectedYearData.receiving.yardsPerReception }
-    ];
-
-    let spiderChart = d3.select(`#spiderChart${id}`);
+  /**
+   * Used for creating scales for the spider plot values
+   * @param {Number} maxData Max value for the attribute that you are creating the scale for
+   */
+  createScaleForSpiderCharts(maxData) {
+    return d3.scaleLinear()
+      .domain([0, maxData])
+      .range([]);
   }
 
   createLineGraphs() {
