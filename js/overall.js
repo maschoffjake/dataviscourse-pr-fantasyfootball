@@ -307,7 +307,10 @@ class Overall {
         this.xAxis = d3.axisBottom();
         this.xAxis.scale(this.xScale);
 
-        d3.select('#xAxis').call(this.xAxis);
+        d3.select('#xAxis')
+            .transition()
+            .duration(1500)
+            .call(this.xAxis);
 
         let yValueList = [];
         this.overallData.forEach(function(player) {
@@ -337,7 +340,10 @@ class Overall {
         this.yAxis = d3.axisLeft();
         this.yAxis.scale(this.yScale);
 
-        d3.select('#yAxis').call(this.yAxis);
+        d3.select('#yAxis')
+            .transition()
+            .duration(1500)
+            .call(this.yAxis);
     }
 
     /**
