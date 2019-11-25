@@ -27,3 +27,18 @@ div.dropdownWrapper {
     float: left;
     padding-right: 5px;
 }
+
+/*Source: http://bl.ocks.org/d3noob/a22c42db65eb00d4e369*/
+div.overallToolTip {
+    position: absolute;
+    text-align: center;
+    width: 200px;
+    height: 120px;
+    padding: 2px;
+    font: 20px sans-serif;
+    background: lightgray;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color: black;
+}

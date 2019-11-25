@@ -38,6 +38,20 @@ class Overall {
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
 
+        this.toolTip = overallDiv
+            .append('div')
+            .classed('overallToolTip', true)
+            .style("opacity", 0);
+        this.toolTip
+            .append("h6")
+            .attr("id", "toolTipLine1");
+        this.toolTip
+            .append("h6")
+            .attr("id", "toolTipLine2");
+        this.toolTip
+            .append("h6")
+            .attr("id", "toolTipLine3");
+
         //Create an svg for the chart and add a header
         overallDiv
             .append('svg')
@@ -228,7 +242,30 @@ class Overall {
 
         let that = this; //If reference to Overall class is needed for click events
         circles
-            //insert click events here when time comes
+            .on('mouseover', function(d) {
+                that.toolTip
+                    .select('#toolTipLine1')
+                    .text(d.name)
+                    .attr('y', '20px');
+                that.toolTip
+                    .select('#toolTipLine2')
+                    .text(`${that.xIndicator}: ${d.years[0][that.xIndicator]}`); // will need to parse pass, rush, rec attributes
+                that.toolTip
+                    .select('#toolTipLine3')
+                    .text(`${that.yIndicator}: ${d.years[0][that.yIndicator]}`); // will need to parse pass, rush, rec attributes
+                that.toolTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", .9)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on('mouseout', function(d) {
+                that.toolTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            })
             .transition()
             .duration(1500)
             // .attr('cx', (d) => this.xScale(d.year[this.xIndicator]))
@@ -246,8 +283,6 @@ class Overall {
                     return that.xScale(d.years[that.selectedYear].receiving[key]);
                 }
                 else {
-                    let what = d.years[that.selectedYear][that.xIndicator];
-                    let now = that.xScale(what);
                     return that.xScale(d.years[that.selectedYear][that.xIndicator]);
                 }
             })
