@@ -247,12 +247,34 @@ class Overall {
                     .select('#toolTipLine1')
                     .text(d.name)
                     .attr('y', '20px');
+                let line2Label = that.dropdownData.filter((d) => d[0] === that.xIndicator)[0][1];
+                let line2Value = that.xIndicator;
+                if(that.xIndicator.includes('PASS')) {
+                    line2Value = that.xIndicator.replace('PASS', '');
+                }
+                else if(that.xIndicator.includes('RUSH')) {
+                    line2Value = that.xIndicator.replace('RUSH', '');
+                }
+                else if(that.xIndicator.includes('REC')) {
+                    line2Value = that.xIndicator.replace('REC', '');
+                }
                 that.toolTip
                     .select('#toolTipLine2')
-                    .text(`${that.xIndicator}: ${d.years[0][that.xIndicator]}`); // will need to parse pass, rush, rec attributes
+                    .text(`${line2Label}: ${d.years[that.selectedYear][line2Value]}`); // will need to parse pass, rush, rec attributes
+                let line3Label = that.dropdownData.filter((d) => d[0] === that.yIndicator)[0][1];
+                let line3Value = that.xIndicator;
+                if(that.xIndicator.includes('PASS')) {
+                    line3Value = that.xIndicator.replace('PASS', '');
+                }
+                else if(that.xIndicator.includes('RUSH')) {
+                    line3Value = that.xIndicator.replace('RUSH', '');
+                }
+                else if(that.xIndicator.includes('REC')) {
+                    line3Value = that.xIndicator.replace('REC', '');
+                }
                 that.toolTip
                     .select('#toolTipLine3')
-                    .text(`${that.yIndicator}: ${d.years[0][that.yIndicator]}`); // will need to parse pass, rush, rec attributes
+                    .text(`${line3Label}: ${d.years[that.selectedYear][line3Value]}`); // will need to parse pass, rush, rec attributes
                 that.toolTip
                     .transition()
                     .duration(500)
