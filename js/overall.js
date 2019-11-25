@@ -33,7 +33,7 @@ class Overall {
     }
 
     createChart() {
-        this.parseDataForYear("2016", 'QB');
+        // this.parseDataForYear("2016", 'QB');
 
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
@@ -68,10 +68,10 @@ class Overall {
             .classed('axisLabel', true);
 
         //Get fantasy points from parsed data to find the max to be displayed on the x-axis
-        let ptList = [];
-        this.overallData.forEach(function(player) {
-            ptList.push(player.year.fantasyPoints);
-        });
+        // let ptList = [];
+        // this.overallData.forEach(function(player) {
+        //     ptList.push(player.year.fantasyPoints);
+        // });
 
         //Create the x-axis group and scale
         let xAxisGroup = chartGroup
@@ -79,16 +79,16 @@ class Overall {
             .attr('id', 'xAxis')
             .attr('transform', 'translate(0,630)');
 
-        this.xScale = d3
-            .scaleLinear()
-            .domain([0, Math.max(...ptList)])
-            .range([60, 480])
-            .nice();
+        // this.xScale = d3
+        //     .scaleLinear()
+        //     .domain([0, Math.max(...ptList)])
+        //     .range([60, 480])
+        //     .nice();
+        //
+        // this.xAxis = d3.axisBottom();
+        // this.xAxis.scale(this.xScale);
 
-        this.xAxis = d3.axisBottom();
-        this.xAxis.scale(this.xScale);
-
-        xAxisGroup.call(this.xAxis);
+        // xAxisGroup.call(this.xAxis);
 
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
@@ -96,17 +96,17 @@ class Overall {
             .attr('id', 'yAxis')
             .attr('transform', 'translate(60,0)');//translate transform to get axis in proper spot
 
-        this.yScale = d3
-            .scaleLinear()
-            .domain([Math.max(...ptList), 0])
-            .range([210, 630])
-            .nice();
-
-        this.yAxis = d3.axisLeft();
-        this.yAxis.scale(this.yScale);
-
-        yAxisGroup.call(this.yAxis);
-        this.updateChart();
+        // this.yScale = d3
+        //     .scaleLinear()
+        //     .domain([Math.max(...ptList), 0])
+        //     .range([210, 630])
+        //     .nice();
+        //
+        // this.yAxis = d3.axisLeft();
+        // this.yAxis.scale(this.yScale);
+        //
+        // yAxisGroup.call(this.yAxis);
+        // this.updateChart();
 
         let dropdownWrapper = overallDiv.append('div')
             .classed('dropdownWrapper', true);
@@ -235,35 +235,37 @@ class Overall {
             .attr('cx', (d) => {
                 if(that.xIndicator.includes('PASS')) {
                     let key = that.xIndicator.replace('PASS', '');
-                    return that.xScale(d.year.passing[key]);
+                    return that.xScale(d.years[that.selectedYear].passing[key]);
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     let key = that.xIndicator.replace('RUSH', '');
-                    return that.xScale(d.year.rushing[key]);
+                    return that.xScale(d.years[that.selectedYear].rushing[key]);
                 }
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
-                    return that.xScale(d.year.receiving[key]);
+                    return that.xScale(d.years[that.selectedYear].receiving[key]);
                 }
                 else {
-                    return that.xScale(d.year[that.xIndicator]);
+                    let what = d.years[that.selectedYear][that.xIndicator];
+                    let now = that.xScale(what);
+                    return that.xScale(d.years[that.selectedYear][that.xIndicator]);
                 }
             })
             .attr('cy', (d) => {
                 if (that.yIndicator.includes('PASS')) {
                     let key = that.yIndicator.replace('PASS', '');
-                    return that.yScale(d.year.passing[key]);
+                    return that.yScale(d.years[that.selectedYear].passing[key]);
                 }
                 else if (that.yIndicator.includes('RUSH')) {
                     let key = that.yIndicator.replace('RUSH', '');
-                    return that.yScale(d.year.rushing[key]);
+                    return that.yScale(d.years[that.selectedYear].rushing[key]);
                 }
                 else if (that.yIndicator.includes('REC')) {
                     let key = that.yIndicator.replace('REC', '');
-                    return that.yScale(d.year.receiving[key]);
+                    return that.yScale(d.years[that.selectedYear].receiving[key]);
                 }
                 else {
-                    return that.yScale(d.year[that.yIndicator]);
+                    return that.yScale(d.years[that.selectedYear][that.yIndicator]);
                 }
             })
             .attr('r', 3);
@@ -271,7 +273,7 @@ class Overall {
         circles
             .select('title')
             .text(function(d) {
-                return `${d.name}: ${d.year.fantasyPoints} pts`
+                return `${d.name}: ${d.years[that.selectedYear].fantasyPoints} pts`
             })
     }
 
@@ -281,18 +283,18 @@ class Overall {
         this.overallData.forEach(function(player) {
             if(that.xIndicator.includes('PASS')) {
                 let key = that.xIndicator.replace('PASS', '');
-                xValueList.push(player.year.passing[key]);
+                xValueList.push(player.years[that.selectedYear].passing[key]);
             }
             else if(that.xIndicator.includes('RUSH')) {
                 let key = that.xIndicator.replace('RUSH', '');
-                xValueList.push(player.year.rushing[key]);
+                xValueList.push(player.years[that.selectedYear].rushing[key]);
             }
             else if(that.xIndicator.includes('REC')) {
                 let key = that.xIndicator.replace('REC', '');
-                xValueList.push(player.year.receiving[key]);
+                xValueList.push(player.years[that.selectedYear].receiving[key]);
             }
             else {
-                xValueList.push(player.year[that.xIndicator]);
+                xValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.xIndicator]);
             }
         });
 
@@ -311,18 +313,18 @@ class Overall {
         this.overallData.forEach(function(player) {
             if(that.yIndicator.includes('PASS')) {
                 let key = that.yIndicator.replace('PASS', '');
-                yValueList.push(player.year.passing[key]);
+                yValueList.push(player.years[that.selectedYear].passing[key]);
             }
             else if(that.yIndicator.includes('RUSH')) {
                 let key = that.yIndicator.replace('RUSH', '');
-                yValueList.push(player.year.rushing[key]);
+                yValueList.push(player.years[that.selectedYear].rushing[key]);
             }
             else if(that.yIndicator.includes('REC')) {
                 let key = that.yIndicator.replace('REC', '');
-                yValueList.push(player.year.receiving[key]);
+                yValueList.push(player.years[that.selectedYear].receiving[key]);
             }
             else {
-                yValueList.push(player.year[that.yIndicator]);
+                yValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.yIndicator]);
             }
         });
 
@@ -377,13 +379,17 @@ class Overall {
         console.log(`Update Selected Year: ${yearIndex}`);
         let yearObj = this.player1.years[yearIndex];
         let year = yearObj.year;
+        this.selectedYear = yearIndex;
         let position = yearObj.position;
-        this.parseDataForYear(year, position);
+        this.parseDataForYear(this.player1[yearIndex], position);
         this.updateChart();
     }
 
     updateView() {
         //updateChart
+        console.log('updateView');
+        // this.parseDataForYear(this.selectedYear,this.player1.years[])
+        this.updateChart();
     }
 
     setCompareMode(compareEnable) {
