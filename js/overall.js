@@ -146,6 +146,11 @@ class Overall {
             .append('select');
 
         this.drawDropDowns();
+
+        overallDiv
+            .append('button')
+            .text('Extremes')
+            .attr('id', 'extremesButton');
     }
 
     drawDropDowns() {
@@ -301,7 +306,8 @@ class Overall {
                     .style("opacity", 0);
             })
             .on('click', function(d) {
-                that.updateSelectedPlayer(d);
+                let selectedPlayer = that.allData.filter((player) => {return player.name === d.name})[0];
+                that.updateSelectedPlayer(selectedPlayer);
             })
             .classed('selected', function(d) {
                 if((that.player1 != null) && (d.name === that.player1.name)) {

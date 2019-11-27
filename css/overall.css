@@ -21,6 +21,10 @@ div.dropdownWrapper {
     float: right;
 }
 
+.dropdownPanel {
+    margin: 3px;
+}
+
 .dropdownLabel {
     width: 1%7;
     display: inline-block;
@@ -45,4 +49,11 @@ div.overallToolTip {
 
 circle.selected {
     fill: #00a7d1;
+}
+
+#extremesButton {
+    width: 140px;
+    font-size: 12px;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
 }
