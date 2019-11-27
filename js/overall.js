@@ -290,15 +290,18 @@ class Overall {
                 that.toolTip
                     .transition()
                     .duration(500)
-                    .style("opacity", .9)
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                    .style("opacity", .8)
+                    .style("left", (d3.event.pageX - 200) + "px")
+                    .style("top", (d3.event.pageY - 75) + "px");
             })
-            .on('mouseout', function(d) {
+            .on('mouseout', function() {
                 that.toolTip
                     .transition()
                     .duration(500)
                     .style("opacity", 0);
+            })
+            .on('click', function(d) {
+                that.updateSelectedPlayer(d);
             })
             .classed('selected', function(d) {
                 if((that.player1 != null) && (d.name === that.player1.name)) {
@@ -308,7 +311,6 @@ class Overall {
             })
             .transition()
             .duration(1500)
-            // .attr('cx', (d) => this.xScale(d.year[this.xIndicator]))
             .attr('cx', (d) => {
                 if(that.xIndicator.includes('PASS')) {
                     let key = that.xIndicator.replace('PASS', '');
