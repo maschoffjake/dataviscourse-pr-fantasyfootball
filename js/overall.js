@@ -33,7 +33,7 @@ class Overall {
     }
 
     createChart() {
-        // this.parseDataForYear("2016", 'QB');
+        this.parseDataForYear("2016", 'TE');
 
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
@@ -251,18 +251,18 @@ class Overall {
                 let line2Value = that.xIndicator;
                 if(that.xIndicator.includes('PASS')) {
                     line2Value = that.xIndicator.replace('PASS', '');
-                    line2Value = d.years[that.selectedYear].passing[line2Value];
+                    line2Value = d.year.passing[line2Value];
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     line2Value = that.xIndicator.replace('RUSH', '');
-                    line2Value = d.years[that.selectedYear].rushing[line2Value];
+                    line2Value = d.year.rushing[line2Value];
                 }
                 else if(that.xIndicator.includes('REC')) {
                     line2Value = that.xIndicator.replace('REC', '');
-                    line2Value = d.years[that.selectedYear].receiving[line2Value];
+                    line2Value = d.year.receiving[line2Value];
                 }
                 else {
-                    line2Value = d.years[that.selectedYear][line2Value];
+                    line2Value = d.year[line2Value];
                 }
                 that.toolTip
                     .select('#toolTipLine2')
@@ -271,18 +271,18 @@ class Overall {
                 let line3Value = that.yIndicator;
                 if(that.yIndicator.includes('PASS')) {
                     line3Value = that.yIndicator.replace('PASS', '');
-                    line3Value = d.years[that.selectedYear].passing[line3Value];
+                    line3Value = d.year.passing[line3Value];
                 }
                 else if(that.yIndicator.includes('RUSH')) {
                     line3Value = that.yIndicator.replace('RUSH', '');
-                    line3Value = d.years[that.selectedYear].rushing[line3Value];
+                    line3Value = d.year.rushing[line3Value];
                 }
                 else if(that.yIndicator.includes('REC')) {
                     line3Value = that.yIndicator.replace('REC', '');
-                    line3Value = d.years[that.selectedYear].receiving[line3Value];
+                    line3Value = d.year.receiving[line3Value];
                 }
                 else {
-                    line3Value = d.years[that.selectedYear][line3Value];
+                    line3Value = d.year[line3Value];
                 }
                 that.toolTip
                     .select('#toolTipLine3')
@@ -306,44 +306,40 @@ class Overall {
             .attr('cx', (d) => {
                 if(that.xIndicator.includes('PASS')) {
                     let key = that.xIndicator.replace('PASS', '');
-                    return that.xScale(d.years[that.selectedYear].passing[key]);
+                    return that.xScale(d.year.passing[key]);
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     let key = that.xIndicator.replace('RUSH', '');
-                    return that.xScale(d.years[that.selectedYear].rushing[key]);
+                    return that.xScale(d.year.rushing[key]);
                 }
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
-                    return that.xScale(d.years[that.selectedYear].receiving[key]);
+                    return that.xScale(d.year.receiving[key]);
                 }
                 else {
-                    return that.xScale(d.years[that.selectedYear][that.xIndicator]);
+                    // return that.xScale(d.years[that.selectedYear][that.xIndicator]);
+                    return that.xScale(d.year[that.xIndicator]);
                 }
             })
             .attr('cy', (d) => {
                 if (that.yIndicator.includes('PASS')) {
                     let key = that.yIndicator.replace('PASS', '');
-                    return that.yScale(d.years[that.selectedYear].passing[key]);
+                    return that.yScale(d.year.passing[key]);
                 }
                 else if (that.yIndicator.includes('RUSH')) {
                     let key = that.yIndicator.replace('RUSH', '');
-                    return that.yScale(d.years[that.selectedYear].rushing[key]);
+                    return that.yScale(d.year.rushing[key]);
                 }
                 else if (that.yIndicator.includes('REC')) {
                     let key = that.yIndicator.replace('REC', '');
-                    return that.yScale(d.years[that.selectedYear].receiving[key]);
+                    return that.yScale(d.year.receiving[key]);
                 }
                 else {
-                    return that.yScale(d.years[that.selectedYear][that.yIndicator]);
+                    // return that.yScale(d.years[that.selectedYear][that.yIndicator]);
+                    return that.yScale(d.year[that.yIndicator]);
                 }
             })
             .attr('r', 3);
-
-        circles
-            .select('title')
-            .text(function(d) {
-                return `${d.name}: ${d.years[that.selectedYear].fantasyPoints} pts`
-            })
     }
 
     updateScales() {
@@ -352,18 +348,19 @@ class Overall {
         this.overallData.forEach(function(player) {
             if(that.xIndicator.includes('PASS')) {
                 let key = that.xIndicator.replace('PASS', '');
-                xValueList.push(player.years[that.selectedYear].passing[key]);
+                xValueList.push(player.year.passing[key]);
             }
             else if(that.xIndicator.includes('RUSH')) {
                 let key = that.xIndicator.replace('RUSH', '');
-                xValueList.push(player.years[that.selectedYear].rushing[key]);
+                xValueList.push(player.year.rushing[key]);
             }
             else if(that.xIndicator.includes('REC')) {
                 let key = that.xIndicator.replace('REC', '');
-                xValueList.push(player.years[that.selectedYear].receiving[key]);
+                xValueList.push(player.year.receiving[key]);
             }
             else {
-                xValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.xIndicator]);
+                // xValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.xIndicator]);
+                xValueList.push(player.year[that.xIndicator]);
             }
         });
 
@@ -385,18 +382,19 @@ class Overall {
         this.overallData.forEach(function(player) {
             if(that.yIndicator.includes('PASS')) {
                 let key = that.yIndicator.replace('PASS', '');
-                yValueList.push(player.years[that.selectedYear].passing[key]);
+                yValueList.push(player.year.passing[key]);
             }
             else if(that.yIndicator.includes('RUSH')) {
                 let key = that.yIndicator.replace('RUSH', '');
-                yValueList.push(player.years[that.selectedYear].rushing[key]);
+                yValueList.push(player.year.rushing[key]);
             }
             else if(that.yIndicator.includes('REC')) {
                 let key = that.yIndicator.replace('REC', '');
-                yValueList.push(player.years[that.selectedYear].receiving[key]);
+                yValueList.push(player.year.receiving[key]);
             }
             else {
-                yValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.yIndicator]);
+                // yValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.yIndicator]);
+                yValueList.push(player.year[that.yIndicator]);
             }
         });
 
@@ -456,7 +454,7 @@ class Overall {
         let year = yearObj.year;
         this.selectedYear = yearIndex;
         let position = yearObj.position;
-        this.parseDataForYear(this.player1[yearIndex], position);
+        this.parseDataForYear(year, position);
         this.updateChart();
     }
 
