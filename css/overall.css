@@ -42,3 +42,7 @@ div.overallToolTip {
     pointer-events: none;
     color: black;
 }
+
+circle.selected {
+    fill: #00a7d1;
+}

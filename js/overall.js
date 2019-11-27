@@ -300,6 +300,12 @@ class Overall {
                     .duration(500)
                     .style("opacity", 0);
             })
+            .classed('selected', function(d) {
+                if((that.player1 != null) && (d.name === that.player1.name)) {
+                    return true;
+                }
+                return (that.player2 != null) && (d.name === that.player2.name);
+            })
             .transition()
             .duration(1500)
             // .attr('cx', (d) => this.xScale(d.year[this.xIndicator]))
