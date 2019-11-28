@@ -452,6 +452,10 @@ class Overall {
         this.overallData = updateData;
     }
 
+    parseDataForYears(years, position) {
+
+    }
+
     updateCurrentPlayers(player1, player2) {
         //update player data and highlighting if needed
         // original player objects from parsed csv
@@ -463,7 +467,24 @@ class Overall {
         //will receive an index, so access year via this.player1.years
         //will need to parse the data set for the year and position again
         // this.selectedYear = year;
+        let that = this;
         console.log(`Update Selected Year: ${yearIndex}`);
+        // if(yearIndex.length > 1) {
+        //     let years = [];
+        //     yearIndex.forEach(function(index) {
+        //         years.push(that.player1.years[index]);
+        //     });
+        //     let position = this.player1.years[0].position;
+        //     this.selectedYear = years;
+        //     this.parsDataForYears(this.selectedYear, position)
+        // }
+        // else {
+        //     let yearObj = this.player1.years[yearIndex];
+        //     let year = yearObj.year;
+        //     this.selectedYear = yearIndex;
+        //     let position = yearObj.position;
+        //     this.parseDataForYear(year, position);
+        // }
         let yearObj = this.player1.years[yearIndex];
         let year = yearObj.year;
         this.selectedYear = yearIndex;
