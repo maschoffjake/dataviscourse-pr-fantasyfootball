@@ -36,6 +36,8 @@ class Player {
     this.circleBuffer = 50;
     this.transitionTime = 1000;
 
+    this.widthOfPieChart = 25;
+
     this.maxData = maxData;
   }
 
@@ -296,54 +298,129 @@ class Player {
                               .domain([0, numberOfCircles])
                               .range([0, this.spiderChartRadius]);
 
+    // Trying to draw a circle with a path
+    // spiderGroup
+    //   .append('path')
+    //   .attr('d', this.getCirclePath())
+    //   .attr('stroke', 'blue')
+    //   .attr('stroke-width', 2)
+    //   .attr('fill', 'none')
+    //   .attr('id', `${id}OuterRadius`);
+
+    const arc = d3.arc()
+      .innerRadius(this.spiderChartRadius)
+      .outerRadius(this.spiderChartRadius + this.widthOfPieChart);
+
+    const pie = d3.pie()
+      .value(360/labels.length)
+      .padAngle(0)
+      .sort(null);
+
+    // Create pie chart arcs and translate them more onto page
+    const pieArcs = spiderGroup
+      .append('g')
+      .attr('id', d => {return 'arcs' + id;})
+      .attr('transform', 'translate(100,100)');
+
+    // Create the pie arcs
+    const arcs = pieArcs 
+      .selectAll('.labelArcs')
+			.data(pie(labels))
+		  .enter().append('path')
+			.attr('class', 'labelArcs')
+			.attr('id', (d) => { 
+        return 'labelArc' + id + d.data;
+      })
+      .attr('d', arc);
+
+    // Add an onclick function to the pie arcs
+    arcs
+      .on('click', function(d) {
+        const rotate = -1 * ((d.startAngle + d.endAngle)/2 / Math.PI * 180);
+        pieArcs
+          .transition()
+          .attr('transform', `translate(100,100) rotate(${rotate})`)
+          .duration(1000);
+
+        text
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+      });
+      
+
+    // Append text within the pie chart 
+    const text = pieArcs
+      .selectAll('.labelText')
+      .data(labels)
+      .enter()
+      .append('text')
+      .attr('class', 'labelText')
+      .attr('dy', this.widthOfPieChart/2 + 3) // Get in the middle of the arc, seemed to work well
+      .attr('x', (d) => {
+        // Center the text in the middle of the pie charts (has to be dependent on length of the label, 4.5 times seemed to be a good number)
+        return (360/labels.length) - 4.5 * (d.length/2);
+      })
+      .append('textPath')
+      .attr('xlink:href', (d) => {return '#labelArc' + id + d;})
+      .text(d => {return d;});
+
+
+    // Create all background circles (going to put in its own group, so we don't select these when updating spider plots)
     let circles = spiderGroup
       .selectAll('circle')
       .data(ticks);
 
-    let newCircles = circles  
-      .enter()
-      .append('circle')
-      .attr('cx', this.spiderChartRadius)
-      .attr('cy', this.spiderChartRadius)
-      .attr('r', 0)
-      .classed('spider-chart-circles', true);
+    // let newCircles = circles  
+    //   .enter()
+    //   .append('circle')
+    //   .attr('cx', this.spiderChartRadius)
+    //   .attr('cy', this.spiderChartRadius)
+    //   .attr('r', 0)
+    //   .classed('spider-chart-circles', true);
 
-    // Create lines and labels
+    // Create lines
     let lines = spiderGroup
       .selectAll('line')
       .data(labels);
+            
+  let newLines = lines
+      .enter()
+      .append('line')
+      .attr('x1', this.spiderChartRadius)
+      .attr('y1', this.spiderChartRadius)
+      .attr('x2', this.spiderChartRadius)
+      .attr('y2', this.spiderChartRadius);
 
-    let textLabels = spiderGroup
-      .selectAll('text')
-      .data(labels);
-              
-    let newLines = lines
-        .enter()
-        .append('line')
-        .attr('x1', this.spiderChartRadius)
-        .attr('y1', this.spiderChartRadius)
-        .attr('x2', this.spiderChartRadius)
-        .attr('y2', this.spiderChartRadius);
+    // Create labels
+    // let textLabels = spiderGroup
+    //   .selectAll('text')
+    //   .data(labels);
 
-    let newLabels = textLabels
-        .enter()
-        .append('text')
-        .attr('x', (d, i) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
-        })
-        .attr('y', (d, i) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
-        })
-        .text(d => {
-          return d;
-        })
-        .style('opacity', 0);
+
+    // let newLabels = textLabels
+    //     .enter()
+    //     .append('text')
+    //     .attr('x', (d, i) => {
+    //       const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
+    //       return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+    //     })
+    //     .attr('y', (d, i) => {
+    //       const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
+    //       return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
+    //     })
+    //     .text(d => {
+    //       return d;
+    //     })
+    //     .style('opacity', 0);
+
+    // Also create circles that will be used to manipulate the points in the spider chart
+    spiderGroup
+        
 
     lines = newLines.merge(lines);
-    textLabels = newLabels.merge(textLabels);
-    circles = newCircles.merge(circles);
+    // textLabels = newLabels.merge(textLabels);
+    // circles = newCircles.merge(circles);
 
     lines
         .transition()
@@ -358,18 +435,28 @@ class Player {
         })
         .attr('stroke','black');
 
-    circles
-      .transition()
-      .duration(this.transitionTime)
-      .attr('r', d => {
-        return circleRadiusScale(d + 1)
-      });
+    // circles
+    //   .transition()
+    //   .duration(this.transitionTime)
+    //   .attr('r', d => {
+    //     return circleRadiusScale(d + 1)
+    //   });
 
-    textLabels
-      .transition()
-      .duration(this.transitionTime)
-      .style('opacity', 1);
+    // textLabels
+    //   .transition()
+    //   .duration(this.transitionTime)
+    //   .style('opacity', 1);
 
+  }
+
+  getCirclePath() {
+    const cx = this.spiderChartRadius;
+    const cy = this.spiderChartRadius;
+    const myr = this.spiderChartRadius;
+    return "M" + cx + "," + cy + " " +
+      "m" + -myr + ", 0 " +
+      "a" + myr + "," + myr + " 0 1,0 " + myr*2  + ",0 " +
+      "a" + myr + "," + myr + " 0 1,0 " + -myr*2 + ",0Z";
   }
 
   calculateXValue(angle, centerRadius, outerRadius, scale){
