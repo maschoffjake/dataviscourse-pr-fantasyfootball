@@ -257,6 +257,7 @@ class Overall {
                 if(that.xIndicator.includes('PASS')) {
                     line2Value = that.xIndicator.replace('PASS', '');
                     line2Value = d.year.passing[line2Value];
+                    // line2Value = (Object.keys(d).includes('year') ? d.year.passing[line2Value] : d.years)
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     line2Value = that.xIndicator.replace('RUSH', '');
@@ -452,8 +453,70 @@ class Overall {
         this.overallData = updateData;
     }
 
-    parseDataForYears(years, position) {
-
+    parseDataForYears(yearIndices, position) {
+        let updateData = [];
+        let years = [];
+        for(let i = 0; i < yearIndices.length; i++) {
+            years.push(this.player1.years[i].year);
+        }
+        this.allData.map(function(player) {
+            let x = Object.values(player.years);
+            let val = x.filter(d => years.includes(d.year));
+            console.log(val);
+            if(val.length > 0) {
+                if(val[0].position === position) {
+                    let playerObj = {
+                        'name': player.name,
+                        "team": val[0].team,
+                        "position": val[0].position,
+                        "age": val[0].age,
+                        "games": 0,
+                        "gamesStarted": 0,
+                        "passing": {
+                            "completions": 0,
+                            "attempts": 0,
+                            "passingYards": 0,
+                            "touchdownPasses": 0,
+                            "interceptions": 0
+                        },
+                        "rushing": {
+                            "attempts": 0,
+                            "rushingYards": 0,
+                            "yardsPerAttempt": 0,
+                            "rushingTouchdowns": 0
+                        },
+                        "receiving": {
+                            "target": 0,
+                            "receptions": 0,
+                            "receivingYards": 0,
+                            "yardsPerReception": 0,
+                            "receivingTouchdowns": 0
+                        },
+                        "fantasyPoints": 0,
+                        "ppr": 0,
+                        "ppg": 0,
+                        "pprpg": 0,
+                        "positionRank": 0
+                    };
+                    val.forEach(function(year) {
+                        Object.keys(year).forEach(function(key) {
+                            if(key != 'year' && key != 'team' && key != 'position' && key != 'age') {
+                                if(key === 'passing' || key === 'rushing' || key === 'receiving') {
+                                    Object.keys(year[key]).forEach(function(attr) {
+                                        playerObj[key][attr] += parseInt(year[key][attr]);
+                                    });
+                                }
+                                else {
+                                    playerObj[key] += parseInt(year[key]);
+                                }
+                            }
+                        });
+                    });
+                    updateData.push(playerObj);
+                }
+            }
+        });
+        this.overallData = updateData;
     }
 
     updateCurrentPlayers(player1, player2) {
@@ -489,6 +552,7 @@ class Overall {
         let year = yearObj.year;
         this.selectedYear = yearIndex;
         let position = yearObj.position;
+        // this.parseDataForYears([0,1], 'TE');
         this.parseDataForYear(year, position);
         this.updateChart();
     }
