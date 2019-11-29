@@ -78,7 +78,7 @@ class Overall {
             .append('text')
             .attr('id', 'yAxisLabel')
             .attr('transform', 'translate(20, 470) rotate(90) scale(-1,-1)')
-            .text('Player Names')
+            .text('Games Started')
             .classed('axisLabel', true);
 
         //Get fantasy points from parsed data to find the max to be displayed on the x-axis
