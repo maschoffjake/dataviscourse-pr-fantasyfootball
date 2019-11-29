@@ -520,6 +520,10 @@ class Player {
       })
       .classed('selected_years_brush', true);
 
+    if (minIndex > 10) {
+      minIndex = 0;
+    }
+
     if (playerGroup.includes('Player1')) {
       this.yearRangeIndexPlayer1.min = minIndex;
       this.yearRangeIndexPlayer1.max = maxIndex;
@@ -528,18 +532,14 @@ class Player {
       this.yearRangeIndexPlayer2.max = maxIndex;
     }
 
-    let minIndexAllPlayer = this.yearRangeIndexPlayer1.min;
-    if (this.yearRangeIndexPlayer2 < minIndexAllPlayer) {
-      minIndexAllPlayer = this.yearRangeIndexPlayer2.min;
+    let yearsToForward = [];
+
+    yearsToForward.push([this.yearRangeIndexPlayer1.min, this.yearRangeIndexPlayer1.max]);
+
+    if (this.compareEnable) {
+      yearsToForward.push([this.yearRangeIndexPlayer2.min, this.yearRangeIndexPlayer2.max]);
     }
-    let maxIndexAllPlayer = this.yearRangeIndexPlayer1.max;
-    if (this.yearRangeIndexPlayer2 < minIndexAllPlayer) {
-      maxIndexAllPlayer = this.yearRangeIndexPlayer2.max;
-    }
-    if (minIndexAllPlayer === maxIndexAllPlayer || minIndexAllPlayer === 50) {
-      this.updateSelectedYearOverallView([maxIndexAllPlayer]);
-    } else {
-      this.updateSelectedYearOverallView([minIndexAllPlayer, maxIndexAllPlayer]);
-    }
+    
+    this.updateSelectedYearOverallView(yearsToForward);
   }
 }
