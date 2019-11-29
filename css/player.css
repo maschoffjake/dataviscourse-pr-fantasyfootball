@@ -26,3 +26,24 @@
     fill: none;
     stroke: gray;
 }
+
+.labelArcs {
+    fill: #d3d3d3;
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.labelText {
+    fill: black;
+    font-size: 13px;
+}
+
+.linesInSpiderChart {
+    stroke: cadetblue;
+}
+
+.spiderChartPlotPath {
+    stroke: crimson;
+    fill: crimson;
+    opacity: 0.6;
+}

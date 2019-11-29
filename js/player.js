@@ -36,6 +36,17 @@ class Player {
     this.circleBuffer = 50;
     this.transitionTime = 1000;
 
+    this.widthOfPieChart = 25;
+
+    // Need to save what data is being stored in each quadrant, so we can create the spider plots in correct area
+    // This will be used in updateSpiderCharts
+       this.dataToRadian = {
+      'Points': {},
+      'Passing': {},
+      'Rushing': {},
+      'Receiving': {}
+    };
+    this.spiderChartPlotCirclesRadiuses = 5;
     this.maxData = maxData;
   }
 
@@ -78,15 +89,15 @@ class Player {
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
 
-    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1);
-    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1);
-    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1);
-    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1);
+    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 4);
+    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
 
-    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2);
-    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2);
-    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2);
-    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2);
+    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
+    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
   }
 
   /**
@@ -277,153 +288,361 @@ class Player {
     // TODO: change color of selected block w/ brush
   }
 
+
   /**
-   * Creates the spider charts for the categories of a player's stats
+   * 
+   * @param {String} id id to give the created spider chart
+   * @param {Number} x  x-position to translate the spider graph
+   * @param {Number} y y-position to translate the spider graph
+   * @param {List[String]} labels labels to give the spider chart
    */
   createSpiderChart(id, x, y, labels) {
 
-    // Create the passing spider chart
+    // Create the spider chart with the passed in id
     const spiderGroup = this.svg
       .append('g')
       .attr('id', `spiderChart${id}`)
       .attr('transform', `translate(${x}, ${y})`);
 
-    // Create circles which go around the spider chart
-    const numberOfCircles = 5;
-    const ticks = [...Array(numberOfCircles).keys()];
-    const circleRadiusScale = d3.scaleLinear()
-                              .domain([0, numberOfCircles])
-                              .range([0, this.spiderChartRadius]);
+    // Create arc generators and a pie chart (this will create the outer ring of the spider chart, sort of like a donut chart)
+    const arc = d3.arc()
+      .innerRadius(this.spiderChartRadius)
+      .outerRadius(this.spiderChartRadius + this.widthOfPieChart);
 
-    let circles = spiderGroup
-      .selectAll('circle')
-      .data(ticks);
+    const pie = d3.pie()
+      .value(360/labels.length)
+      .padAngle(0)
+      .sort(null);
 
-    let newCircles = circles  
+    // Create pie chart arcs and translate them more onto page
+    const pieArcs = spiderGroup
+      .append('g')
+      .attr('id', 'arcs' + id)
+      .attr('transform', 'translate(100,100)');
+
+    // Create the pie arcs
+    const arcs = pieArcs 
+      .selectAll('.labelArcs')
+			.data(pie(labels))
+		  .enter().append('path')
+			.attr('class', 'labelArcs')
+			.attr('id', (d, i) => { 
+         this.dataToRadian[id][d.data] = (d.startAngle + d.endAngle)/2;
+        return 'labelArc' + id + d.data;
+      })
+      .attr('d', arc);
+
+    // Add an onclick function to the pie arcs to rotate when they are clicked
+    arcs
+      .on('click', function(d) {
+        // Find the angle to which to rotate the spider chart
+        const rotate = -1 * ((d.startAngle + d.endAngle)/2 / Math.PI * 180);
+        pieArcs
+          .transition()
+          .attr('transform', `translate(100,100) rotate(${rotate})`)
+          .duration(1000);
+
+        text
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        chartLines
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        spiderPlotGroup
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        spiderPlotPathGroup
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+      });
+      
+    // TODO: add on click event so it rotates when text eleents are also clicked
+    // Append text within the pie chart 
+    const text = pieArcs
+      .selectAll('.labelText')
+      .data(labels)
       .enter()
-      .append('circle')
-      .attr('cx', this.spiderChartRadius)
-      .attr('cy', this.spiderChartRadius)
-      .attr('r', 0)
-      .classed('spider-chart-circles', true);
+      .append('text')
+      .attr('class', 'labelText')
+      .attr('dy', this.widthOfPieChart/2 + 3) // Get in the middle of the arc, seemed to work well
+      .attr('x', (d) => {
+        // Center the text in the middle of the pie charts (has to be dependent on length of the label, 4.5 times seemed to be a good number)
+        return (360/labels.length) - 4.5 * (d.length/2);
+      })
+      .append('textPath')
+      .attr('xlink:href', (d) => {return '#labelArc' + id + d;})
+      .text(d => {return d;});
 
-    // Create lines and labels
-    let lines = spiderGroup
+
+    // Creates the group to translate the lines in
+    const chartLines = spiderGroup
+      .append('g')
+      .attr('transform', 'translate(100,100)')
+      .append('g')  // This group needs to be added to rotate
+      .attr('class', 'chartLines');
+
+    // Create the group to hold the lines in
+    const actualLineGroup = chartLines
+      .append('g')
+      .attr('transform', 'translate(-100,-100)');  // Untranslate the center movements (hacky) must be kept or it will rotate off the page
+
+    // Create lines
+    let lines = actualLineGroup
       .selectAll('line')
       .data(labels);
-
-    let textLabels = spiderGroup
-      .selectAll('text')
-      .data(labels);
-              
-    let newLines = lines
-        .enter()
-        .append('line')
-        .attr('x1', this.spiderChartRadius)
-        .attr('y1', this.spiderChartRadius)
-        .attr('x2', this.spiderChartRadius)
-        .attr('y2', this.spiderChartRadius);
-
-    let newLabels = textLabels
-        .enter()
-        .append('text')
-        .attr('x', (d, i) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
-        })
-        .attr('y', (d, i) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
-        })
-        .text(d => {
-          return d;
-        })
-        .style('opacity', 0);
+            
+  let newLines = lines
+      .enter()
+      .append('line')
+      .attr('x1', this.spiderChartRadius)
+      .attr('y1', this.spiderChartRadius)
+      .attr('x2', this.spiderChartRadius)
+      .attr('y2', this.spiderChartRadius)
+      .attr('class', 'linesInSpiderChart');
 
     lines = newLines.merge(lines);
-    textLabels = newLabels.merge(textLabels);
-    circles = newCircles.merge(circles);
 
     lines
         .transition()
         .duration(this.transitionTime)
         .attr('x2', (d,i) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+          // Going to offset the angles by a little so they are in the middle of each of the pi sections, that's where the 0.5
+          // comes into play
+          const angle = (Math.PI / 2) + (2 * Math.PI * (i+.5) / labels.length);
+          return this.calculateXValue(angle, this.spiderChartRadius, null, null);
         })
         .attr('y2', (d,i) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
-        })
-        .attr('stroke','black');
+          // Going to offset the angles by a little so they are in the middle of each of the pi sections, that's where the 0.5
+          // comes into play
+          const angle = (Math.PI / 2) + (2 * Math.PI * (i+.5) / labels.length);
+          return this.calculateYValue(angle, this.spiderChartRadius, null, null);
+        });
 
-    circles
-      .transition()
-      .duration(this.transitionTime)
-      .attr('r', d => {
-        return circleRadiusScale(d + 1)
-      });
+    // Create a group for spider chart plot points to rotate
+    const spiderPlotGroup = spiderGroup
+        .append('g')
+        .attr('transform', 'translate(100,100)')
+        .append('g')
+        .attr('class', `spiderChartSpiderPlots`);
 
-    textLabels
-      .transition()
-      .duration(this.transitionTime)
-      .style('opacity', 1);
+    const actualSpiderPlotGroup = spiderPlotGroup
+        .append('g')
+        .attr('transform', 'translate(-100,-100)')  // Hacky way to get a group to rotate, have to keep this or it breaks...
+        .attr('id', `spiderChart${id}SpiderPlots`);
 
+    const spiderPlotPoints = actualSpiderPlotGroup
+        .selectAll('spiderChartDataPoints')
+        .data(labels);
+    
+    spiderPlotPoints
+        .enter()
+        .append('circle')
+        .attr('cx', this.spiderChartRadius)
+        .attr('cy', this.spiderChartRadius)
+        .attr('r', 0)
+        .attr('class', 'spiderChartDataPoints');
+
+    // Create a group for the spider plot lines to be roated in
+    const spiderPlotPathGroup = spiderGroup
+        .append('g')
+        .attr('transform', 'translate(100,100)')
+        .append('g');
+
+    spiderPlotPathGroup
+        .append('g')
+        .attr('transform', 'translate(-100,-100)')
+        .attr('id', `spiderChart${id}Path`)
+        .append('path')
+        .attr('class', 'spiderChartPlotPath');
   }
 
-  calculateXValue(angle, centerRadius, outerRadius, scale){
-    const x = Math.cos(angle) * scale(outerRadius);
+  /**
+   * 
+   * @param {*} angle 
+   * @param {*} centerRadius 
+   * @param {*} value 
+   * @param {*} scale 
+   */
+  calculateXValue(angle, centerRadius, value, scale){
+    if (scale === null) {
+      const x = Math.cos(angle) * centerRadius;
+      return centerRadius + x;
+    }
+    const x = Math.cos(angle) * scale(value);
     return centerRadius + x;
   }
 
-  calculateYValue(angle, centerRadius, outerRadius, scale){
-    const y = Math.sin(angle) * scale(outerRadius);
+  /**
+   * 
+   * @param {*} angle 
+   * @param {*} centerRadius 
+   * @param {*} value 
+   * @param {*} scale 
+   */
+  calculateYValue(angle, centerRadius, value, scale){
+    if (scale === null) {
+      const y = Math.sin(angle) * centerRadius;
+      return centerRadius - y;
+    }
+    const y = Math.sin(angle) * scale(value);
     return centerRadius - y;
   }
 
   /**
    * Used to update the bar charts and the axis for the new player
    */
-  updateSpiderChart(id, player, playerData, selectedYearIndex, x, y) {
+  updateSpiderChart(id, player, playerData, selectedYearIndex, numberOfArcs, x, y) {
+    // Don't update player 2 stuff if it isn't selected
     if (player === 'Player2' && !this.compareEnable) {
       return;
     }
-    // Update spider charts
+
+    // Update spider charts with current year
     const selectedYearData = playerData.years[selectedYearIndex];
+    console.log(selectedYearData);
 
-    // Create data points for each spider chart
-    const playerScore = [
-      { 'Fantasy Points': selectedYearData.fantasyPoints },
-      { 'PPR Points': selectedYearData.ppr },
-      { 'PPG': selectedYearData.ppg },
-      { 'PPRPG': selectedYearData.pprpg },
-      { 'Position Rank': selectedYearData.positionRank }
-    ];
+    let dataToUse = null;
+    switch (id) {
+      case 'Passing' :
+        dataToUse = [
+          [ 'Touchdowns' , selectedYearData.passing.touchdownPasses ],
+          [ 'Interceptions' , selectedYearData.passing.interceptions ],
+          [ 'Passing Yards' , selectedYearData.passing.passingYards ],
+          [ 'Completions' , selectedYearData.passing.completions ],
+          [ 'Attempts' , selectedYearData.passing.attempts ]
+        ];
+        break;
+      case 'Rushing' :
+        dataToUse = [
+          [ 'Touchdowns' , selectedYearData.rushing.rushingTouchdowns ],
+          [ 'Rushing Yards' , selectedYearData.rushing.rushingYards ],
+          [ 'Attempts' , selectedYearData.rushing.attempts ],
+          [ 'Yards Per Attempt' , selectedYearData.rushing.yardsPerAttempt ]
+        ];
+        break;
+      case 'Receiving' :
+        dataToUse = [
+          [ 'Touchdowns' , selectedYearData.receiving.receivingTouchdowns ],
+          [ 'Receiving Yards' , selectedYearData.receiving.receivingYards ],
+          [ 'Receptions' , selectedYearData.receiving.receptions ],
+          [ 'Targets' , selectedYearData.receiving.target ],
+          [ 'Yards Per Reception' , selectedYearData.receiving.yardsPerReception ]
+        ];
+        break;
+      case 'Points' :
+        dataToUse = [
+          [ 'Fantasy Points' , selectedYearData.fantasyPoints ],
+          [ 'PPR Points' , selectedYearData.ppr ],
+          [ 'PPG' , selectedYearData.ppg ],
+          [ 'PPRPG' , selectedYearData.pprpg ],
+          [ 'Position Rank' , selectedYearData.positionRank ]
+        ];
+        break;
+      default :
+        console.log('Unable to find this ID:', id);
+        return;
+    }
 
-    const playerPassing = [
-      { 'Touchdowns': selectedYearData.passing.touchdownPasses },
-      { 'Interceptions': selectedYearData.passing.interceptions },
-      { 'Passing Yards': selectedYearData.passing.passingYards },
-      { 'Completions': selectedYearData.passing.completions },
-      { 'Attempts': selectedYearData.passing.attempts }
-    ];
+    // UPDATE THE PLOT POINTS
+    const spiderPlotPoints = d3.select(`#spiderChart${id}SpiderPlots`).selectAll('.spiderChartDataPoints').data(dataToUse);
 
-    const playerRushing = [
-      { 'Touchdowns': selectedYearData.rushing.rushingTouchdowns },
-      { 'Rushing Yards': selectedYearData.rushing.rushingYards },
-      { 'Attempts': selectedYearData.rushing.attempts },
-      { 'Yards Per Attempt': selectedYearData.rushing.yardsPerAttempt }
-    ];
+    spiderPlotPoints
+        .transition()
+        .duration(this.transitionTime)
+        .attr('cx', (d) => {
+          const attributeName = d[0];
+          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
+          const value = d[1];
+          // Position Rank scale is inverted, 1 is the best and max is the worst
+          let scale;
+          if (attributeName === 'Position Rank') {
+            scale = d3.scaleLinear()
+              .domain([maxValueForThisAttribute, 1])
+              .range([0, this.spiderChartRadius]);
+          }
+          else {
+            scale = d3.scaleLinear()
+              .domain([0, maxValueForThisAttribute])
+              .range([0, this.spiderChartRadius]);
+          }
+          // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
+          let radian = this.dataToRadian[id][attributeName];
+          radian = -1 * radian + Math.PI/2;
+          return this.calculateXValue(radian, this.spiderChartRadius, value, scale);
+        })
+        .attr('cy', (d) => {
+          const attributeName = d[0];
+          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
+          const value = d[1];
+          let scale;
+          // Position Rank scale is inverted, 1 is the best and max is the worst
+          if (attributeName === 'Position Rank') {
+            scale = d3.scaleLinear()
+              .domain([maxValueForThisAttribute, 1])
+              .range([0, this.spiderChartRadius]);
+          }
+          else {
+            scale = d3.scaleLinear()
+              .domain([0, maxValueForThisAttribute])
+              .range([0, this.spiderChartRadius]);
+          }
+          // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
+          let radian = this.dataToRadian[id][attributeName];
+          radian = -1 * radian + Math.PI/2;
+          return this.calculateYValue(radian, this.spiderChartRadius, value, scale);
+        })
+        .attr('r', this.spiderChartPlotCirclesRadiuses);
 
-    const playerReceiving = [
-      { 'Touchdowns': selectedYearData.receiving.receivingTouchdowns },
-      { 'Receiving Yards': selectedYearData.receiving.receivingYards },
-      { 'Receptions': selectedYearData.receiving.receptions },
-      { 'Targets': selectedYearData.receiving.target },
-      { 'Yards Per Reception': selectedYearData.receiving.yardsPerReception }
-    ];
-
-    let spiderChart = d3.select(`#spiderChart${id}`);
+        // UPDATE THE PATH THAT CONNECTS ALL OF THE POINTS
+        // Can't really find a good way of doing this with D3...
+        // Create path from the data to use
+        const spiderChartPath = d3.select(`#spiderChart${id}`).select('.spiderChartPlotPath');
+        let path = '';
+        let count = 0;  // Count used to concatenate the move value on to the string first
+        for (let item of dataToUse) {
+          const attributeName = item[0];
+          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
+          const value = item[1];
+          // Position Rank scale is inverted, 1 is the best and max is the worst
+          let scale;
+          if (attributeName === 'Position Rank') {
+            scale = d3.scaleLinear()
+              .domain([maxValueForThisAttribute, 1])
+              .range([0, this.spiderChartRadius]);
+          }
+          else {
+            scale = d3.scaleLinear()
+              .domain([0, maxValueForThisAttribute])
+              .range([0, this.spiderChartRadius]);
+          }
+          // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
+          let radian = this.dataToRadian[id][attributeName];
+          radian = -1 * radian + Math.PI/2;
+          const xValue = this.calculateXValue(radian, this.spiderChartRadius, value, scale);
+          const yValue = this.calculateYValue(radian, this.spiderChartRadius, value, scale);
+          
+          // Add the move value to the front of the string initially
+          if (count === 0) {
+            count++;
+            path += `M ${xValue} ${yValue}`;
+          }
+          // Otherwise append lines to each points
+          else {
+            path += `L ${xValue} ${yValue}`;
+          }
+        }
+        path += ' Z';
+        spiderChartPath
+          .transition()
+          .attr('d', path)
+          .duration(1000);
   }
 
   createLineGraphs() {
