@@ -8,7 +8,7 @@ class Player {
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
-    this.svgHeight = 1000;
+    this.svgHeight = 1100;
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
@@ -210,7 +210,7 @@ class Player {
 
         if (this.id.includes('Player1')) {
           // Update selected circle in overall view only for player 1.
-          that.updateSelectedYearOverallView(i);
+          that.updateSelectedYearOverallView([i]);
           that.selectedYearIndexPlayer1 = i;
         } else {
           that.selectedYearIndexPlayer2 = i;
@@ -425,15 +425,15 @@ class Player {
     let spiderChart = d3.select(`#spiderChart${id}`);
   }
 
-  createLineGraphs(player) {
+  createLineGraphs() {
     let lineGraphs = this.svg.append('g')
-      .attr('id', `lineGraphs${player}`)
+      .attr('id', `lineGraphs`)
       .style('opacity', 0)
       .attr('transform', `translate(430, 125)`);
 
-    this.createLineGraphsHelper(lineGraphs, `${player}Receiving`);
-    this.createLineGraphsHelper(lineGraphs, `${player}Passing`);
-    this.createLineGraphsHelper(lineGraphs, `${player}Rushing`);
+    this.createLineGraphsHelper(lineGraphs, `receiving`);
+    this.createLineGraphsHelper(lineGraphs, `passing`);
+    this.createLineGraphsHelper(lineGraphs, `rushing`);
   }
 
   createLineGraphsHelper(parentGroup, id) {
@@ -526,6 +526,20 @@ class Player {
     } else {
       this.yearRangeIndexPlayer2.min = minIndex;
       this.yearRangeIndexPlayer2.max = maxIndex;
+    }
+
+    let minIndexAllPlayer = this.yearRangeIndexPlayer1.min;
+    if (this.yearRangeIndexPlayer2 < minIndexAllPlayer) {
+      minIndexAllPlayer = this.yearRangeIndexPlayer2.min;
+    }
+    let maxIndexAllPlayer = this.yearRangeIndexPlayer1.max;
+    if (this.yearRangeIndexPlayer2 < minIndexAllPlayer) {
+      maxIndexAllPlayer = this.yearRangeIndexPlayer2.max;
+    }
+    if (minIndexAllPlayer === maxIndexAllPlayer || minIndexAllPlayer === 50) {
+      this.updateSelectedYearOverallView([maxIndexAllPlayer]);
+    } else {
+      this.updateSelectedYearOverallView([minIndexAllPlayer, maxIndexAllPlayer]);
     }
   }
 }
