@@ -40,7 +40,7 @@ class Player {
 
     // Need to save what data is being stored in each quadrant, so we can create the spider plots in correct area
     // This will be used in updateSpiderCharts
-    this.dataToIndex = {
+       this.dataToRadian = {
       'Points': {},
       'Passing': {},
       'Rushing': {},
@@ -329,8 +329,7 @@ class Player {
 		  .enter().append('path')
 			.attr('class', 'labelArcs')
 			.attr('id', (d, i) => { 
-        // Save this information later for when we need to update
-        this.dataToIndex[id][d.data] = i;
+         this.dataToRadian[id][d.data] = (d.startAngle + d.endAngle)/2;
         return 'labelArc' + id + d.data;
       })
       .attr('d', arc);
@@ -351,6 +350,11 @@ class Player {
           .duration(1000);
 
         chartLines
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        spiderPlotGroup
           .transition()
           .attr('transform', `rotate(${rotate})`)
           .duration(1000);
@@ -384,7 +388,7 @@ class Player {
     // Create the group to hold the lines in
     const actualLineGroup = chartLines
       .append('g')
-      .attr('transform', 'translate(-100,-100)');  // Untranslate the center movements (hacky)
+      .attr('transform', 'translate(-100,-100)');  // Untranslate the center movements (hacky) must be kept or it will rotate off the page
 
     // Create lines
     let lines = actualLineGroup
@@ -397,8 +401,8 @@ class Player {
       .attr('x1', this.spiderChartRadius)
       .attr('y1', this.spiderChartRadius)
       .attr('x2', this.spiderChartRadius)
-      .attr('y2', this.spiderChartRadius);
-        
+      .attr('y2', this.spiderChartRadius)
+      .attr('class', 'linesInSpiderChart');
 
     lines = newLines.merge(lines);
 
@@ -408,18 +412,39 @@ class Player {
         .attr('x2', (d,i) => {
           // Going to offset the angles by a little so they are in the middle of each of the pi sections, that's where the 0.5
           // comes into play
-          const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / labels.length);
-          console.log(id,d, 'has angle', angle);
+          const angle = (Math.PI / 2) + (2 * Math.PI * (i+.5) / labels.length);
           return this.calculateXValue(angle, this.spiderChartRadius, null, null);
         })
         .attr('y2', (d,i) => {
           // Going to offset the angles by a little so they are in the middle of each of the pi sections, that's where the 0.5
           // comes into play
-          const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / labels.length);
-          console.log(id,d, 'has angle', angle);
+          const angle = (Math.PI / 2) + (2 * Math.PI * (i+.5) / labels.length);
           return this.calculateYValue(angle, this.spiderChartRadius, null, null);
-        })
-        .attr('class', 'linesInSpiderChart');
+        });
+
+    // Create a group for spider chart to rotate
+    const spiderPlotGroup = spiderGroup
+        .append('g')
+        .attr('transform', 'translate(100,100)')
+        .append('g')
+        .attr('class', `spiderChartSpiderPlots`);
+
+    const actualSpiderPlotGroup = spiderPlotGroup
+        .append('g')
+        .attr('transform', 'translate(-100,-100)')  // Hacky way to get a group to rotate, have to keep this or it breaks...
+        .attr('id', `spiderChart${id}SpiderPlots`);
+
+    const spiderPlotPoints = actualSpiderPlotGroup
+        .selectAll('spiderChartDataPoints')
+        .data(labels);
+    
+    spiderPlotPoints
+        .enter()
+        .append('circle')
+        .attr('cx', this.spiderChartRadius)
+        .attr('cy', this.spiderChartRadius)
+        .attr('r', 0)
+        .attr('class', 'spiderChartDataPoints');
   }
 
   /**
@@ -465,7 +490,7 @@ class Player {
 
     // Update spider charts with current year
     const selectedYearData = playerData.years[selectedYearIndex];
-    // console.log(selectedYearData);
+    console.log(selectedYearData);
 
     let dataToUse = null;
     switch (id) {
@@ -509,55 +534,53 @@ class Player {
         return;
     }
 
-    const spiderChart = d3.select(`#spiderChart${id}`);
-    let spiderPlots = spiderChart
-      .selectAll('.spiderChartDataPoints')
-      .data(dataToUse);
+    const spiderPlotPoints = d3.select(`#spiderChart${id}SpiderPlots`).selectAll('.spiderChartDataPoints').data(dataToUse);
 
-    // New plot points for the spider charts 
-    const newSpiderPlots = spiderPlots
-      .enter()
-      .append('circle')
-      .attr('cx', this.spiderChartRadius)
-      .attr('cy', this.spiderChartRadius)
-      .attr('r', 0)
-      .attr('class', 'spiderChartDataPoints');
-        
-
-    spiderPlots = newSpiderPlots.merge(spiderPlots);
-
-    spiderPlots
+    spiderPlotPoints
         .transition()
         .duration(this.transitionTime)
         .attr('cx', (d) => {
           const attributeName = d[0];
           const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
           const value = d[1];
-          const scale = d3.scaleLinear()
-                          .range([0, maxValueForThisAttribute])
-                          .domain([0, this.spiderChartRadius]);
-          // console.log(this.dataToIndex);
-          const i = this.dataToIndex[id][attributeName];
-          const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / numberOfArcs);
-          console.log(id,attributeName, 'has angle', angle);
-          // console.log('i:',i);
-          // console.log('numberOfArcs:',numberOfArcs);
-          // console.log(angle);
-          return this.calculateXValue(angle, this.spiderChartRadius, value, scale)
+          // Position Rank scale is inverted, 1 is the best and max is the worst
+          let scale;
+          if (attributeName === 'Position Rank') {
+            scale = d3.scaleLinear()
+              .domain([maxValueForThisAttribute, 1])
+              .range([0, this.spiderChartRadius]);
+          }
+          else {
+            scale = d3.scaleLinear()
+              .domain([0, maxValueForThisAttribute])
+              .range([0, this.spiderChartRadius]);
+          }
+          console.log(id, attributeName, maxValueForThisAttribute);
+          // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
+          let radian = this.dataToRadian[id][attributeName];
+          radian = -1 * radian + Math.PI/2;
+          return this.calculateXValue(radian, this.spiderChartRadius, value, scale);
         })
         .attr('cy', (d) => {
           const attributeName = d[0];
           const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
           const value = d[1];
-          const scale = d3.scaleLinear()
-                          .range([0, maxValueForThisAttribute])
-                          .domain([0, this.spiderChartRadius]);
-          const i = this.dataToIndex[id][attributeName];
-          // console.log(this.dataToIndex);
-          const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / numberOfArcs);
-          // console.log(angle);
-          console.log(id,attributeName, 'has angle', angle);
-          return this.calculateYValue(angle, this.spiderChartRadius, value, scale);
+          let scale;
+          // Position Rank scale is inverted, 1 is the best and max is the worst
+          if (attributeName === 'Position Rank') {
+            scale = d3.scaleLinear()
+              .domain([maxValueForThisAttribute, 1])
+              .range([0, this.spiderChartRadius]);
+          }
+          else {
+            scale = d3.scaleLinear()
+              .domain([0, maxValueForThisAttribute])
+              .range([0, this.spiderChartRadius]);
+          }
+          // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
+          let radian = this.dataToRadian[id][attributeName];
+          radian = -1 * radian + Math.PI/2;
+          return this.calculateYValue(radian, this.spiderChartRadius, value, scale);
         })
         .attr('r', this.spiderChartPlotCirclesRadiuses);
   }
