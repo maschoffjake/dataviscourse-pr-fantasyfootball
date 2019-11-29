@@ -41,3 +41,9 @@
 .linesInSpiderChart {
     stroke: cadetblue;
 }
+
+.spiderChartPlotPath {
+    stroke: crimson;
+    fill: crimson;
+    opacity: 0.6;
+}

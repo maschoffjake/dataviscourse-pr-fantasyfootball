@@ -48,7 +48,6 @@ class Player {
     };
     this.spiderChartPlotCirclesRadiuses = 5;
     this.maxData = maxData;
-    console.log(this.maxData);
   }
 
   /**
@@ -358,6 +357,11 @@ class Player {
           .transition()
           .attr('transform', `rotate(${rotate})`)
           .duration(1000);
+
+        spiderPlotPathGroup
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
       });
       
     // TODO: add on click event so it rotates when text eleents are also clicked
@@ -422,7 +426,7 @@ class Player {
           return this.calculateYValue(angle, this.spiderChartRadius, null, null);
         });
 
-    // Create a group for spider chart to rotate
+    // Create a group for spider chart plot points to rotate
     const spiderPlotGroup = spiderGroup
         .append('g')
         .attr('transform', 'translate(100,100)')
@@ -445,6 +449,19 @@ class Player {
         .attr('cy', this.spiderChartRadius)
         .attr('r', 0)
         .attr('class', 'spiderChartDataPoints');
+
+    // Create a group for the spider plot lines to be roated in
+    const spiderPlotPathGroup = spiderGroup
+        .append('g')
+        .attr('transform', 'translate(100,100)')
+        .append('g');
+
+    spiderPlotPathGroup
+        .append('g')
+        .attr('transform', 'translate(-100,-100)')
+        .attr('id', `spiderChart${id}Path`)
+        .append('path')
+        .attr('class', 'spiderChartPlotPath');
   }
 
   /**
@@ -534,6 +551,7 @@ class Player {
         return;
     }
 
+    // UPDATE THE PLOT POINTS
     const spiderPlotPoints = d3.select(`#spiderChart${id}SpiderPlots`).selectAll('.spiderChartDataPoints').data(dataToUse);
 
     spiderPlotPoints
@@ -555,7 +573,6 @@ class Player {
               .domain([0, maxValueForThisAttribute])
               .range([0, this.spiderChartRadius]);
           }
-          console.log(id, attributeName, maxValueForThisAttribute);
           // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
           let radian = this.dataToRadian[id][attributeName];
           radian = -1 * radian + Math.PI/2;
@@ -583,6 +600,50 @@ class Player {
           return this.calculateYValue(radian, this.spiderChartRadius, value, scale);
         })
         .attr('r', this.spiderChartPlotCirclesRadiuses);
+
+        // UPDATE THE PATH THAT CONNECTS ALL OF THE POINTS
+        // Can't really find a good way of doing this with D3...
+        // Create path from the data to use
+        const spiderChartPath = d3.select(`#spiderChart${id}`).select('.spiderChartPlotPath');
+        let path = '';
+        let count = 0;  // Count used to concatenate the move value on to the string first
+        for (let item of dataToUse) {
+          const attributeName = item[0];
+          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
+          const value = item[1];
+          // Position Rank scale is inverted, 1 is the best and max is the worst
+          let scale;
+          if (attributeName === 'Position Rank') {
+            scale = d3.scaleLinear()
+              .domain([maxValueForThisAttribute, 1])
+              .range([0, this.spiderChartRadius]);
+          }
+          else {
+            scale = d3.scaleLinear()
+              .domain([0, maxValueForThisAttribute])
+              .range([0, this.spiderChartRadius]);
+          }
+          // Since we are moving in opposite direction of unit circle, and also 90 degrees offset, must multiple by -1 and add pi/2
+          let radian = this.dataToRadian[id][attributeName];
+          radian = -1 * radian + Math.PI/2;
+          const xValue = this.calculateXValue(radian, this.spiderChartRadius, value, scale);
+          const yValue = this.calculateYValue(radian, this.spiderChartRadius, value, scale);
+          
+          // Add the move value to the front of the string initially
+          if (count === 0) {
+            count++;
+            path += `M ${xValue} ${yValue}`;
+          }
+          // Otherwise append lines to each points
+          else {
+            path += `L ${xValue} ${yValue}`;
+          }
+        }
+        path += ' Z';
+        spiderChartPath
+          .transition()
+          .attr('d', path)
+          .duration(1000);
   }
 
   createLineGraphs() {
