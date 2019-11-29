@@ -60,10 +60,8 @@ class Player {
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
-    this.createLineGraphs();
-    this.createLineGraphs();
-    this.createLineGraphs();
-    this.createLineGraphs();
+    this.createLineGraphs('Player2');
+    this.createLineGraphs('Player1');
   }
 
   /**
@@ -427,8 +425,26 @@ class Player {
     let spiderChart = d3.select(`#spiderChart${id}`);
   }
 
-  createLineGraphs() {
+  createLineGraphs(player) {
+    let lineGraphs = this.svg.append('g')
+      .attr('id', `lineGraphs${player}`)
+      .style('opacity', 0)
+      .attr('transform', `translate(430, 125)`);
 
+    this.createLineGraphsHelper(lineGraphs, `${player}Receiving`);
+    this.createLineGraphsHelper(lineGraphs, `${player}Passing`);
+    this.createLineGraphsHelper(lineGraphs, `${player}Rushing`);
+  }
+
+  createLineGraphsHelper(parentGroup, id) {
+    let lineGraph = parentGroup.append('g')
+      .attr('id', id);
+
+    lineGraph.append('g')
+      .attr('id', `${id}Axis`);
+
+    lineGraph.append('g')
+      .attr('id', `${id}Lines`);
   }
 
   updateLineGraphs() {
