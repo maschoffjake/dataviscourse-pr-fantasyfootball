@@ -453,12 +453,13 @@ class Overall {
         this.overallData = updateData;
     }
 
-    parseDataForYears(yearIndices, position) {
+    parseDataForYears(years, position) {
         let updateData = [];
-        let years = [];
-        for(let i = 0; i < yearIndices.length; i++) {
-            years.push(this.player1.years[i].year);
-        }
+        //receiving years already in proper format
+        // let years = [];
+        // for(let i = 0; i < yearIndices.length; i++) {
+        //     years.push(this.player1.years[i].year);
+        // }
         this.allData.map(function(player) {
             let x = Object.values(player.years);
             let val = x.filter(d => years.includes(d.year));
@@ -532,29 +533,33 @@ class Overall {
         // this.selectedYear = year;
         let that = this;
         console.log(`Update Selected Year: ${yearIndex}`);
-        // if(yearIndex.length > 1) {
-        //     let years = [];
-        //     yearIndex.forEach(function(index) {
-        //         years.push(that.player1.years[index]);
-        //     });
-        //     let position = this.player1.years[0].position;
-        //     this.selectedYear = years;
-        //     this.parsDataForYears(this.selectedYear, position)
-        // }
-        // else {
-        //     let yearObj = this.player1.years[yearIndex];
-        //     let year = yearObj.year;
-        //     this.selectedYear = yearIndex;
-        //     let position = yearObj.position;
-        //     this.parseDataForYear(year, position);
-        // }
-        let yearObj = this.player1.years[yearIndex];
-        let year = yearObj.year;
-        this.selectedYear = yearIndex;
-        let position = yearObj.position;
-        // this.parseDataForYears([0,1], 'TE');
-        this.parseDataForYear(year, position);
-        this.updateChart();
+        //For multiples years selected for single player
+        if(yearIndex[0].length > 1) {
+            let years = [];
+            yearIndex[0].forEach(function(index) {
+                if(!years.includes(that.player1.years[index].year)) {
+                    years.push(that.player1.years[index].year);
+                }
+            });
+            let position = this.player1.years[0].position;
+            this.selectedYear = years;
+            this.parseDataForYears(this.selectedYear, position)
+        }
+        //Single year selected for single player
+        else {
+            let yearObj = this.player1.years[yearIndex];
+            let year = yearObj.year;
+            this.selectedYear = yearIndex;
+            let position = yearObj.position;
+            this.parseDataForYear(year, position);
+        }
+        // let yearObj = this.player1.years[yearIndex];
+        // let year = yearObj.year;
+        // this.selectedYear = yearIndex;
+        // let position = yearObj.position;
+        // // this.parseDataForYears([0,1], 'TE');
+        // this.parseDataForYear(year, position);
+        // this.updateChart();
     }
 
     updateView() {
