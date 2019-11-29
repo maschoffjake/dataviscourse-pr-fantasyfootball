@@ -93,15 +93,15 @@ class Player {
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
 
-    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1);
-    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1);
-    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1);
-    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1);
+    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 4);
+    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
 
-    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2);
-    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2);
-    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2);
-    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2);
+    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
+    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
   }
 
   /**
@@ -330,7 +330,7 @@ class Player {
 			.attr('class', 'labelArcs')
 			.attr('id', (d, i) => { 
         // Save this information later for when we need to update
-        this.dataToIndex[id][d] = i;
+        this.dataToIndex[id][d.data] = i;
         return 'labelArc' + id + d.data;
       })
       .attr('d', arc);
@@ -409,12 +409,14 @@ class Player {
           // Going to offset the angles by a little so they are in the middle of each of the pi sections, that's where the 0.5
           // comes into play
           const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, null, null)
+          console.log(id,d, 'has angle', angle);
+          return this.calculateXValue(angle, this.spiderChartRadius, null, null);
         })
         .attr('y2', (d,i) => {
           // Going to offset the angles by a little so they are in the middle of each of the pi sections, that's where the 0.5
           // comes into play
           const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / labels.length);
+          console.log(id,d, 'has angle', angle);
           return this.calculateYValue(angle, this.spiderChartRadius, null, null);
         })
         .attr('class', 'linesInSpiderChart');
@@ -424,15 +426,15 @@ class Player {
    * 
    * @param {*} angle 
    * @param {*} centerRadius 
-   * @param {*} outerRadius 
+   * @param {*} value 
    * @param {*} scale 
    */
-  calculateXValue(angle, centerRadius, outerRadius, scale){
+  calculateXValue(angle, centerRadius, value, scale){
     if (scale === null) {
       const x = Math.cos(angle) * centerRadius;
       return centerRadius + x;
     }
-    const x = Math.cos(angle) * scale(outerRadius);
+    const x = Math.cos(angle) * scale(value);
     return centerRadius + x;
   }
 
@@ -440,22 +442,22 @@ class Player {
    * 
    * @param {*} angle 
    * @param {*} centerRadius 
-   * @param {*} outerRadius 
+   * @param {*} value 
    * @param {*} scale 
    */
-  calculateYValue(angle, centerRadius, outerRadius, scale){
+  calculateYValue(angle, centerRadius, value, scale){
     if (scale === null) {
       const y = Math.sin(angle) * centerRadius;
       return centerRadius - y;
     }
-    const y = Math.sin(angle) * scale(outerRadius);
+    const y = Math.sin(angle) * scale(value);
     return centerRadius - y;
   }
 
   /**
    * Used to update the bar charts and the axis for the new player
    */
-  updateSpiderChart(id, player, playerData, selectedYearIndex, x, y) {
+  updateSpiderChart(id, player, playerData, selectedYearIndex, numberOfArcs, x, y) {
     // Don't update player 2 stuff if it isn't selected
     if (player === 'Player2' && !this.compareEnable) {
       return;
@@ -463,7 +465,7 @@ class Player {
 
     // Update spider charts with current year
     const selectedYearData = playerData.years[selectedYearIndex];
-    console.log(selectedYearData);
+    // console.log(selectedYearData);
 
     let dataToUse = null;
     switch (id) {
@@ -528,20 +530,36 @@ class Player {
         .transition()
         .duration(this.transitionTime)
         .attr('cx', (d) => {
-          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][i];
           const attributeName = d[0];
+          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
           const value = d[1];
           const scale = d3.scaleLinear()
-                          .range([0, i])
+                          .range([0, maxValueForThisAttribute])
                           .domain([0, this.spiderChartRadius]);
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateXValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale)
+          // console.log(this.dataToIndex);
+          const i = this.dataToIndex[id][attributeName];
+          const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / numberOfArcs);
+          console.log(id,attributeName, 'has angle', angle);
+          // console.log('i:',i);
+          // console.log('numberOfArcs:',numberOfArcs);
+          // console.log(angle);
+          return this.calculateXValue(angle, this.spiderChartRadius, value, scale)
         })
         .attr('cy', (d) => {
-          const angle = (Math.PI / 2) + (2 * Math.PI * i / labels.length);
-          return this.calculateYValue(angle, this.spiderChartRadius, numberOfCircles, circleRadiusScale);
+          const attributeName = d[0];
+          const maxValueForThisAttribute = this.maxData[selectedYearData.year][selectedYearData.position][id][attributeName];
+          const value = d[1];
+          const scale = d3.scaleLinear()
+                          .range([0, maxValueForThisAttribute])
+                          .domain([0, this.spiderChartRadius]);
+          const i = this.dataToIndex[id][attributeName];
+          // console.log(this.dataToIndex);
+          const angle = (Math.PI / 2) + (2 * Math.PI * (i+0.5) / numberOfArcs);
+          // console.log(angle);
+          console.log(id,attributeName, 'has angle', angle);
+          return this.calculateYValue(angle, this.spiderChartRadius, value, scale);
         })
-        .attr('r', this.spiderChartPlotCirclesRadiuses)
+        .attr('r', this.spiderChartPlotCirclesRadiuses);
   }
 
   createLineGraphs() {
