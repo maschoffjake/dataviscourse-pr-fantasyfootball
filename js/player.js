@@ -8,7 +8,7 @@ class Player {
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
-    this.svgHeight = 1000;
+    this.svgHeight = 1100;
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
@@ -71,10 +71,8 @@ class Player {
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
-    this.createLineGraphs();
-    this.createLineGraphs();
-    this.createLineGraphs();
-    this.createLineGraphs();
+    this.createLineGraphs('Player2');
+    this.createLineGraphs('Player1');
   }
 
   /**
@@ -223,7 +221,7 @@ class Player {
 
         if (this.id.includes('Player1')) {
           // Update selected circle in overall view only for player 1.
-          that.updateSelectedYearOverallView(i);
+          that.updateSelectedYearOverallView([i]);
           that.selectedYearIndexPlayer1 = i;
         } else {
           that.selectedYearIndexPlayer2 = i;
@@ -647,7 +645,25 @@ class Player {
   }
 
   createLineGraphs() {
+    let lineGraphs = this.svg.append('g')
+      .attr('id', `lineGraphs`)
+      .style('opacity', 0)
+      .attr('transform', `translate(430, 125)`);
 
+    this.createLineGraphsHelper(lineGraphs, `receiving`);
+    this.createLineGraphsHelper(lineGraphs, `passing`);
+    this.createLineGraphsHelper(lineGraphs, `rushing`);
+  }
+
+  createLineGraphsHelper(parentGroup, id) {
+    let lineGraph = parentGroup.append('g')
+      .attr('id', id);
+
+    lineGraph.append('g')
+      .attr('id', `${id}Axis`);
+
+    lineGraph.append('g')
+      .attr('id', `${id}Lines`);
   }
 
   updateLineGraphs() {
@@ -723,6 +739,10 @@ class Player {
       })
       .classed('selected_years_brush', true);
 
+    if (minIndex > 10) {
+      minIndex = 0;
+    }
+
     if (playerGroup.includes('Player1')) {
       this.yearRangeIndexPlayer1.min = minIndex;
       this.yearRangeIndexPlayer1.max = maxIndex;
@@ -730,5 +750,15 @@ class Player {
       this.yearRangeIndexPlayer2.min = minIndex;
       this.yearRangeIndexPlayer2.max = maxIndex;
     }
+
+    let yearsToForward = [];
+
+    yearsToForward.push([this.yearRangeIndexPlayer1.min, this.yearRangeIndexPlayer1.max]);
+
+    if (this.compareEnable) {
+      yearsToForward.push([this.yearRangeIndexPlayer2.min, this.yearRangeIndexPlayer2.max]);
+    }
+    
+    this.updateSelectedYearOverallView(yearsToForward);
   }
 }
