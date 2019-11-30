@@ -100,15 +100,7 @@ class Player {
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
 
-    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
-    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 4);
-    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
-    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
-
-    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
-    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
-    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
-    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChartDriver();
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
@@ -121,6 +113,21 @@ class Player {
       ['target', 'reception', 'receivingYards', 'yardsPerReception', 'receivingTouchdowns']);
     this.updateLineGraphs('receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer,
       ['attempts', 'rushingYards', 'yardsPerAttempt', 'rushingTouchdowns']);
+  }
+
+  /**
+   * Updates the spider charts.
+   */
+  updateSpiderChartDriver() {
+    this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+    this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 4);
+    this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+    this.updateSpiderChart('Points', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
+
+    this.updateSpiderChart('Passing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
+    this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+    this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
   }
 
   /**
@@ -250,6 +257,7 @@ class Player {
         } else {
           that.selectedYearIndexPlayer2 = i;
         }
+        that.updateSpiderChartDriver();
       });
 
     circles
