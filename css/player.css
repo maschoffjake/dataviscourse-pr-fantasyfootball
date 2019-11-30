@@ -31,11 +31,13 @@
     fill: #d3d3d3;
     stroke: black;
     stroke-width: 1px;
+    cursor: pointer;
 }
 
 .labelText {
     fill: black;
     font-size: 13px;
+    cursor: pointer;
 }
 
 .linesInSpiderChart {

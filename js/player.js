@@ -46,7 +46,7 @@ class Player {
       'Rushing': {},
       'Receiving': {}
     };
-    this.spiderChartPlotCirclesRadiuses = 5;
+    this.spiderChartPlotCirclesRadiuses = 3;
     this.maxData = maxData;
   }
 
@@ -361,8 +361,9 @@ class Player {
           .attr('transform', `rotate(${rotate})`)
           .duration(1000);
       });
-      
-    // TODO: add on click event so it rotates when text eleents are also clicked
+    
+    let that = this;
+
     // Append text within the pie chart 
     const text = pieArcs
       .selectAll('.labelText')
@@ -377,7 +378,35 @@ class Player {
       })
       .append('textPath')
       .attr('xlink:href', (d) => {return '#labelArc' + id + d;})
-      .text(d => {return d;});
+      .text(d => {return d;})
+      .on('click', function(d) {
+        // Find the angle to which to rotate the spider chart
+        const rotate = -1 * (that.dataToRadian[id][d] / Math.PI * 180);
+        pieArcs
+          .transition()
+          .attr('transform', `translate(100,100) rotate(${rotate})`)
+          .duration(1000);
+
+        text
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        chartLines
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        spiderPlotGroup
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+
+        spiderPlotPathGroup
+          .transition()
+          .attr('transform', `rotate(${rotate})`)
+          .duration(1000);
+      });
 
 
     // Creates the group to translate the lines in
@@ -459,6 +488,7 @@ class Player {
         .attr('transform', 'translate(-100,-100)')
         .attr('id', `spiderChart${id}Path`)
         .append('path')
+        .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
         .attr('class', 'spiderChartPlotPath');
   }
 
