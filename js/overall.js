@@ -462,10 +462,9 @@ class Overall {
         // }
         this.allData.map(function(player) {
             let x = Object.values(player.years);
-            let val = x.filter(d => years.includes(d.year) && d.position === position);
-            console.log(val);
+            let val = x.filter(d => years.includes(d.year) && (d.position === position[0] || d.position === position[1]));
             if(val.length > 0) {
-                if(val[0].position === position) {
+                if(position.includes(val[0].position)) {
                     let playerObj = {
                         'name': player.name,
                         "team": val[0].team,
@@ -539,32 +538,19 @@ class Overall {
             let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1]);
             years = player1Years.concat(player2Years).map(d => d.year);
             let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
-            removeDups(years);
-
-            // years = yearObjs.map(d => d.year);
-            // yearIndex[0].forEach(function(index) {
-            //     if(!years.includes(that.player1.years[index].year)) {
-            //         years.push(that.player1.years[index].year);
-            //     }
-            // });
-            // yearIndex[1].forEach(function(index) {
-            //     if(!years.includes(that.player2.years[index].year)) {
-            //         years.push(that.player2.years[index].year);
-            //     }
-            // });
-            let position = this.player1.years[0].position;
+            years = removeDups(years);
+            let position = [this.player1.years[0].position, this.player2.years[0].position];
             this.selectedYear = years;
             this.parseDataForYears(this.selectedYear, position)
         }
         //For multiples years selected for single player
         else if(yearIndex[0].length > 1) {
             let years = [];
-            yearIndex[0].forEach(function(index) {
-                if(!years.includes(that.player1.years[index].year)) {
-                    years.push(that.player1.years[index].year);
-                }
-            });
-            let position = this.player1.years[0].position;
+            let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
+            years = player1Years.map(d => d.year);
+            let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
+            years = removeDups(years);
+            let position = [this.player1.years[0].position];
             this.selectedYear = years;
             this.parseDataForYears(this.selectedYear, position)
         }
@@ -582,7 +568,7 @@ class Overall {
         // let position = yearObj.position;
         // // this.parseDataForYears([0,1], 'TE');
         // this.parseDataForYear(year, position);
-        // this.updateChart();
+        //TODO: call updateChart once refactored to handle multiple years
     }
 
     updateView() {
