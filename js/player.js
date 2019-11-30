@@ -862,8 +862,6 @@ class Player {
         'player2', yearScale, startYear, endYear));
     }
 
-    console.log(formatedDataPlayer);
-
     let yearAxis = d3.axisBottom()
       .tickFormat(d3.format('d'))
       .ticks(endYear - startYear)
