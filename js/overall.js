@@ -317,11 +317,9 @@ class Overall {
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
                     let keys = Object.keys(d);
-                    return that.xScale((keys.includes('year')) ? d.year.receiving[key] : d.receiving[key]);
+                    return that.xScale((keys.includes('year')) ? parseFloat(d.year.receiving[key]) : parseFloat(d.receiving[key]));
                 }
                 else {
-                    // return that.xScale(d.years[that.selectedYear][that.xIndicator]);
-                    // return that.xScale(d.year[that.xIndicator]);
                     let keys = Object.keys(d);
                     return that.xScale((keys.includes('year')) ? d.year[that.xIndicator] : d[that.xIndicator]);
                 }
@@ -605,26 +603,18 @@ class Overall {
             let maxPlayerX = null,
                 maxPlayerY = null;
             //Iterate over circles to find the player with the lowest xIndicator and yIndicator values
+            //TODO: need to check xIndicator and yIndicator for PASS, RUSH, REC & not else ifs
             if (that.yIndicator.includes('PASS')) {
                 circleObjs.forEach(function(player) {
-                    let keyX = that.xIndicator.replace('PASS', '');
                     let keyY = that.yIndicator.replace('PASS', '');
                     let keys = Object.keys(player.__data__);
                     if (keys.includes('year')) {
-                        if(parseInt(player.__data__.year.passing[keyX]) >= maxX) {
-                            maxX = parseInt(player.__data__.year.passing[keyX]);
-                            maxPlayerX = player;
-                        }
                         if(parseInt(player.__data__.year.passing[keyY]) >= maxY) {
                             maxY = parseInt(player.__data__.year.passing[keyY]);
                             maxPlayerY = player;
                         }
                     }
                     else {
-                        if(parseInt(player.__data__.passing[keyX]) >= maxX) {
-                            maxX = parseInt(player.__data__.passing[keyX]);
-                            maxPlayerX = player;
-                        }
                         if(parseInt(player.__data__.passing[keyY]) >= maxY) {
                             maxY = parseInt(player.__data__.passing[keyY]);
                             maxPlayerY = player;
@@ -632,26 +622,35 @@ class Overall {
                     }
                 });
             }
+            if(that.xIndicator.includes('PASS')) {
+                circleObjs.forEach(function(player) {
+                    let keyX = that.xIndicator.replace('PASS', '');
+                    let keys = Object.keys(player.__data__);
+                    if (keys.includes('year')) {
+                        if(parseInt(player.__data__.year.passing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.year.passing[keyX]);
+                            maxPlayerX = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__.passing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.passing[keyX]);
+                            maxPlayerX = player;
+                        }
+                    }
+                });
+            }
             else if (that.yIndicator.includes('RUSH')) {
                 circleObjs.forEach(function(player) {
-                    let keyX = that.xIndicator.replace('RUSH', '');
                     let keyY = that.yIndicator.replace('RUSH', '');
                     let keys = Object.keys(player.__data__);
                     if (keys.includes('year')) {
-                        if(parseInt(player.__data__.year.rushing[keyX]) >= maxX) {
-                            maxX = parseInt(player.__data__.year.rushing[keyX]);
-                            maxPlayerX = player;
-                        }
                         if(parseInt(player.__data__.year.rushing[keyY]) >= maxY) {
                             maxY = parseInt(player.__data__.year.rushing[keyY]);
                             maxPlayerY = player;
                         }
                     }
                     else {
-                        if(parseInt(player.__data__.rushing[keyX]) >= maxX) {
-                            maxX = parseInt(player.__data__.rushing[keyX]);
-                            maxPlayerX = player;
-                        }
                         if(parseInt(player.__data__.rushing[keyY]) >= maxY) {
                             maxY = parseInt(player.__data__.rushing[keyY]);
                             maxPlayerY = player;
@@ -659,29 +658,56 @@ class Overall {
                     }
                 });
             }
-            else if (that.yIndicator.includes('REC')) {
+            if (that.xIndicator.includes('RUSH')) {
                 circleObjs.forEach(function(player) {
-                    let keyX = that.xIndicator.replace('REC', '');
+                    let keyX = that.xIndicator.replace('RUSH', '');
+                    let keys = Object.keys(player.__data__);
+                    if (keys.includes('year')) {
+                        if(parseInt(player.__data__.year.rushing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.year.rushing[keyX]);
+                            maxPlayerX = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__.rushing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.rushing[keyX]);
+                            maxPlayerX = player;
+                        }
+                    }
+                });
+            }
+            if (that.yIndicator.includes('REC')) {
+                circleObjs.forEach(function(player) {
                     let keyY = that.yIndicator.replace('REC', '');
                     let keys = Object.keys(player.__data__);
                     if (keys.includes('year')) {
-                        if(parseInt(player.__data__.year.receiving[keyX]) >= maxX) {
-                            maxX = parseInt(player.__data__.year.receiving[keyX]);
-                            maxPlayerX = player;
-                        }
                         if(parseInt(player.__data__.year.receiving[keyY]) >= maxY) {
                             maxY = parseInt(player.__data__.year.receiving[keyY]);
                             maxPlayerY = player;
                         }
                     }
                     else {
-                        if(parseInt(player.__data__.receiving[keyX]) >= maxX) {
-                            maxX = parseInt(player.__data__.receiving[keyX]);
-                            maxPlayerX = player;
-                        }
                         if(parseInt(player.__data__.receiving[keyY]) >= maxY) {
                             maxY = parseInt(player.__data__.receiving[keyY]);
                             maxPlayerY = player;
+                        }
+                    }
+                });
+            }
+            if (that.xIndicator.includes('REC')) {
+                circleObjs.forEach(function(player) {
+                    let keyX = that.xIndicator.replace('REC', '');
+                    let keys = Object.keys(player.__data__);
+                    if (keys.includes('year')) {
+                        if(parseInt(player.__data__.year.receiving[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.year.receiving[keyX]);
+                            maxPlayerX = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__.receiving[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.receiving[keyX]);
+                            maxPlayerX = player;
                         }
                     }
                 });
