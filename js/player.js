@@ -574,7 +574,7 @@ class Player {
         .attr('transform', 'translate(-100,-100)')
         .attr('id', `spiderChart${id}Path`)
         .append('path')
-        .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
+        .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
         .attr('class', 'spiderChartPlotPathPlayer1');
 
     // Create a path for player 2 (compare mode)
@@ -584,7 +584,7 @@ class Player {
       .attr('transform', 'translate(-100,-100)')
       .attr('id', `spiderChart${id}Path`)
       .append('path')
-      .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
+      .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
       .attr('class', 'spiderChartPlotPathPlayer2');
   }
 
@@ -632,6 +632,22 @@ class Player {
   updateSpiderChart(id, player, playerData, selectedYearIndex) {
     // Don't update player 2 stuff if it isn't selected
     if (player === 'Player2' && !this.compareEnable) {
+      // First remove player 2's items, or make sure they aren't being displayed
+      const spiderPlotPointsPlayer2 = d3.select(`#spiderChart${id}SpiderPlots${player}`).selectAll(`.spiderChartDataPoints${player}`);
+
+      // Transition circles towards the middle and then remove them
+      spiderPlotPointsPlayer2
+        .transition()
+        .duration(this.transitionTime)
+        .attr('cx', this.spiderChartRadius)
+        .attr('cy', this.spiderChartRadius)
+        .attr('r', 0);
+
+      // Move the path towards the middle as well
+      d3.select(`#spiderChart${id}`).select(`.spiderChartPlotPath${player}`)
+        .transition()
+        .duration(this.transitionTime)
+        .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`);
       return;
     }
 
