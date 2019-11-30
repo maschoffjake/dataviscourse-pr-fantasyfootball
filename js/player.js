@@ -49,7 +49,7 @@ class Player {
     this.spiderChartPlotCirclesRadiuses = 5;
     this.maxData = maxData;
 
-    this.lineGraphWidth = 700;
+    this.lineGraphWidth = 750;
     this.lineGraphHeight = 300;
 
     this.spiderChartDialogWidth = 300;
@@ -77,7 +77,7 @@ class Player {
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
 
-    let lineGraphOffsetX = this.spiderChartRadius * 2 + this.widthOfPieChart + this.spiderChartDialogWidth;
+    let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
     this.createLineGraphs('points', 'Points', lineGraphOffsetX, lineGraphOffsetY);
     this.createLineGraphs('passing', 'Passing', lineGraphOffsetX, lineGraphOffsetY);
@@ -110,7 +110,7 @@ class Player {
     this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
     this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
 
-    let lineGraphOffsetX = this.spiderChartRadius * 2 + this.widthOfPieChart + this.spiderChartDialogWidth;
+    let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
     let lineGraphYBuffer = 0;
     this.updateLineGraphs('points', lineGraphOffsetX, lineGraphOffsetY);
