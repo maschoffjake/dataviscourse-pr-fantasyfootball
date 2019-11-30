@@ -256,19 +256,25 @@ class Overall {
                 let line2Value = that.xIndicator;
                 if(that.xIndicator.includes('PASS')) {
                     line2Value = that.xIndicator.replace('PASS', '');
-                    line2Value = d.year.passing[line2Value];
-                    // line2Value = (Object.keys(d).includes('year') ? d.year.passing[line2Value] : d.years)
+                    // line2Value = d.year.passing[line2Value];
+                    let keys = Object.keys(d);
+                    line2Value = (keys.includes('year')) ? d.year.passing[line2Value] : d.passing[line2Value];
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     line2Value = that.xIndicator.replace('RUSH', '');
-                    line2Value = d.year.rushing[line2Value];
+                    // line2Value = d.year.rushing[line2Value];
+                    let keys = Object.keys(d);
+                    line2Value = (keys.includes('year')) ? d.year.rushing[line2Value] : d.rushing[line2Value];
                 }
                 else if(that.xIndicator.includes('REC')) {
                     line2Value = that.xIndicator.replace('REC', '');
-                    line2Value = d.year.receiving[line2Value];
+                    // line2Value = d.year.receiving[line2Value];
+                    let keys = Object.keys(d);
+                    line2Value = (keys.includes('year')) ? d.year.receiving[line2Value] : d.receiving[line2Value];
                 }
                 else {
-                    line2Value = d.year[line2Value];
+                    let keys = Object.keys(d);
+                    line2Value = (keys.includes('year')) ? d.year[line2Value] : d[line2Value];
                 }
                 that.toolTip
                     .select('#toolTipLine2')
@@ -277,18 +283,25 @@ class Overall {
                 let line3Value = that.yIndicator;
                 if(that.yIndicator.includes('PASS')) {
                     line3Value = that.yIndicator.replace('PASS', '');
-                    line3Value = d.year.passing[line3Value];
+                    // line3Value = d.year.passing[line3Value];
+                    let keys = Object.keys(d);
+                    line3Value = (keys.includes('year')) ? d.year.passing[line3Value] : d.passing[line3Value];
                 }
                 else if(that.yIndicator.includes('RUSH')) {
                     line3Value = that.yIndicator.replace('RUSH', '');
-                    line3Value = d.year.rushing[line3Value];
+                    // line3Value = d.year.rushing[line3Value];
+                    let keys = Object.keys(d);
+                    line3Value = (keys.includes('year')) ? d.year.rushing[line3Value] : d.rushing[line3Value];
                 }
                 else if(that.yIndicator.includes('REC')) {
                     line3Value = that.yIndicator.replace('REC', '');
-                    line3Value = d.year.receiving[line3Value];
+                    // line3Value = d.year.receiving[line3Value];
+                    let keys = Object.keys(d);
+                    line3Value = (keys.includes('year')) ? d.year.receiving[line3Value] : d.receiving[line3Value];
                 }
                 else {
-                    line3Value = d.year[line3Value];
+                    let keys = Object.keys(d);
+                    line3Value = (keys.includes('year')) ? d.year[line3Value] : d[line3Value];
                 }
                 that.toolTip
                     .select('#toolTipLine3')
@@ -321,37 +334,46 @@ class Overall {
             .attr('cx', (d) => {
                 if(that.xIndicator.includes('PASS')) {
                     let key = that.xIndicator.replace('PASS', '');
-                    return that.xScale(d.year.passing[key]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.xScale(d.year.passing[key]) : that.xScale(d.passing[key]);
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     let key = that.xIndicator.replace('RUSH', '');
-                    return that.xScale(d.year.rushing[key]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.xScale(d.year.rushing[key]) : that.xScale(d.rushing[key]);
                 }
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
-                    return that.xScale(d.year.receiving[key]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.xScale(d.year.receiving[key]) : that.xScale(d.receiving[key]);
                 }
                 else {
                     // return that.xScale(d.years[that.selectedYear][that.xIndicator]);
-                    return that.xScale(d.year[that.xIndicator]);
+                    // return that.xScale(d.year[that.xIndicator]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.xScale(d.year[that.xIndicator]) : that.xScale(d[that.xIndicator]);
                 }
             })
             .attr('cy', (d) => {
                 if (that.yIndicator.includes('PASS')) {
                     let key = that.yIndicator.replace('PASS', '');
-                    return that.yScale(d.year.passing[key]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.yScale(d.year.passing[key]) : that.yScale(d.passing[key]);
                 }
                 else if (that.yIndicator.includes('RUSH')) {
                     let key = that.yIndicator.replace('RUSH', '');
-                    return that.yScale(d.year.rushing[key]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.yScale(d.year.rushing[key]) : that.yScale(d.rushing[key]);
                 }
                 else if (that.yIndicator.includes('REC')) {
                     let key = that.yIndicator.replace('REC', '');
-                    return that.yScale(d.year.receiving[key]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.yScale(d.year.receiving[key]) : that.yScale(d.receiving[key]);
                 }
                 else {
                     // return that.yScale(d.years[that.selectedYear][that.yIndicator]);
-                    return that.yScale(d.year[that.yIndicator]);
+                    let keys = Object.keys(d);
+                    return (keys.includes('year')) ? that.yScale(d.year[that.yIndicator]) : that.yScale(d[that.yIndicator]);
                 }
             })
             .attr('r', 3);
