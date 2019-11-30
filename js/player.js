@@ -451,9 +451,18 @@ class Player {
         d3.select(`#spiderChart${id}`).select('.selectedArc')
           .attr('class', 'labelArcs');
 
+
         // Turn this arc to the select one
-        d3.select(this)
-          .attr('class', 'selectedArc');
+        const group = d3.select(`#spiderChart${id}`);
+        const arcGroup = group.select(`#arcs${id}`);
+        const arcs = arcGroup.selectAll('path');
+        // Was unable to do this with D3... kept returning an empty selection so did it manually
+        for (let item of arcs._groups[0]) {
+          if (item.id === `labelArc${id}${d}`) {
+            item.className.baseVal = 'selectedArc';
+            break;
+          }
+        }
       });
 
 
