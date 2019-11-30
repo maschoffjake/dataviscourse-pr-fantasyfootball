@@ -446,6 +446,14 @@ class Player {
           .transition()
           .attr('transform', `rotate(${rotate})`)
           .duration(1000);
+
+        // Turn off the already selected pie arc
+        d3.select(`#spiderChart${id}`).select('.selectedArc')
+          .attr('class', 'labelArcs');
+
+        // Turn this arc to the select one
+        d3.select(this)
+          .attr('class', 'selectedArc');
       });
 
 
