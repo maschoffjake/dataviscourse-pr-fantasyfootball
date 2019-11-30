@@ -715,8 +715,15 @@ class Player {
       .ticks(endYear - startYear)
       .scale(yearScale);
 
-    d3.select(`#${id}YearAxis`)
+    let yearAxisGroup = d3.select(`#${id}YearAxis`);
+
+    yearAxisGroup
       .call(yearAxis);
+
+    yearAxisGroup
+      .transition()
+      .duration(this.transitionTime)
+      .attr('transform', `translate(0, ${this.lineGraphHeight-50})`);
   }
 
   /**
