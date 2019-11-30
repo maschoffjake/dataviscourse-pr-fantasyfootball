@@ -238,6 +238,8 @@ class Overall {
             .enter()
             .append("circle");
         newCircles
+            .attr('cx', '60')
+            .attr('cy', '630')
             .append('title');
 
         circles.exit()
@@ -335,45 +337,45 @@ class Overall {
                 if(that.xIndicator.includes('PASS')) {
                     let key = that.xIndicator.replace('PASS', '');
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.xScale(d.year.passing[key]) : that.xScale(d.passing[key]);
+                    return that.xScale((keys.includes('year')) ? d.year.passing[key] : d.passing[key]);
                 }
                 else if(that.xIndicator.includes('RUSH')) {
                     let key = that.xIndicator.replace('RUSH', '');
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.xScale(d.year.rushing[key]) : that.xScale(d.rushing[key]);
+                    return that.xScale((keys.includes('year')) ? d.year.rushing[key] : d.rushing[key]);
                 }
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.xScale(d.year.receiving[key]) : that.xScale(d.receiving[key]);
+                    return that.xScale((keys.includes('year')) ? d.year.receiving[key] : d.receiving[key]);
                 }
                 else {
                     // return that.xScale(d.years[that.selectedYear][that.xIndicator]);
                     // return that.xScale(d.year[that.xIndicator]);
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.xScale(d.year[that.xIndicator]) : that.xScale(d[that.xIndicator]);
+                    return that.xScale((keys.includes('year')) ? d.year[that.xIndicator] : d[that.xIndicator]);
                 }
             })
             .attr('cy', (d) => {
                 if (that.yIndicator.includes('PASS')) {
                     let key = that.yIndicator.replace('PASS', '');
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.yScale(d.year.passing[key]) : that.yScale(d.passing[key]);
+                    return that.yScale((keys.includes('year')) ? d.year.passing[key] : d.passing[key]);
                 }
                 else if (that.yIndicator.includes('RUSH')) {
                     let key = that.yIndicator.replace('RUSH', '');
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.yScale(d.year.rushing[key]) : that.yScale(d.rushing[key]);
+                    return that.yScale((keys.includes('year')) ? d.year.rushing[key] : d.rushing[key]);
                 }
                 else if (that.yIndicator.includes('REC')) {
                     let key = that.yIndicator.replace('REC', '');
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.yScale(d.year.receiving[key]) : that.yScale(d.receiving[key]);
+                    return that.yScale((keys.includes('year')) ? d.year.receiving[key] : d.receiving[key]);
                 }
                 else {
                     // return that.yScale(d.years[that.selectedYear][that.yIndicator]);
                     let keys = Object.keys(d);
-                    return (keys.includes('year')) ? that.yScale(d.year[that.yIndicator]) : that.yScale(d[that.yIndicator]);
+                    return that.yScale((keys.includes('year')) ? d.year[that.yIndicator] : d[that.yIndicator]);
                 }
             })
             .attr('r', 3);
@@ -385,19 +387,24 @@ class Overall {
         this.overallData.forEach(function(player) {
             if(that.xIndicator.includes('PASS')) {
                 let key = that.xIndicator.replace('PASS', '');
-                xValueList.push(player.year.passing[key]);
+                let keys = Object.keys(player);
+                xValueList.push((keys.includes('year')) ? player.year.passing[key] : player.passing[key]);
             }
             else if(that.xIndicator.includes('RUSH')) {
                 let key = that.xIndicator.replace('RUSH', '');
-                xValueList.push(player.year.rushing[key]);
+                let keys = Object.keys(player);
+                xValueList.push((keys.includes('year')) ? player.year.rushing[key] : player.rushing[key]);
             }
             else if(that.xIndicator.includes('REC')) {
                 let key = that.xIndicator.replace('REC', '');
-                xValueList.push(player.year.receiving[key]);
+                let keys = Object.keys(player);
+                xValueList.push((keys.includes('year')) ? player.year.receiving[key] : player.receiving[key]);
             }
             else {
                 // xValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.xIndicator]);
-                xValueList.push(player.year[that.xIndicator]);
+                let keys = Object.keys(player);
+                xValueList.push((keys.includes('year')) ? player.year[that.xIndicator] : player[that.xIndicator]);
+                // xValueList.push(player.year[that.xIndicator]);
             }
         });
 
@@ -419,19 +426,24 @@ class Overall {
         this.overallData.forEach(function(player) {
             if(that.yIndicator.includes('PASS')) {
                 let key = that.yIndicator.replace('PASS', '');
-                yValueList.push(player.year.passing[key]);
+                let keys = Object.keys(player);
+                yValueList.push((keys.includes('year')) ? player.year.passing[key] : player.passing[key]);
             }
             else if(that.yIndicator.includes('RUSH')) {
                 let key = that.yIndicator.replace('RUSH', '');
-                yValueList.push(player.year.rushing[key]);
+                let keys = Object.keys(player);
+                yValueList.push((keys.includes('year')) ? player.year.rushing[key] : player.rushing[key]);
             }
             else if(that.yIndicator.includes('REC')) {
                 let key = that.yIndicator.replace('REC', '');
-                yValueList.push(player.year.receiving[key]);
+                let keys = Object.keys(player);
+                yValueList.push((keys.includes('year')) ? player.year.receiving[key] : player.receiving[key]);
             }
             else {
                 // yValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.yIndicator]);
-                yValueList.push(player.year[that.yIndicator]);
+                let keys = Object.keys(player);
+                yValueList.push((keys.includes('year')) ? player.year[that.yIndicator] : player[that.yIndicator]);
+                // yValueList.push(player.year[that.yIndicator]);
             }
         });
 
@@ -591,6 +603,7 @@ class Overall {
         // // this.parseDataForYears([0,1], 'TE');
         // this.parseDataForYear(year, position);
         //TODO: call updateChart once refactored to handle multiple years
+        this.updateChart();
     }
 
     updateView() {
