@@ -57,3 +57,14 @@ circle.selected {
     padding: 3px 6px 3px 6px;
     border-radius: 5px;
 }
+
+.faded {
+    fill: lightgrey;
+    stroke: lightgrey;
+}
+
+.extremes {
+    fill: #4900db;
+    stroke: black;
+}
+
