@@ -8,6 +8,7 @@ class Overall {
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
         this.selectedYear = 0;
         this.compareEnable = false;
+        this.showExtremes = false;
         this.xIndicator = 'fantasyPoints';
         this.yIndicator = 'gamesStarted';
         this.dropdownData = [
@@ -38,6 +39,12 @@ class Overall {
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
 
+        overallDiv
+            .append('button')
+            .text('Extremes')
+            .attr('id', 'extremesButton')
+            .on('click', () => this.toggleExtremes());
+
         this.toolTip = overallDiv
             .append('div')
             .classed('overallToolTip', true)
@@ -60,8 +67,9 @@ class Overall {
             .append('g')
             .attr('id', 'overallChartGroup')
             .append('text')
-            .text('Overall Data for Year')
-            .style('font-size', '38px')
+            .text('Fantasy Points vs. Games Started')
+            .style('font-size', '24px')
+            .attr('id', 'chartTitle')
             .attr('x', 100)
             .attr('y', 150);
 
@@ -81,46 +89,17 @@ class Overall {
             .text('Games Started')
             .classed('axisLabel', true);
 
-        //Get fantasy points from parsed data to find the max to be displayed on the x-axis
-        // let ptList = [];
-        // this.overallData.forEach(function(player) {
-        //     ptList.push(player.year.fantasyPoints);
-        // });
-
         //Create the x-axis group and scale
         let xAxisGroup = chartGroup
             .append('g')
             .attr('id', 'xAxis')
             .attr('transform', 'translate(0,630)');
 
-        // this.xScale = d3
-        //     .scaleLinear()
-        //     .domain([0, Math.max(...ptList)])
-        //     .range([60, 480])
-        //     .nice();
-        //
-        // this.xAxis = d3.axisBottom();
-        // this.xAxis.scale(this.xScale);
-
-        // xAxisGroup.call(this.xAxis);
-
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
             .append('g')
             .attr('id', 'yAxis')
             .attr('transform', 'translate(60,0)');//translate transform to get axis in proper spot
-
-        // this.yScale = d3
-        //     .scaleLinear()
-        //     .domain([Math.max(...ptList), 0])
-        //     .range([210, 630])
-        //     .nice();
-        //
-        // this.yAxis = d3.axisLeft();
-        // this.yAxis.scale(this.yScale);
-        //
-        // yAxisGroup.call(this.yAxis);
-        // this.updateChart();
 
         let dropdownWrapper = overallDiv.append('div')
             .classed('dropdownWrapper', true);
@@ -146,11 +125,6 @@ class Overall {
             .append('select');
 
         this.drawDropDowns();
-
-        overallDiv
-            .append('button')
-            .text('Extremes')
-            .attr('id', 'extremesButton');
     }
 
     drawDropDowns() {
@@ -181,12 +155,10 @@ class Overall {
             d3.select('#xAxisLabel')
                 .text(this.options[this.selectedIndex].label);
             that.xIndicator = this.options[this.selectedIndex].value;
+            let yLabel = that.dropdownData.filter(d => d[0] === that.yIndicator)[0][1];
+            d3.select('#chartTitle')
+                .text(`${this.options[this.selectedIndex].label} vs. ${yLabel}`);
             that.updateChart();
-            // let xValue = this.options[this.selectedIndex].value;
-            // let yValue = dropY.node().value;
-            // let cValue = dropC.node().value;
-            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
-            // that.updateCountry
         });
 
         let dropY = d3.select('#yDropdown').select('.dropdownContent').select('select');
@@ -212,12 +184,10 @@ class Overall {
             d3.select('#yAxisLabel')
                 .text(this.options[this.selectedIndex].label);
             that.yIndicator = this.options[this.selectedIndex].value;
+            let xLabel = that.dropdownData.filter(d => d[0] === that.xIndicator)[0][1];
+            d3.select('#chartTitle')
+                .text(`${xLabel} vs. ${this.options[this.selectedIndex].label}`);
             that.updateChart();
-            // let xValue = this.options[this.selectedIndex].value;
-            // let yValue = dropY.node().value;
-            // let cValue = dropC.node().value;
-            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
-            // that.updateCountry
         });
     }
 
@@ -378,7 +348,7 @@ class Overall {
                     return that.yScale((keys.includes('year')) ? d.year[that.yIndicator] : d[that.yIndicator]);
                 }
             })
-            .attr('r', 3);
+            .attr('r', 5);
     }
 
     updateScales() {
@@ -489,11 +459,6 @@ class Overall {
 
     parseDataForYears(years, position) {
         let updateData = [];
-        //receiving years already in proper format
-        // let years = [];
-        // for(let i = 0; i < yearIndices.length; i++) {
-        //     years.push(this.player1.years[i].year);
-        // }
         this.allData.map(function(player) {
             let x = Object.values(player.years);
             let val = x.filter(d => years.includes(d.year) && (d.position === position[0] || d.position === position[1]));
@@ -534,7 +499,7 @@ class Overall {
                     };
                     val.forEach(function(year) {
                         Object.keys(year).forEach(function(key) {
-                            if(key != 'year' && key != 'team' && key != 'position' && key != 'age') {
+                            if(key !== 'year' && key !== 'team' && key !== 'position' && key !== 'age') {
                                 if(key === 'passing' || key === 'rushing' || key === 'receiving') {
                                     Object.keys(year[key]).forEach(function(attr) {
                                         playerObj[key][attr] += parseInt(year[key][attr]);
@@ -561,12 +526,10 @@ class Overall {
     }
 
     updateSelectedYear(yearIndex) {
-        //will receive an index, so access year via this.player1.years
-        //will need to parse the data set for the year and position again
-        // this.selectedYear = year;
         let that = this;
-        console.log(`Update Selected Year: ${yearIndex}`);
+        //Check if comparing players
         if(this.compareEnable) {
+            //Check if comparing players for multiple years
             if(yearIndex.length > 1) {
                 let years = [];
                 let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
@@ -605,24 +568,155 @@ class Overall {
             let position = yearObj.position;
             this.parseDataForYear(year, position);
         }
-        // let yearObj = this.player1.years[yearIndex];
-        // let year = yearObj.year;
-        // this.selectedYear = yearIndex;
-        // let position = yearObj.position;
-        // // this.parseDataForYears([0,1], 'TE');
-        // this.parseDataForYear(year, position);
-        //TODO: call updateChart once refactored to handle multiple years
+
         this.updateChart();
     }
 
     updateView() {
-        //updateChart
-        console.log('updateView');
-        // this.parseDataForYear(this.selectedYear,this.player1.years[])
         this.updateChart();
     }
 
     setCompareMode(compareEnable) {
         this.compareEnable = compareEnable;
+    }
+
+    toggleExtremes() {
+        let that = this;
+        if(this.showExtremes) {
+            let circles = d3.select('#overallView')
+                .selectAll('circle');
+            circles
+                .classed('faded', false)
+                .classed('extremes', false);
+        }
+        else {
+            let circles = d3.select('#overallView')
+                .selectAll('circle');
+            d3.select('#overallView')
+                .selectAll('.selected')
+                .classed('selected', false);
+            circles
+                .classed('faded', true);
+
+            let circleObjs = circles._groups[0];
+            //Set up variables to extract minPlayer
+            let maxX = 0,
+                maxY = 0;
+            let maxPlayerX = null,
+                maxPlayerY = null;
+            //Iterate over circles to find the player with the lowest xIndicator and yIndicator values
+            if (that.yIndicator.includes('PASS')) {
+                circleObjs.forEach(function(player) {
+                    let keyX = that.xIndicator.replace('PASS', '');
+                    let keyY = that.yIndicator.replace('PASS', '');
+                    let keys = Object.keys(player.__data__);
+                    if (keys.includes('year')) {
+                        if(parseInt(player.__data__.year.passing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.year.passing[keyX]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.year.passing[keyY]) >= maxY) {
+                            maxY = parseInt(player.__data__.year.passing[keyY]);
+                            maxPlayerY = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__.passing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.passing[keyX]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.passing[keyY]) >= maxY) {
+                            maxY = parseInt(player.__data__.passing[keyY]);
+                            maxPlayerY = player;
+                        }
+                    }
+                });
+            }
+            else if (that.yIndicator.includes('RUSH')) {
+                circleObjs.forEach(function(player) {
+                    let keyX = that.xIndicator.replace('RUSH', '');
+                    let keyY = that.yIndicator.replace('RUSH', '');
+                    let keys = Object.keys(player.__data__);
+                    if (keys.includes('year')) {
+                        if(parseInt(player.__data__.year.rushing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.year.rushing[keyX]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.year.rushing[keyY]) >= maxY) {
+                            maxY = parseInt(player.__data__.year.rushing[keyY]);
+                            maxPlayerY = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__.rushing[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.rushing[keyX]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.rushing[keyY]) >= maxY) {
+                            maxY = parseInt(player.__data__.rushing[keyY]);
+                            maxPlayerY = player;
+                        }
+                    }
+                });
+            }
+            else if (that.yIndicator.includes('REC')) {
+                circleObjs.forEach(function(player) {
+                    let keyX = that.xIndicator.replace('REC', '');
+                    let keyY = that.yIndicator.replace('REC', '');
+                    let keys = Object.keys(player.__data__);
+                    if (keys.includes('year')) {
+                        if(parseInt(player.__data__.year.receiving[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.year.receiving[keyX]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.year.receiving[keyY]) >= maxY) {
+                            maxY = parseInt(player.__data__.year.receiving[keyY]);
+                            maxPlayerY = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__.receiving[keyX]) >= maxX) {
+                            maxX = parseInt(player.__data__.receiving[keyX]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.receiving[keyY]) >= maxY) {
+                            maxY = parseInt(player.__data__.receiving[keyY]);
+                            maxPlayerY = player;
+                        }
+                    }
+                });
+            }
+            else {
+                circleObjs.forEach(function(player) {
+                    let keys = Object.keys(player.__data__);
+                    if(keys.includes('year')) {
+                        if(parseInt(player.__data__.year[that.xIndicator]) >= maxX) {
+                            maxX = parseInt(player.__data__.year[that.xIndicator]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__.year[that.yIndicator]) >= maxY) {
+                            maxY = parseInt(player.__data__.year[that.yIndicator]);
+                            maxPlayerY = player;
+                        }
+                    }
+                    else {
+                        if(parseInt(player.__data__[that.xIndicator]) >= maxX) {
+                            maxX = parseInt(player.__data__[that.xIndicator]);
+                            maxPlayerX = player;
+                        }
+                        if(parseInt(player.__data__[that.yIndicator]) >= maxY) {
+                            maxY = parseInt(player.__data__[that.yIndicator]);
+                            maxPlayerY = player;
+                        }
+                    }
+                });
+            }
+
+            maxPlayerX
+                .classList = ['extremes'];
+            maxPlayerY
+                .classList = ['extremes'];
+        }
+        this.showExtremes = !this.showExtremes;
     }
 }
