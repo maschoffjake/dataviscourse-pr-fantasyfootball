@@ -567,15 +567,24 @@ class Overall {
         let that = this;
         console.log(`Update Selected Year: ${yearIndex}`);
         if(this.compareEnable) {
-            let years = [];
-            let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
-            let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1]);
-            years = player1Years.concat(player2Years).map(d => d.year);
-            let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
-            years = removeDups(years);
-            let position = [this.player1.years[0].position, this.player2.years[0].position];
-            this.selectedYear = years;
-            this.parseDataForYears(this.selectedYear, position)
+            if(yearIndex.length > 1) {
+                let years = [];
+                let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
+                let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1]);
+                years = player1Years.concat(player2Years).map(d => d.year);
+                let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
+                years = removeDups(years);
+                let position = [this.player1.years[0].position, this.player2.years[0].position];
+                this.selectedYear = years;
+                this.parseDataForYears(this.selectedYear, position)
+            }
+            else {
+                let yearObj = this.player1.years[yearIndex[0]];
+                let year = yearObj.year;
+                this.selectedYear = yearIndex[0];
+                let position = yearObj.position;
+                this.parseDataForYear(year, position);
+            }
         }
         //For multiples years selected for single player
         else if(yearIndex[0].length > 1) {
