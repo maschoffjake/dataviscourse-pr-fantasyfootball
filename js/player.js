@@ -68,6 +68,8 @@ class Player {
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
+
+    // Create the spider charts
     const pointLabels = ['Fantasy Points', 'PPR Points', 'PPG', 'PPRPG', 'Position Rank'];
     const passingLabels = ['Touchdowns', 'Interceptions', 'Passing Yards', 'Completions', 'Attempts'];
     const rushingLabels = ['Touchdowns', 'Rushing Yards', 'Attempts', 'Yards Per Attempt'];
@@ -76,6 +78,12 @@ class Player {
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
+
+    // Create the tooltips associated with the spider charts
+    this.createSpiderChartToolTip('Points', spiderChartX, spiderChartY);
+    this.createSpiderChartToolTip('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
+    this.createSpiderChartToolTip('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
+    this.createSpiderChartToolTip('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
@@ -100,6 +108,7 @@ class Player {
     this.updateYearBarAndBrush('Player1', this.player1, xPlayer1, y);
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
 
+    // Update spider charts
     this.updateSpiderChart('Passing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
     this.updateSpiderChart('Rushing', 'Player1', this.player1, this.selectedYearIndexPlayer1, 4);
     this.updateSpiderChart('Receiving', 'Player1', this.player1, this.selectedYearIndexPlayer1, 5);
@@ -109,6 +118,9 @@ class Player {
     this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
     this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
     this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+
+    // Update spider chart tooltips
+
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
@@ -309,7 +321,7 @@ class Player {
 
 
   /**
-   * 
+   * Creates the barbones of the spider charts, ie groups, transitions, text, lines, spiderChartPlotPoints
    * @param {String} id id to give the created spider chart
    * @param {Number} x  x-position to translate the spider graph
    * @param {Number} y y-position to translate the spider graph
@@ -380,6 +392,14 @@ class Player {
           .transition()
           .attr('transform', `rotate(${rotate})`)
           .duration(1000);
+
+        // Turn off the already selected pie arc
+        d3.select(`#spiderChart${id}`).select('.selectedArc')
+          .attr('class', 'labelArcs');
+
+        // Turn this arc to the select one
+        d3.select(this)
+          .attr('class', 'selectedArc');
       });
     
     let that = this;
@@ -480,13 +500,14 @@ class Player {
         .append('g')
         .attr('class', `spiderChartSpiderPlots`);
 
-    const actualSpiderPlotGroup = spiderPlotGroup
+    // Create points for player 1 (compare mode)
+    const actualSpiderPlotGroupPlayer1 = spiderPlotGroup
         .append('g')
         .attr('transform', 'translate(-100,-100)')  // Hacky way to get a group to rotate, have to keep this or it breaks...
-        .attr('id', `spiderChart${id}SpiderPlots`);
+        .attr('id', `spiderChart${id}SpiderPlotsPlayer1`);
 
-    const spiderPlotPoints = actualSpiderPlotGroup
-        .selectAll('spiderChartDataPoints')
+    let spiderPlotPoints = actualSpiderPlotGroupPlayer1
+        .selectAll('spiderChartDataPointsPlayer1')
         .data(labels);
     
     spiderPlotPoints
@@ -495,7 +516,25 @@ class Player {
         .attr('cx', this.spiderChartRadius)
         .attr('cy', this.spiderChartRadius)
         .attr('r', 0)
-        .attr('class', 'spiderChartDataPoints');
+        .attr('class', 'spiderChartDataPointsPlayer1');
+
+    // Create points for player 2 (compare mode)
+    const actualSpiderPlotGroupPlayer2 = spiderPlotGroup
+        .append('g')
+        .attr('transform', 'translate(-100,-100)')  // Hacky way to get a group to rotate, have to keep this or it breaks...
+        .attr('id', `spiderChart${id}SpiderPlotsPlayer2`);
+
+    spiderPlotPoints = actualSpiderPlotGroupPlayer2
+        .selectAll('spiderChartDataPointsPlayer2')
+        .data(labels);
+    
+    spiderPlotPoints
+        .enter()
+        .append('circle')
+        .attr('cx', this.spiderChartRadius)
+        .attr('cy', this.spiderChartRadius)
+        .attr('r', 0)
+        .attr('class', 'spiderChartDataPointsPlayer2');
 
     // Create a group for the spider plot lines to be roated in
     const spiderPlotPathGroup = spiderGroup
@@ -503,23 +542,36 @@ class Player {
         .attr('transform', 'translate(100,100)')
         .append('g');
 
+    // Create a path for player 1 (compare mode)
+    // Must create defaul path of same dimensions in order for it to translate on startup
     spiderPlotPathGroup
         .append('g')
         .attr('transform', 'translate(-100,-100)')
         .attr('id', `spiderChart${id}Path`)
         .append('path')
-        .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
-        .attr('class', 'spiderChartPlotPath');
+        .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
+        .attr('class', 'spiderChartPlotPathPlayer1');
+
+    // Create a path for player 2 (compare mode)
+    // Must create defaul path of same dimensions in order for it to translate on startup
+    spiderPlotPathGroup
+      .append('g')
+      .attr('transform', 'translate(-100,-100)')
+      .attr('id', `spiderChart${id}Path`)
+      .append('path')
+      .attr('d', `M ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius} L ${this.spiderChartRadius} ${this.spiderChartRadius}`)
+      .attr('class', 'spiderChartPlotPathPlayer2');
   }
 
   /**
-   * 
-   * @param {*} angle 
-   * @param {*} centerRadius 
-   * @param {*} value 
-   * @param {*} scale 
+   * Used to calculate the X-value for the spider circle chart
+   * @param {Number} angle Angle that this is being protruded out of from the center of the chart
+   * @param {Number} centerRadius The X-position of the center of the spider chart
+   * @param {Number} value Value that you would like to display along this angle
+   * @param {D3 Scale} scale Scale to use to get this value
    */
   calculateXValue(angle, centerRadius, value, scale){
+    // If no scale provided, just use the entire radius
     if (scale === null) {
       const x = Math.cos(angle) * centerRadius;
       return centerRadius + x;
@@ -529,13 +581,14 @@ class Player {
   }
 
   /**
-   * 
-   * @param {*} angle 
-   * @param {*} centerRadius 
-   * @param {*} value 
-   * @param {*} scale 
+   * Used to calculate the Y-value for the spider circle chart
+   * @param {Number} angle Angle that this is being protruded out of from the center of the chart
+   * @param {Number} centerRadius The Y-position of the center of the spider chart
+   * @param {Number} value Value that you would like to display along this angle
+   * @param {D3 Scale} scale Scale to use to get this value
    */
   calculateYValue(angle, centerRadius, value, scale){
+    // If no scale provided, just use the entire radius
     if (scale === null) {
       const y = Math.sin(angle) * centerRadius;
       return centerRadius - y;
@@ -545,9 +598,13 @@ class Player {
   }
 
   /**
-   * Used to update the bar charts and the axis for the new player
+   * Used to update the spider charts
+   * @param {String} id ID of the spiderChart to update (ie: 'Passing', 'Rushing' etc)
+   * @param {String} player Used to indicate which player we are updating (ie: 'Player1' or 'Player2')
+   * @param {PlayerObject} playerData The player obejct data
+   * @param {Number} selectedYearIndex The current year that we are analyzing
    */
-  updateSpiderChart(id, player, playerData, selectedYearIndex, numberOfArcs, x, y) {
+  updateSpiderChart(id, player, playerData, selectedYearIndex) {
     // Don't update player 2 stuff if it isn't selected
     if (player === 'Player2' && !this.compareEnable) {
       return;
@@ -555,13 +612,12 @@ class Player {
 
     // Update spider charts with current year
     const selectedYearData = playerData.years[selectedYearIndex];
-    console.log(selectedYearData);
 
     let dataToUse = null;
     switch (id) {
       case 'Passing' :
         dataToUse = [
-          [ 'Touchdowns' , selectedYearData.passing.touchdownPasses ],
+          [ 'Touchdowns' , selectedYearData.passing.touchdownPasses == null ? 0 : selectedYearData.passing.touchdownPasses ],
           [ 'Interceptions' , selectedYearData.passing.interceptions ],
           [ 'Passing Yards' , selectedYearData.passing.passingYards ],
           [ 'Completions' , selectedYearData.passing.completions ],
@@ -600,7 +656,7 @@ class Player {
     }
 
     // UPDATE THE PLOT POINTS
-    const spiderPlotPoints = d3.select(`#spiderChart${id}SpiderPlots`).selectAll('.spiderChartDataPoints').data(dataToUse);
+    const spiderPlotPoints = d3.select(`#spiderChart${id}SpiderPlots${player}`).selectAll(`.spiderChartDataPoints${player}`).data(dataToUse);
 
     spiderPlotPoints
         .transition()
@@ -652,7 +708,7 @@ class Player {
         // UPDATE THE PATH THAT CONNECTS ALL OF THE POINTS
         // Can't really find a good way of doing this with D3...
         // Create path from the data to use
-        const spiderChartPath = d3.select(`#spiderChart${id}`).select('.spiderChartPlotPath');
+        const spiderChartPath = d3.select(`#spiderChart${id}`).select(`.spiderChartPlotPath${player}`);
         let path = '';
         let count = 0;  // Count used to concatenate the move value on to the string first
         for (let item of dataToUse) {
@@ -692,6 +748,31 @@ class Player {
           .transition()
           .attr('d', path)
           .duration(1000);
+  }
+
+    /**
+   * Creates the side tooltip for the spider chart to display the statistics for it
+   * @param {String} id ID for the current tooltip
+   * @param {Number} x Where to translate the tooltip (x position)
+   * @param {Number} y Where to translate the tooltip (y position)
+   */
+  createSpiderChartToolTip(id, x, y) {
+    // Create the spider chart with the passed in id
+    const toolTip = this.svg
+        .append('g')
+        .attr('id', `spiderChartToolTip${id}`)
+        .attr('transform', `translate(${x}, ${y})`);
+  }
+
+  /**
+   * Used to update the tooltips next to the spider charts
+   * @param {String} id ID of the spiderChartToolTip to update (ie: 'Passing', 'Rushing' etc)
+   * @param {String} player Used to indicate which player we are updating (ie: 'Player1' or 'Player2')
+   * @param {PlayerObject} playerData The player obejct data
+   * @param {Number} selectedYearIndex The current year that we are analyzing
+   */
+  updateSpiderChartToolTip(id, player, playerData, selectedYearIndex) {
+
   }
 
   createLineGraphs(id, label, x, y) {
