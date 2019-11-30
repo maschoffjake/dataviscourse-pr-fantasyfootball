@@ -8,7 +8,7 @@ class Player {
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
-    this.svgHeight = 1100;
+    this.svgHeight = 1300;
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
@@ -33,7 +33,7 @@ class Player {
       });
 
     this.spiderChartRadius = 100;
-    this.circleBuffer = 50;
+    this.circleBuffer = 100;
     this.transitionTime = 1000;
 
     this.widthOfPieChart = 25;
@@ -48,6 +48,11 @@ class Player {
     };
     this.spiderChartPlotCirclesRadiuses = 5;
     this.maxData = maxData;
+
+    this.lineGraphWidth = 700;
+    this.lineGraphHeight = 300;
+
+    this.spiderChartDialogWidth = 300;
   }
 
   /**
@@ -59,7 +64,7 @@ class Player {
       .attr('height', this.svgHeight);
 
     let spiderChartX = 25;
-    let spiderChartY = 100;
+    let spiderChartY = 175;
 
     this.createYearBarAndBrush('Player2');
     this.createYearBarAndBrush('Player1');
@@ -71,7 +76,13 @@ class Player {
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
-    this.createLineGraphs();
+
+    let lineGraphOffsetX = this.spiderChartRadius * 2 + this.widthOfPieChart + this.spiderChartDialogWidth;
+    let lineGraphOffsetY = 150;
+    this.createLineGraphs('points', 'Points', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('passing', 'Passing', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('rushing', 'Rushing', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('receiving', 'Receiving', lineGraphOffsetX, lineGraphOffsetY);
   }
 
   /**
@@ -98,6 +109,14 @@ class Player {
     this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
     this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
     this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+
+    let lineGraphOffsetX = this.spiderChartRadius * 2 + this.widthOfPieChart + this.spiderChartDialogWidth;
+    let lineGraphOffsetY = 150;
+    let lineGraphYBuffer = 0;
+    this.updateLineGraphs('points', lineGraphOffsetX, lineGraphOffsetY);
+    this.updateLineGraphs('passing', lineGraphOffsetX, lineGraphOffsetY + this.lineGraphHeight + lineGraphYBuffer);
+    this.updateLineGraphs('rushing', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 2) + lineGraphYBuffer);
+    this.updateLineGraphs('receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer);
   }
 
   /**
@@ -645,30 +664,59 @@ class Player {
           .duration(1000);
   }
 
-  createLineGraphs() {
-    let lineGraphs = this.svg.append('g')
-      .attr('id', `lineGraphs`)
+  createLineGraphs(id, label, x, y) {
+    let lineGraph = this.svg.append('g')
+      .attr('id', `${id}LineGraph`)
       .style('opacity', 0)
-      .attr('transform', `translate(430, 125)`);
+      .attr('width', this.lineGraphWidth)
+      .attr('transform', `translate(${x}, ${y})`);
 
-    this.createLineGraphsHelper(lineGraphs, `receiving`);
-    this.createLineGraphsHelper(lineGraphs, `passing`);
-    this.createLineGraphsHelper(lineGraphs, `rushing`);
-  }
-
-  createLineGraphsHelper(parentGroup, id) {
-    let lineGraph = parentGroup.append('g')
-      .attr('id', id);
+    lineGraph.append('text')
+      .attr('class', 'line_graph_title')
+      .text(label);
 
     lineGraph.append('g')
-      .attr('id', `${id}Axis`);
+      .attr('id', `${id}YearAxis`);
 
     lineGraph.append('g')
       .attr('id', `${id}Lines`);
   }
 
-  updateLineGraphs() {
+  updateLineGraphs(id, x, y) {
+    let lineGraph = this.svg.select(`#${id}LineGraph`);
 
+    lineGraph
+      .transition()
+      .duration(this.transitionTime)
+      .style('opacity', 1)
+      .attr('transform', `translate(${x}, ${y})`);
+
+    let startYear = parseInt(this.player1.years[0].year);
+    let endYear = parseInt(this.player1.years[this.player1.years.length - 1].year);
+
+    if (this.compareEnable) {
+      let player2StartYear = parseInt(this.player2.years[0].year);
+      let player2EndYear = parseInt(this.player1.years[this.player2.years.length - 1].year);
+      if (startYear > player2StartYear) {
+        startYear = player2StartYear;
+      }
+      if (endYear < player2EndYear) {
+        endYear = player2EndYear;
+      }
+    }
+
+    let yearScale = d3
+      .scaleLinear()
+      .domain([startYear, endYear])
+      .range([0, this.lineGraphWidth - 25]);
+
+    let yearAxis = d3.axisBottom()
+      .tickFormat(d3.format('d'))
+      .ticks(endYear - startYear)
+      .scale(yearScale);
+
+    d3.select(`#${id}YearAxis`)
+      .call(yearAxis);
   }
 
   /**

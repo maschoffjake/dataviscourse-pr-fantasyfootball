@@ -47,3 +47,8 @@
     fill: crimson;
     opacity: 0.6;
 }
+
+.line_graph_title {
+    color: black;
+    font-size: 24px;
+}
