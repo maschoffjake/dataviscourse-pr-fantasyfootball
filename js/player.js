@@ -8,7 +8,7 @@ class Player {
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
-    this.svgHeight = 1300;
+    this.svgHeight = 1350;
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
@@ -714,9 +714,6 @@ class Player {
     let startYear = parseInt(this.player1.years[0].year);
     let endYear = parseInt(this.player1.years[this.player1.years.length - 1].year);
 
-
-    let formatedDataPlayer = this.formatDataForLineGraph(this.player2, attributes, id, 'player1');
-
     if (this.compareEnable) {
       let player2StartYear = parseInt(this.player2.years[0].year);
       let player2EndYear = parseInt(this.player2.years[this.player2.years.length - 1].year);
@@ -726,13 +723,17 @@ class Player {
       if (endYear < player2EndYear) {
         endYear = player2EndYear;
       }
-      formatedDataPlayer = formatedDataPlayer.concat(this.formatDataForLineGraph(this.player2, attributes, id, 'player2'));
     }
 
     let yearScale = d3
       .scaleLinear()
       .domain([startYear, endYear])
       .range([0, this.lineGraphWidth - 25]);
+
+    let formatedDataPlayer = this.formatDataForLineGraph(this.player2, attributes, id, 'player1', yearScale);
+    if (this.compareEnable) {
+      formatedDataPlayer = formatedDataPlayer.concat(this.formatDataForLineGraph(this.player2, attributes, id, 'player2', yearScale));
+    }
 
     let yearAxis = d3.axisBottom()
       .tickFormat(d3.format('d'))
@@ -751,7 +752,41 @@ class Player {
       .duration(this.transitionTime)
       .attr('transform', `translate(0, ${this.lineGraphHeight-50})`);
 
-    
+    //This is the accessor function we talked about above
+    let lineFunction = d3.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; })
+      .curve(d3.curveLinear);
+
+
+    let lineGroup = lineGraph.select(`#${id}Lines`);
+
+    let lines = lineGroup
+      .selectAll('path')
+      .data(formatedDataPlayer);
+
+    let newLines = lines.enter()
+      .append('path')
+      .style('opacity', 0);
+
+    lines.exit()
+      .transition()
+      .duration(this.transitionTime)
+      .style('opacity', 0)
+      .remove();
+
+    lines = newLines.merge(lines);
+
+    lines
+      // .transition()
+      // .duration(this.transitionTime)
+      .attr('d', (d) => {
+        console.log(d.years);
+        return lineFunction(d.years); })
+      .attr('id', (d) => { return d.elementID; })
+      .style('fill', 'none')
+      .style('stroke', 'black')
+      .style('opacity', 1);
   }
 
   /**
@@ -759,9 +794,10 @@ class Player {
    * @param player - player for the line graph
    * @param id - id of the line graph group
    * @param attributes
-   * @param player
+   * @param playerID
+   * @param yearScale
    */
-  formatDataForLineGraph(player, attributes, id, playerID) {
+  formatDataForLineGraph(player, attributes, id, playerID, yearScale) {
     let toReturn = [];
     attributes.forEach((d) => {
       let toAdd = {};
@@ -780,15 +816,25 @@ class Player {
         return yearObj[id][d];
       });
 
+      let dataScale = d3.scaleLinear()
+        .domain([toAdd.min, toAdd.max])
+        .range([0, this.lineGraphHeight - 50]);
+
       toAdd.years = [];
       player.years.forEach((yearObj) => {
         let value = yearObj[d];
         if (id !== 'points') {
-          return yearObj[id][d];
+          value = yearObj[id][d];
+        }
+        console.log(d);
+        console.log(value);
+        value = dataScale(parseFloat(value));
+        if (!value) {
+          value = 0;
         }
         let toAddObj = {
-          'year': parseInt(yearObj.year),
-          'val': parseFloat(yearObj[d])
+          'x': yearScale(parseInt(yearObj.year)),
+          'y': value
         };
         toAdd.years.push(toAddObj);
       });
