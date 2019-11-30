@@ -40,7 +40,7 @@ class Player {
 
     // Need to save what data is being stored in each quadrant, so we can create the spider plots in correct area
     // This will be used in updateSpiderCharts
-       this.dataToRadian = {
+    this.dataToRadian = {
       'Points': {},
       'Passing': {},
       'Rushing': {},
@@ -113,10 +113,14 @@ class Player {
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
     let lineGraphYBuffer = 0;
-    this.updateLineGraphs('points', lineGraphOffsetX, lineGraphOffsetY);
-    this.updateLineGraphs('passing', lineGraphOffsetX, lineGraphOffsetY + this.lineGraphHeight + lineGraphYBuffer);
-    this.updateLineGraphs('rushing', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 2) + lineGraphYBuffer);
-    this.updateLineGraphs('receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer);
+    this.updateLineGraphs('points', lineGraphOffsetX, lineGraphOffsetY,
+      ['fantasyPoints', 'ppg', 'ppr', 'pprpg', 'positionRank']);
+    this.updateLineGraphs('passing', lineGraphOffsetX, lineGraphOffsetY + this.lineGraphHeight + lineGraphYBuffer,
+      ['attempts', 'completions', 'interceptions', 'passingYards', 'touchdownPasses']);
+    this.updateLineGraphs('rushing', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 2) + lineGraphYBuffer,
+      ['target', 'reception', 'receivingYards', 'yardsPerReception', 'receivingTouchdowns']);
+    this.updateLineGraphs('receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer,
+      ['attempts', 'rushingYards', 'yardsPerAttempt', 'rushingTouchdowns']);
   }
 
   /**
@@ -682,7 +686,15 @@ class Player {
       .attr('id', `${id}Lines`);
   }
 
-  updateLineGraphs(id, x, y) {
+  /**
+   * Updates the line graph for the category.
+   * @param id - ID of the group that needs to be updated
+   * @param x - X position of the group
+   * @param y - Y position of the group
+   * @param attributes
+   * @param data
+   */
+  updateLineGraphs(id, x, y, attributes) {
     let lineGraph = this.svg.select(`#${id}LineGraph`);
 
     lineGraph
@@ -694,15 +706,19 @@ class Player {
     let startYear = parseInt(this.player1.years[0].year);
     let endYear = parseInt(this.player1.years[this.player1.years.length - 1].year);
 
+
+    let formatedDataPlayer = this.formatDataForLineGraph(this.player2, attributes, id, 'player1');
+
     if (this.compareEnable) {
       let player2StartYear = parseInt(this.player2.years[0].year);
-      let player2EndYear = parseInt(this.player1.years[this.player2.years.length - 1].year);
+      let player2EndYear = parseInt(this.player2.years[this.player2.years.length - 1].year);
       if (startYear > player2StartYear) {
         startYear = player2StartYear;
       }
       if (endYear < player2EndYear) {
         endYear = player2EndYear;
       }
+      formatedDataPlayer = formatedDataPlayer.concat(this.formatDataForLineGraph(this.player2, attributes, id, 'player2'));
     }
 
     let yearScale = d3
@@ -718,12 +734,59 @@ class Player {
     let yearAxisGroup = d3.select(`#${id}YearAxis`);
 
     yearAxisGroup
+      .transition()
+      .duration(1000)
       .call(yearAxis);
 
     yearAxisGroup
       .transition()
       .duration(this.transitionTime)
       .attr('transform', `translate(0, ${this.lineGraphHeight-50})`);
+
+    
+  }
+
+  /**
+   * Formats player data to be used for line graphs
+   * @param player - player for the line graph
+   * @param id - id of the line graph group
+   * @param attributes
+   * @param player
+   */
+  formatDataForLineGraph(player, attributes, id, playerID) {
+    let toReturn = [];
+    attributes.forEach((d) => {
+      let toAdd = {};
+      toAdd.id = d;
+      toAdd.elementID = d + playerID;
+      toAdd.min = d3.min(player.years, (yearObj) => {
+        if (id === 'points') {
+          return yearObj[d];
+        }
+        return yearObj[id][d];
+      });
+      toAdd.max = d3.max(player.years, (yearObj) => {
+        if (id === 'points') {
+          return yearObj[d];
+        }
+        return yearObj[id][d];
+      });
+
+      toAdd.years = [];
+      player.years.forEach((yearObj) => {
+        let value = yearObj[d];
+        if (id !== 'points') {
+          return yearObj[id][d];
+        }
+        let toAddObj = {
+          'year': parseInt(yearObj.year),
+          'val': parseFloat(yearObj[d])
+        };
+        toAdd.years.push(toAddObj);
+      });
+      toReturn.push(toAdd);
+    });
+    return toReturn;
   }
 
   /**
