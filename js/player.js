@@ -71,8 +71,7 @@ class Player {
     this.createSpiderChart('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer), passingLabels);
     this.createSpiderChart('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2, rushingLabels);
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
-    this.createLineGraphs('Player2');
-    this.createLineGraphs('Player1');
+    this.createLineGraphs();
   }
 
   /**
@@ -213,10 +212,12 @@ class Player {
         grandpaNode.selectAll('text')
           .classed('selected_year_circle', false);
         grandpaNode.selectAll('text')
-          .attr('class', (d, j) => {
+          .attr('class', function (d, j) {
+            let toReturn = d3.select(this).attr('class');
             if (j === i) {
-              return 'selected_year_circle';
+              toReturn += ` selected_year_circle`;
             }
+            return toReturn;
           });
 
         if (this.id.includes('Player1')) {
@@ -773,22 +774,29 @@ class Player {
       minIndex = 0;
     }
 
+    let updateOverallViewToggle = false;
+
     if (playerGroup.includes('Player1')) {
+      if (this.yearRangeIndexPlayer1.min !== minIndex || this.yearRangeIndexPlayer1.max !== maxIndex) {
+        updateOverallViewToggle = true;
+      }
       this.yearRangeIndexPlayer1.min = minIndex;
       this.yearRangeIndexPlayer1.max = maxIndex;
     } else {
+      if (this.yearRangeIndexPlayer2.min !== minIndex || this.yearRangeIndexPlayer2.max !== maxIndex) {
+        updateOverallViewToggle = true;
+      }
       this.yearRangeIndexPlayer2.min = minIndex;
       this.yearRangeIndexPlayer2.max = maxIndex;
     }
 
-    let yearsToForward = [];
-
-    yearsToForward.push([this.yearRangeIndexPlayer1.min, this.yearRangeIndexPlayer1.max]);
-
-    if (this.compareEnable) {
-      yearsToForward.push([this.yearRangeIndexPlayer2.min, this.yearRangeIndexPlayer2.max]);
+    if (updateOverallViewToggle) {
+      let yearsToForward = [];
+      yearsToForward.push([this.yearRangeIndexPlayer1.min, this.yearRangeIndexPlayer1.max]);
+      if (this.compareEnable) {
+        yearsToForward.push([this.yearRangeIndexPlayer2.min, this.yearRangeIndexPlayer2.max]);
+      }
+      this.updateSelectedYearOverallView(yearsToForward);
     }
-    
-    this.updateSelectedYearOverallView(yearsToForward);
   }
 }
