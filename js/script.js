@@ -120,34 +120,34 @@ async function loadMaxes(file) {
         // Intialize object 
         for (let i = 2008; i <= 2018; i++) {
             returnObj[i] = {};
-            for (let pos of positions) {
+            for (let pos of positions) {    
                 returnObj[i][pos] = {
                     "Passing": {
-                        "Completions": 0,
-                        "Attempts": 0,
-                        "Passing Yards": 0,
-                        "Touchdowns": 0,
-                        "Interceptions": 0
+                        "Completions": 1,
+                        "Attempts": 1,
+                        "Passing Yards": 1,
+                        "Touchdowns": 1,
+                        "Interceptions": 1
                     },
                     "Rushing": {
-                        "Attempts": 0,
-                        "Rushing Yards": 0,
-                        "Yards Per Attempt": 0,
-                        "Touchdowns": 0,
+                        "Attempts": 1,
+                        "Rushing Yards": 1,
+                        "Yards Per Attempt": 1,
+                        "Touchdowns": 1,
                     },
                     "Receiving": {
-                        "Targets": 0,
-                        "Receptions": 0,
-                        "Receiving Yards": 0,
-                        "Yards Per Reception": 0,
-                        "Touchdowns": 0
+                        "Targets": 1,
+                        "Receptions": 1,
+                        "Receiving Yards": 1,
+                        "Yards Per Reception": 1,
+                        "Touchdowns": 1
                     },
                     "Points": {
-                        "Fantasy Points": 0,
-                        "PPR Points": 0,
-                        "PPG": 0,
-                        "PPRPG": 0,
-                        "Position Rank": 0
+                        "Fantasy Points": 1,
+                        "PPR Points": 1,
+                        "PPG": 1,
+                        "PPRPG": 1,
+                        "Position Rank": 1
                     }
                 }
             }

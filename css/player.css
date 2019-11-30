@@ -31,24 +31,53 @@
     fill: #d3d3d3;
     stroke: black;
     stroke-width: 1px;
+    cursor: pointer;
+}
+
+.selectedArc {
+    fill: darkseagreen;
+    stroke: black;
+    stroke-width: 1px;
+    cursor: pointer;
 }
 
 .labelText {
     fill: black;
     font-size: 13px;
+    cursor: pointer;
 }
 
 .linesInSpiderChart {
     stroke: cadetblue;
 }
 
-.spiderChartPlotPath {
+.spiderChartPlotPathPlayer1 {
     stroke: crimson;
     fill: crimson;
+    opacity: 0.6;
+}
+
+.spiderChartPlotPathPlayer2 {
+    stroke: blue;
+    fill: blue;
     opacity: 0.6;
 }
 
 .line_graph_title {
     color: black;
     font-size: 24px;
+}
+
+.labelArcs:hover {
+    fill: grey;
+}
+
+.spiderChartDataPointsPlayer1 {
+    fill: red;
+    stroke: red;
+}
+
+.spiderChartDataPointsPlayer2 {
+    fill: blue;
+    stroke: blue;
 }
