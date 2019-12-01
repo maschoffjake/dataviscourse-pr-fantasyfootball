@@ -639,6 +639,7 @@ class Overall {
     }
 
     toggleExtremes() {
+        //TODO: Need to make sure yearSelector cannot be toggled when extremes are being shown
         if(this.showExtremes) {
             let circles = d3.select('#overallView')
                 .selectAll('circle');
@@ -681,10 +682,6 @@ class Overall {
             maxPlayers.forEach(function(player) {
                 player.classList = ['extremes'];
             });
-            // maxPlayers
-            //     .classList = ['extremes'];
-            // maxPlayerY
-            //     .classList = ['extremes'];
 
             this.playerXToolTip
                 .transition()
