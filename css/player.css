@@ -28,16 +28,12 @@
 }
 
 .labelArcs {
-    fill: #d3d3d3;
-    stroke: black;
-    stroke-width: 1px;
+    fill: none;
     cursor: pointer;
 }
 
 .selectedArc {
     fill: darkseagreen;
-    stroke: black;
-    stroke-width: 1px;
     cursor: pointer;
 }
 
