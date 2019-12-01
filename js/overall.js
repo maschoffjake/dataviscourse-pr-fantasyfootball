@@ -64,29 +64,36 @@ class Overall {
         overallDiv
             .append('svg')
             .attr('width', 500)
-            .attr('height', 800)
+            .attr('height', 650)
             .append('g')
             .attr('id', 'overallChartGroup')
             .append('text')
-            .text('Fantasy Points vs. Games Started')
-            .style('font-size', '24px')
+            .text('Overall Player Data')
+            .style('font-size', '32px')
             .attr('id', 'chartTitle')
             .attr('x', 100)
-            .attr('y', 150);
+            .attr('y', 50);
+        overallDiv
+            .select('svg')
+            .append('text')
+            .text('2016')
+            .attr('id', 'chartSubheader')
+            .attr('x', 225)
+            .attr('y', 100);
 
         //Create the x-axis label to display the data being represented
         let chartGroup = overallDiv.select('g');
         chartGroup
             .append('text')
             .attr('id', 'xAxisLabel')
-            .attr('transform', 'translate(225, 700)')
+            .attr('transform', 'translate(225, 620)')
             .text('Fantasy Points')
             .classed('axisLabel', true);
         //Create the y-axis label to display the data being represented (should always be player name)
         chartGroup
             .append('text')
             .attr('id', 'yAxisLabel')
-            .attr('transform', 'translate(20, 470) rotate(90) scale(-1,-1)')
+            .attr('transform', 'translate(20, 420) rotate(90) scale(-1,-1)')
             .text('Games Started')
             .classed('axisLabel', true);
 
@@ -94,7 +101,7 @@ class Overall {
         let xAxisGroup = chartGroup
             .append('g')
             .attr('id', 'xAxis')
-            .attr('transform', 'translate(0,630)');
+            .attr('transform', 'translate(0,580)');
 
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
@@ -158,8 +165,8 @@ class Overall {
                     .text(this.options[this.selectedIndex].label);
                 that.xIndicator = this.options[this.selectedIndex].value;
                 let yLabel = that.dropdownData.filter(d => d[0] === that.yIndicator)[0][1];
-                d3.select('#chartTitle')
-                    .text(`${this.options[this.selectedIndex].label} vs. ${yLabel}`);
+                // d3.select('#chartTitle')
+                //     .text(`${this.options[this.selectedIndex].label} vs. ${yLabel}`);
                 that.updateChart();
             }
         });
@@ -189,8 +196,8 @@ class Overall {
                     .text(this.options[this.selectedIndex].label);
                 that.yIndicator = this.options[this.selectedIndex].value;
                 let xLabel = that.dropdownData.filter(d => d[0] === that.xIndicator)[0][1];
-                d3.select('#chartTitle')
-                    .text(`${xLabel} vs. ${this.options[this.selectedIndex].label}`);
+                // d3.select('#chartTitle')
+                //     .text(`${xLabel} vs. ${this.options[this.selectedIndex].label}`);
                 that.updateChart();
             }
         });
@@ -425,7 +432,7 @@ class Overall {
         this.yScale = d3
             .scaleLinear()
             .domain([Math.max(...yValueList), 0])
-            .range([210, 630])
+            .range([160, 580])
             .nice();
 
         this.yAxis = d3.axisLeft();
@@ -536,33 +543,47 @@ class Overall {
         if(this.compareEnable) {
             //Check if comparing players for multiple years
             if(yearIndex.length > 1) {
+                //TODO: player two indices are incorrect. need to fix. player1Years & player2Years will
+                // likely be out of bounds when fixed
+                console.log("yearIndex: " + yearIndex);
                 let years = [];
-                let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
-                let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1]);
+                let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1] + 1);
+                let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1] + 1);
                 years = player1Years.concat(player2Years).map(d => d.year);
                 let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
                 years = removeDups(years);
                 let position = [this.player1.years[0].position, this.player2.years[0].position];
                 this.selectedYear = years;
+                //TODO: find out why this is not working properly
+                console.log(this.selectedYear);
+                d3.select('#chartSubheader')
+                    .text(`${d3.min(this.selectedYear)} - ${d3.max(this.selectedYear)}`);
                 this.parseDataForYears(this.selectedYear, position)
             }
+            //Multiple players, single year
             else {
                 let yearObj = this.player1.years[yearIndex[0]];
                 let year = yearObj.year;
                 this.selectedYear = yearIndex[0];
                 let position = yearObj.position;
+                d3.select('#chartSubheader')
+                    .text(year);
                 this.parseDataForYear(year, position);
             }
         }
         //For multiples years selected for single player
         else if(yearIndex[0].length > 1) {
             let years = [];
-            let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
+            let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1] + 1);
             years = player1Years.map(d => d.year);
             let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
             years = removeDups(years);
             let position = [this.player1.years[0].position];
             this.selectedYear = years;
+            let yearLabel = (this.selectedYear.length > 1) ? `${d3.min(this.selectedYear)} - ${d3.max(this.selectedYear)}` : `${this.selectedYear}`;
+            console.log(this.selectedYear);
+            d3.select('#chartSubheader')
+                .text(yearLabel);
             this.parseDataForYears(this.selectedYear, position)
         }
         //Single year selected for single player
@@ -571,6 +592,8 @@ class Overall {
             let year = yearObj.year;
             this.selectedYear = yearIndex;
             let position = yearObj.position;
+            d3.select('#chartSubheader')
+                .text(`${year}`);
             this.parseDataForYear(year, position);
         }
 

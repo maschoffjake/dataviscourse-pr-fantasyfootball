@@ -1,3 +1,10 @@
+#overallView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /*justify-content: space-evenly;*/
+}
+
 circle {
     stroke-width: 1px;
     stroke: #000000;
@@ -56,6 +63,11 @@ circle.selected {
     font-size: 12px;
     padding: 3px 6px 3px 6px;
     border-radius: 5px;
+}
+
+#chartSubheader {
+    font-size: 24px;
+    fill: slategrey;
 }
 
 .faded {
