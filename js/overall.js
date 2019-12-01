@@ -641,6 +641,9 @@ class Overall {
     toggleExtremes() {
         //TODO: Need to make sure yearSelector cannot be toggled when extremes are being shown
         if(this.showExtremes) {
+            d3.select('#extremesButton')
+                .classed('toggleExtremes', false);
+
             let circles = d3.select('#overallView')
                 .selectAll('circle');
             circles
@@ -660,6 +663,9 @@ class Overall {
                 .style("opacity", 0);
         }
         else {
+            d3.select('#extremesButton')
+                .classed('toggleExtremes', true);
+
             let circles = d3.select('#overallView')
                 .selectAll('circle');
             let selected = d3.select('#overallView')
