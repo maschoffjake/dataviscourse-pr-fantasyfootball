@@ -83,15 +83,21 @@ circle.selected {
 div.extremeToolTip {
     position: absolute;
     text-align: center;
-    width: 200px;
+    width: 300px;
     height: 80px;
     padding: 2px;
     font: 20px sans-serif;
-    background: lightgray;
+    background: black;
     border: 1px;
     border-radius: 8px;
     border-color: #00a7d1;
     pointer-events: none;
-    color: black;
+}
+
+#playerXToolTipLine1 ,
+#playerYToolTipLine1 {
+    font-size: 16px;
+    color: lightgrey;
+    padding: 3px;
 }
 

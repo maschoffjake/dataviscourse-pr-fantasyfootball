@@ -65,28 +65,28 @@ class Overall {
             .classed('extremeToolTip', true)
             .style("opacity", 0);
         this.playerXToolTip
-            .append("h6")
+            .append("p")
             .attr("id", "playerXToolTipLine1");
-        this.playerXToolTip
-            .append("h6")
-            .attr("id", "playerXToolTipLine2");
-        this.playerXToolTip
-            .append("h6")
-            .attr("id", "playerXToolTipLine3");
+        // this.playerXToolTip
+        //     .append("h6")
+        //     .attr("id", "playerXToolTipLine2");
+        // this.playerXToolTip
+        //     .append("h6")
+        //     .attr("id", "playerXToolTipLine3");
 
         this.playerYToolTip = overallDiv
             .append('div')
             .classed('extremeToolTip', true)
             .style("opacity", 0);
         this.playerYToolTip
-            .append("h6")
+            .append("p")
             .attr("id", "playerYToolTipLine1");
-        this.playerYToolTip
-            .append("h6")
-            .attr("id", "playerYToolTipLine2");
-        this.playerYToolTip
-            .append("h6")
-            .attr("id", "playerYToolTipLine3");
+        // this.playerYToolTip
+        //     .append("h6")
+        //     .attr("id", "playerYToolTipLine2");
+        // this.playerYToolTip
+        //     .append("h6")
+        //     .attr("id", "playerYToolTipLine3");
 
         //Create an svg for the chart and add a header
         overallDiv
@@ -690,15 +690,71 @@ class Overall {
                 .transition()
                 .duration(500)
                 .style("opacity", .8)
-                .style("left", `${1200 + maxPlayers[0].cx.baseVal.value}` + "px")
+                .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
                 .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+            let playerXData = maxPlayers[0].__data__;
+
+            let playerXCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
+            let playerXValForCategory = this.xIndicator;
+            if(this.xIndicator.includes('PASS')) {
+                playerXValForCategory = this.xIndicator.replace('PASS', '');
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year.passing[playerXValForCategory] : playerXData.passing[playerXValForCategory];
+            }
+            else if(this.xIndicator.includes('RUSH')) {
+                playerXValForCategory = this.xIndicator.replace('RUSH', '');
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year.rushing[playerXValForCategory] : playerXData.rushing[playerXValForCategory];
+            }
+            else if(this.xIndicator.includes('REC')) {
+                playerXValForCategory = this.xIndicator.replace('REC', '');
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year.receiving[playerXValForCategory] : playerXData.receiving[playerXValForCategory];
+            }
+            else {
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year[playerXValForCategory] : playerXData[playerXValForCategory];
+            }
+
+            //TODO: maybe make dictionary to display actual team name instead of abbrev.
+            // Need to check if this is for multiple years or not as well
+            d3.select('#playerXToolTipLine1')
+                .text(`${playerXData.name.toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${playerXData.year.team}.`);
 
             this.playerYToolTip
                 .transition()
                 .duration(500)
                 .style("opacity", .8)
-                .style("left", `${1200 + maxPlayers[1].cx.baseVal.value}` + "px")
+                .style("left", `${1100 + maxPlayers[1].cx.baseVal.value}` + "px")
                 .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
+            let playerYData = maxPlayers[1].__data__;
+
+            let playerYCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
+            let playerYValForCategory = this.yIndicator;
+            if(this.yIndicator.includes('PASS')) {
+                playerYValForCategory = this.yIndicator.replace('PASS', '');
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year.passing[playerYValForCategory] : playerXData.passing[playerYValForCategory];
+            }
+            else if(this.yIndicator.includes('RUSH')) {
+                playerYValForCategory = this.yIndicator.replace('RUSH', '');
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year.rushing[playerYValForCategory] : playerXData.rushing[playerYValForCategory];
+            }
+            else if(this.yIndicator.includes('REC')) {
+                playerYValForCategory = this.yIndicator.replace('REC', '');
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year.receiving[playerYValForCategory] : playerXData.receiving[playerYValForCategory];
+            }
+            else {
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year[playerYValForCategory] : playerXData[playerYValForCategory];
+            }
+
+            //TODO: maybe make dictionary to display actual team name instead of abbrev.
+            // Need to check if this is for multiple years or not as well
+            d3.select('#playerYToolTipLine1')
+                .text(`${playerYData.name.toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${playerYData.year.team}.`);
         }
         this.showExtremes = !this.showExtremes;
     }
