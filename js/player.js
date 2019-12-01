@@ -159,13 +159,13 @@ class Player {
     let lineGraphOffsetY = 150;
     let lineGraphYBuffer = 0;
     this.updateLineGraphs('Points', lineGraphOffsetX, lineGraphOffsetY,
-      ['fantasyPoints', 'ppg', 'ppr', 'pprpg', 'positionRank']);
+      ['fantasyPoints', 'ppr', 'ppg', 'pprpg', 'positionRank']);
     this.updateLineGraphs('Passing', lineGraphOffsetX, lineGraphOffsetY + this.lineGraphHeight + lineGraphYBuffer,
-      ['attempts', 'completions', 'interceptions', 'passingYards', 'touchdownPasses']);
+      ['touchdownPasses', 'interceptions', 'passingYards', 'completions', 'attempts']);
     this.updateLineGraphs('Rushing', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 2) + lineGraphYBuffer,
-      ['attempts', 'rushingYards', 'yardsPerAttempt', 'rushingTouchdowns']);
+      ['rushingTouchdowns', 'rushingYards', 'attempts', 'yardsPerAttempt']);
     this.updateLineGraphs('Receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer,
-      ['target', 'receptions', 'receivingYards', 'yardsPerReception', 'receivingTouchdowns']);
+      ['receivingTouchdowns', 'receivingYards', 'receptions', 'target', 'yardsPerReception']);
   }
 
   /**
@@ -1026,6 +1026,10 @@ class Player {
           .classed('hoverHighlight', false);
       });
 
+    lines
+      .append('title')
+      .text(d => d.title);
+
     let circleGroup = lineGraph.select(`#${id}Circles`);
 
     let circles = circleGroup
@@ -1098,6 +1102,7 @@ class Player {
     attributes.forEach((attribute) => {
       let toAdd = {};
       toAdd.id = attribute;
+      toAdd.title = mappedAttributesMaxData[attribute];
       toAdd.elementID = attribute + playerID;
       toAdd.player = playerID;
       toAdd.index = index;
