@@ -441,7 +441,7 @@ class Player {
         }
 
         // Update the spider chart tool tip for the selected arc
-        that.updateSpiderChartToolTip(d,)
+        that.updateSpiderChartToolTip(id, d);
       });
 
 
@@ -788,12 +788,12 @@ class Player {
       .attr('height', this.spiderChartToolTipHeight)
       .attr('width', this.spiderChartToolTipWidth);
 
-    rects
-      .append('h3')
+    toolTip
+      .append('text')
       .attr('class', 'titleHeader');
 
-    rects
-      .append('p')
+    toolTip
+      .append('text')
       .attr('class', 'textData');
   }
 
@@ -801,16 +801,22 @@ class Player {
   /**
    * Used to update the tooltips next to the spider charts
    * @param {String} id ID of the spiderChartToolTip to update (ie: 'Passing', 'Rushing' etc)
+   * @param {String} d The attribute from that ID that was selected
    */
-  updateSpiderChartToolTip(id) {
+  updateSpiderChartToolTip(id, d) {
 
     // Select the data chart that we are changing
     const spiderChartToolTipGroup = d3.select(`#spiderChartToolTip${id}`);
+    console.log(spiderChartToolTipGroup);
 
+    console.log('Changing', id);
     // Change the text of the header to what arc is selected
-    spiderChartToolTipGroup
-      .select('h3')
-      .text(id);
+    const header = spiderChartToolTipGroup
+      .select('.titleHeader');
+
+    console.log(header);
+    header
+      .text(d);
 
     // See if we are comparing 2 players so we can display data for both players
     if (this.compareEnable) {
