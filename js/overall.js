@@ -60,6 +60,34 @@ class Overall {
             .append("h6")
             .attr("id", "toolTipLine3");
 
+        this.playerXToolTip = overallDiv
+            .append('div')
+            .classed('extremeToolTip', true)
+            .style("opacity", 0);
+        this.playerXToolTip
+            .append("h6")
+            .attr("id", "playerXToolTipLine1");
+        this.playerXToolTip
+            .append("h6")
+            .attr("id", "playerXToolTipLine2");
+        this.playerXToolTip
+            .append("h6")
+            .attr("id", "playerXToolTipLine3");
+
+        this.playerYToolTip = overallDiv
+            .append('div')
+            .classed('extremeToolTip', true)
+            .style("opacity", 0);
+        this.playerYToolTip
+            .append("h6")
+            .attr("id", "playerYToolTipLine1");
+        this.playerYToolTip
+            .append("h6")
+            .attr("id", "playerYToolTipLine2");
+        this.playerYToolTip
+            .append("h6")
+            .attr("id", "playerYToolTipLine3");
+
         //Create an svg for the chart and add a header
         overallDiv
             .append('svg')
@@ -647,6 +675,13 @@ class Overall {
             //     .classList = ['extremes'];
             // maxPlayerY
             //     .classList = ['extremes'];
+
+            // this.playerXToolTip
+            //     .transition()
+            //     .duration(500)
+            //     .style("opacity", .8)
+            //     .style("left", (1360 + this.selectedPlayers[0].cx.baseVal.val) + "px")
+            //     .style("top", (160 + 1000 + this.selectedPlayers[0].cy.baseVal.val) + "px");
         }
         this.showExtremes = !this.showExtremes;
     }
