@@ -733,7 +733,7 @@ class Overall {
                 .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
             let playerYData = maxPlayers[1].__data__;
 
-            let playerYCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
+            let playerYCategory = this.dropdownData.filter((d) => d[0] === this.yIndicator)[0][1];
             let playerYValForCategory = this.yIndicator;
             if(this.yIndicator.includes('PASS')) {
                 playerYValForCategory = this.yIndicator.replace('PASS', '');
