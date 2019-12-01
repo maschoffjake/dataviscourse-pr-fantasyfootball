@@ -260,70 +260,72 @@ class Overall {
         let that = this; //If reference to Overall class is needed for click events
         circles
             .on('mouseover', function(d) {
-                that.toolTip
-                    .select('#toolTipLine1')
-                    .text(d.name)
-                    .attr('y', '20px');
-                let line2Label = that.dropdownData.filter((d) => d[0] === that.xIndicator)[0][1];
-                let line2Value = that.xIndicator;
-                if(that.xIndicator.includes('PASS')) {
-                    line2Value = that.xIndicator.replace('PASS', '');
-                    // line2Value = d.year.passing[line2Value];
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year.passing[line2Value] : d.passing[line2Value];
+                if(!that.showExtremes) {
+                    that.toolTip
+                        .select('#toolTipLine1')
+                        .text(d.name)
+                        .attr('y', '20px');
+                    let line2Label = that.dropdownData.filter((d) => d[0] === that.xIndicator)[0][1];
+                    let line2Value = that.xIndicator;
+                    if(that.xIndicator.includes('PASS')) {
+                        line2Value = that.xIndicator.replace('PASS', '');
+                        // line2Value = d.year.passing[line2Value];
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year.passing[line2Value] : d.passing[line2Value];
+                    }
+                    else if(that.xIndicator.includes('RUSH')) {
+                        line2Value = that.xIndicator.replace('RUSH', '');
+                        // line2Value = d.year.rushing[line2Value];
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year.rushing[line2Value] : d.rushing[line2Value];
+                    }
+                    else if(that.xIndicator.includes('REC')) {
+                        line2Value = that.xIndicator.replace('REC', '');
+                        // line2Value = d.year.receiving[line2Value];
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year.receiving[line2Value] : d.receiving[line2Value];
+                    }
+                    else {
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year[line2Value] : d[line2Value];
+                    }
+                    that.toolTip
+                        .select('#toolTipLine2')
+                        .text(`${line2Label}: ${line2Value}`); // will need to parse pass, rush, rec attributes
+                    let line3Label = that.dropdownData.filter((d) => d[0] === that.yIndicator)[0][1];
+                    let line3Value = that.yIndicator;
+                    if(that.yIndicator.includes('PASS')) {
+                        line3Value = that.yIndicator.replace('PASS', '');
+                        // line3Value = d.year.passing[line3Value];
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year.passing[line3Value] : d.passing[line3Value];
+                    }
+                    else if(that.yIndicator.includes('RUSH')) {
+                        line3Value = that.yIndicator.replace('RUSH', '');
+                        // line3Value = d.year.rushing[line3Value];
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year.rushing[line3Value] : d.rushing[line3Value];
+                    }
+                    else if(that.yIndicator.includes('REC')) {
+                        line3Value = that.yIndicator.replace('REC', '');
+                        // line3Value = d.year.receiving[line3Value];
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year.receiving[line3Value] : d.receiving[line3Value];
+                    }
+                    else {
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year[line3Value] : d[line3Value];
+                    }
+                    that.toolTip
+                        .select('#toolTipLine3')
+                        .text(`${line3Label}: ${line3Value}`); // will need to parse pass, rush, rec attributes
+                    that.toolTip
+                        .transition()
+                        .duration(500)
+                        .style("opacity", .8)
+                        .style("left", (d3.event.pageX - 200) + "px")
+                        .style("top", (d3.event.pageY - 75) + "px");
                 }
-                else if(that.xIndicator.includes('RUSH')) {
-                    line2Value = that.xIndicator.replace('RUSH', '');
-                    // line2Value = d.year.rushing[line2Value];
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year.rushing[line2Value] : d.rushing[line2Value];
-                }
-                else if(that.xIndicator.includes('REC')) {
-                    line2Value = that.xIndicator.replace('REC', '');
-                    // line2Value = d.year.receiving[line2Value];
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year.receiving[line2Value] : d.receiving[line2Value];
-                }
-                else {
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year[line2Value] : d[line2Value];
-                }
-                that.toolTip
-                    .select('#toolTipLine2')
-                    .text(`${line2Label}: ${line2Value}`); // will need to parse pass, rush, rec attributes
-                let line3Label = that.dropdownData.filter((d) => d[0] === that.yIndicator)[0][1];
-                let line3Value = that.yIndicator;
-                if(that.yIndicator.includes('PASS')) {
-                    line3Value = that.yIndicator.replace('PASS', '');
-                    // line3Value = d.year.passing[line3Value];
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year.passing[line3Value] : d.passing[line3Value];
-                }
-                else if(that.yIndicator.includes('RUSH')) {
-                    line3Value = that.yIndicator.replace('RUSH', '');
-                    // line3Value = d.year.rushing[line3Value];
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year.rushing[line3Value] : d.rushing[line3Value];
-                }
-                else if(that.yIndicator.includes('REC')) {
-                    line3Value = that.yIndicator.replace('REC', '');
-                    // line3Value = d.year.receiving[line3Value];
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year.receiving[line3Value] : d.receiving[line3Value];
-                }
-                else {
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year[line3Value] : d[line3Value];
-                }
-                that.toolTip
-                    .select('#toolTipLine3')
-                    .text(`${line3Label}: ${line3Value}`); // will need to parse pass, rush, rec attributes
-                that.toolTip
-                    .transition()
-                    .duration(500)
-                    .style("opacity", .8)
-                    .style("left", (d3.event.pageX - 200) + "px")
-                    .style("top", (d3.event.pageY - 75) + "px");
             })
             .on('mouseout', function() {
                 that.toolTip
