@@ -399,7 +399,51 @@ class Player {
          this.dataToRadian[id][d.data] = (d.startAngle + d.endAngle)/2;
         return 'labelArc' + id + d.data;
       })
-      .attr('d', arc);
+      .attr('d', arc)
+      .style('fill', d => {
+        const value = id + d.data
+        console.log(value);
+        return this.colorMap[value];
+      });
+
+    // Add an onclick function to the pie arcs to rotate when they are clicked
+    arcs
+    .on('click', function(d) {
+      // Find the angle to which to rotate the spider chart
+      const rotate = -1 * ((d.startAngle + d.endAngle)/2 / Math.PI * 180);
+      pieArcs
+        .transition()
+        .attr('transform', `translate(100,100) rotate(${rotate})`)
+        .duration(1000);
+
+      text
+        .transition()
+        .attr('transform', `rotate(${rotate})`)
+        .duration(1000);
+
+      chartLines
+        .transition()
+        .attr('transform', `rotate(${rotate})`)
+        .duration(1000);
+
+      spiderPlotGroup
+        .transition()
+        .attr('transform', `rotate(${rotate})`)
+        .duration(1000);
+
+      spiderPlotPathGroup
+        .transition()
+        .attr('transform', `rotate(${rotate})`)
+        .duration(1000);
+
+      // Turn off the already selected pie arc
+      d3.select(`#spiderChart${id}`).select('.selectedArc')
+        .attr('class', 'labelArcs');
+
+      // Turn this arc to the select one
+      d3.select(this)
+        .attr('class', 'selectedArc');
+    });
     
     let that = this;
 
