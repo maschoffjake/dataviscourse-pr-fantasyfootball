@@ -267,12 +267,12 @@ class Player {
           });
 
         if (this.id.includes('Player1')) {
-          // Update selected circle in overall view only for player 1.
-          that.updateSelectedYearOverallView([i]);
           that.selectedYearIndexPlayer1 = i;
         } else {
           that.selectedYearIndexPlayer2 = i;
         }
+        // Update selected circle in overall view only for player 1.
+        that.updateSelectedYearOverallView([i]);
         that.updateSpiderChartDriver();
       });
 
@@ -837,6 +837,9 @@ class Player {
 
     lineGraph.append('g')
       .attr('id', `${id}Lines`);
+
+    lineGraph.append('g')
+      .attr('id', `${id}Circles`);
   }
 
   /**
@@ -869,11 +872,12 @@ class Player {
       .domain([startYear, endYear])
       .range([0, this.lineGraphWidth - 25]);
 
-    let formatedDataPlayer = this.formatDataForLineGraph(this.player1, attributes, id,
+    let formatedData = this.formatDataForLineGraph(this.player1, attributes, id,
       'player1', yearScale, startYear, endYear);
     if (this.compareEnable) {
-      formatedDataPlayer = formatedDataPlayer.concat(this.formatDataForLineGraph(this.player2, attributes, id,
-        'player2', yearScale, startYear, endYear));
+      let player2FormatedData = this.formatDataForLineGraph(this.player2, attributes, id, 'player2', yearScale, startYear, endYear);
+      formatedData.lines = formatedData.lines.concat(player2FormatedData.lines);
+      formatedData.circles = formatedData.circles.concat(player2FormatedData.circles);
     }
 
     let yearAxis = d3.axisBottom()
@@ -904,7 +908,7 @@ class Player {
 
     let lines = lineGroup
       .selectAll('path')
-      .data(formatedDataPlayer);
+      .data(formatedData.lines);
 
     let newLines = lines.enter()
       .append('path')
@@ -924,8 +928,61 @@ class Player {
       .attr('d', (d) => { return lineFunction(d.years); })
       .attr('id', (d) => { return d.elementID; })
       .style('fill', 'none')
-      .style('stroke', 'black')
+      .style('stroke', d => d3.schemeSet2[d.index])
+      .style('stroke-width', '2px')
+      .attr('class', (d) => {
+        let classes = '';
+        if (d.player === 'player2') {
+          classes = `${classes} dashed`;
+        }
+        return classes;
+      })
       .style('opacity', 1);
+
+    lines
+      .on('mouseover', function() {
+        d3.select(this)
+          .classed('hoverHighlight', true);
+      })
+      .on('mouseout', function() {
+        d3.select(this)
+          .classed('hoverHighlight', false);
+      });
+
+    let circleGroup = lineGraph.select(`#${id}Circles`);
+
+    let circles = circleGroup
+      .selectAll('circle')
+      .data(formatedData.circles);
+
+    let newCircles = circles.enter()
+      .append('circle')
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', 0)
+      .style('opacity', 0)
+      .style('fill', d3.schemePaired[0]);
+
+    circles.exit()
+      .transition()
+      .duration(this.transitionTime)
+      .attr('r', 0)
+      .style('opacity', 0)
+      .remove();
+
+    circles = newCircles.merge(circles);
+
+    circles
+      .transition()
+      .duration(this.transitionTime)
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y)
+      .style('opacity', 1)
+      .attr('r', 5);
+
+    circles
+      .append('title')
+      .text(d => d.value);
   }
 
   /**
@@ -958,12 +1015,16 @@ class Player {
       'rushingTouchdowns': 'Touchdowns'
     };
     let toReturn = [];
+    let years = [];
     let id = ID.toLowerCase();
+    let index = 0;
     attributes.forEach((attribute) => {
       let toAdd = {};
       toAdd.id = attribute;
       toAdd.elementID = attribute + playerID;
-
+      toAdd.player = playerID;
+      toAdd.index = index;
+      index += 1;
       let min = 0;
       let max = d3.max(Object.keys(this.maxData), (key) => {
         if (key >= minYear && key <= maxYear) {
@@ -976,12 +1037,6 @@ class Player {
         .domain([min, max])
         .range([this.lineGraphHeight - 50, 0]);
 
-      if (attribute === 'positionRank') {
-        dataScale = d3.scaleLinear()
-          .domain([min, max])
-          .range([0, this.lineGraphHeight - 50]);
-      }
-
       toAdd.years = [];
       player.years.forEach((yearObj) => {
         if (parseInt(yearObj.year) >= minYear && parseInt(yearObj.year) <= maxYear) {
@@ -993,17 +1048,27 @@ class Player {
           if (!value || value < 0) {
             value = 0;
           }
-          value = dataScale(value);
+          if (value > max) {
+            value = max;
+          }
+          if (attribute === 'positionRank') {
+            value = max - value;
+          }
           let toAddObj = {
             'x': yearScale(parseInt(yearObj.year)),
-            'y': value
+            'y': dataScale(value),
+            'value': value
           };
           toAdd.years.push(toAddObj);
+          years.push(toAddObj);
         }
       });
       toReturn.push(toAdd);
     });
-    return toReturn;
+    return {
+      'lines': toReturn,
+      'circles': years
+    };
   }
 
   /**

@@ -64,6 +64,10 @@
     font-size: 24px;
 }
 
+.hoverHighlight {
+    stroke-width: 4px !important;
+}
+
 .labelArcs:hover {
     fill: grey;
 }
@@ -82,4 +86,8 @@
     fill: none;
     stroke: black;
     stroke-width: .5px;
+}
+
+.dashed {
+    stroke-dasharray: 5;
 }
