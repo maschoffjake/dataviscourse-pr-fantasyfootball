@@ -718,8 +718,9 @@ class Overall {
 
             //TODO: maybe make dictionary to display actual team name instead of abbrev.
             // Need to check if this is for multiple years or not as well
+            let teamX = (Object.keys(playerXData).includes('year')) ? playerXData.year.team : playerXData.team;
             d3.select('#playerXToolTipLine1')
-                .text(`${playerXData.name.toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${playerXData.year.team}.`);
+                .text(`${playerXData.name.toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${teamX}.`);
 
             this.playerYToolTip
                 .transition()
@@ -753,8 +754,9 @@ class Overall {
 
             //TODO: maybe make dictionary to display actual team name instead of abbrev.
             // Need to check if this is for multiple years or not as well
+            let teamY = (Object.keys(playerYData).includes('year')) ? playerYData.year.team : playerYData.team;
             d3.select('#playerYToolTipLine1')
-                .text(`${playerYData.name.toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${playerYData.year.team}.`);
+                .text(`${playerYData.name.toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${teamY}.`);
         }
         this.showExtremes = !this.showExtremes;
     }
