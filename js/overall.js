@@ -263,7 +263,7 @@ class Overall {
                 if(!that.showExtremes) {
                     that.toolTip
                         .select('#toolTipLine1')
-                        .text(d.name)
+                        .text(d.name.split('_')[0])
                         .attr('y', '20px');
                     let line2Label = that.dropdownData.filter((d) => d[0] === that.xIndicator)[0][1];
                     let line2Value = that.xIndicator;
@@ -723,7 +723,7 @@ class Overall {
             // Need to check if this is for multiple years or not as well
             let teamX = (Object.keys(playerXData).includes('year')) ? playerXData.year.team : playerXData.team;
             d3.select('#playerXToolTipLine1')
-                .text(`${playerXData.name.toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${teamX}.`);
+                .text(`${playerXData.name.split('_')[0].toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${teamX}.`);
 
             let playerYCategory = this.dropdownData.filter((d) => d[0] === this.yIndicator)[0][1];
             let playerYValForCategory = this.yIndicator;
@@ -751,7 +751,7 @@ class Overall {
             // Need to check if this is for multiple years or not as well
             let teamY = (Object.keys(playerYData).includes('year')) ? playerYData.year.team : playerYData.team;
             d3.select('#playerYToolTipLine1')
-                .text(`${playerYData.name.toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${teamY}.`);
+                .text(`${playerYData.name.split('_')[0].toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${teamY}.`);
 
             if (maxPlayers[0] !== maxPlayers[1]) {
                 this.playerXToolTip
