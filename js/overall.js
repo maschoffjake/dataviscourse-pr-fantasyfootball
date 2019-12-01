@@ -647,6 +647,14 @@ class Overall {
             this.selectedPlayers.forEach(function(player) {
                 player.classList = ['selected'];
             });
+            this.playerXToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", 0);
+            this.playerYToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", 0);
         }
         else {
             let circles = d3.select('#overallView')
@@ -676,12 +684,19 @@ class Overall {
             // maxPlayerY
             //     .classList = ['extremes'];
 
-            // this.playerXToolTip
-            //     .transition()
-            //     .duration(500)
-            //     .style("opacity", .8)
-            //     .style("left", (1360 + this.selectedPlayers[0].cx.baseVal.val) + "px")
-            //     .style("top", (160 + 1000 + this.selectedPlayers[0].cy.baseVal.val) + "px");
+            this.playerXToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", .8)
+                .style("left", `${1200 + maxPlayers[0].cx.baseVal.value}` + "px")
+                .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+
+            this.playerYToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", .8)
+                .style("left", `${1200 + maxPlayers[1].cx.baseVal.value}` + "px")
+                .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
         }
         this.showExtremes = !this.showExtremes;
     }
@@ -717,24 +732,6 @@ class Overall {
                 }
             });
         }
-        if(that.xIndicator.includes('PASS')) {
-            circleObjs.forEach(function(player) {
-                let keyX = that.xIndicator.replace('PASS', '');
-                let keys = Object.keys(player.__data__);
-                if (keys.includes('year')) {
-                    if(parseInt(player.__data__.year.passing[keyX]) >= maxX) {
-                        maxX = parseInt(player.__data__.year.passing[keyX]);
-                        maxPlayerX = player;
-                    }
-                }
-                else {
-                    if(parseInt(player.__data__.passing[keyX]) >= maxX) {
-                        maxX = parseInt(player.__data__.passing[keyX]);
-                        maxPlayerX = player;
-                    }
-                }
-            });
-        }
         else if (that.yIndicator.includes('RUSH')) {
             circleObjs.forEach(function(player) {
                 let keyY = that.yIndicator.replace('RUSH', '');
@@ -753,25 +750,7 @@ class Overall {
                 }
             });
         }
-        if (that.xIndicator.includes('RUSH')) {
-            circleObjs.forEach(function(player) {
-                let keyX = that.xIndicator.replace('RUSH', '');
-                let keys = Object.keys(player.__data__);
-                if (keys.includes('year')) {
-                    if(parseInt(player.__data__.year.rushing[keyX]) >= maxX) {
-                        maxX = parseInt(player.__data__.year.rushing[keyX]);
-                        maxPlayerX = player;
-                    }
-                }
-                else {
-                    if(parseInt(player.__data__.rushing[keyX]) >= maxX) {
-                        maxX = parseInt(player.__data__.rushing[keyX]);
-                        maxPlayerX = player;
-                    }
-                }
-            });
-        }
-        if (that.yIndicator.includes('REC')) {
+       else if (that.yIndicator.includes('REC')) {
             circleObjs.forEach(function(player) {
                 let keyY = that.yIndicator.replace('REC', '');
                 let keys = Object.keys(player.__data__);
@@ -789,7 +768,60 @@ class Overall {
                 }
             });
         }
-        if (that.xIndicator.includes('REC')) {
+        else {
+            circleObjs.forEach(function(player) {
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if (parseInt(player.__data__.year[that.yIndicator]) >= maxY) {
+                        maxY = parseInt(player.__data__.year[that.yIndicator]);
+                        maxPlayerY = player;
+                    }
+                }
+                else {
+                    if (parseInt(player.__data__[that.yIndicator]) >= maxY) {
+                        maxY = parseInt(player.__data__[that.yIndicator]);
+                        maxPlayerY = player;
+                    }
+                }
+            });
+        }
+        if(that.xIndicator.includes('PASS')) {
+            circleObjs.forEach(function(player) {
+                let keyX = that.xIndicator.replace('PASS', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.passing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.year.passing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.passing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.passing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+            });
+        }
+        else if (that.xIndicator.includes('RUSH')) {
+            circleObjs.forEach(function(player) {
+                let keyX = that.xIndicator.replace('RUSH', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.rushing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.year.rushing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.rushing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.rushing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+            });
+        }
+        else if (that.xIndicator.includes('REC')) {
             circleObjs.forEach(function(player) {
                 let keyX = that.xIndicator.replace('REC', '');
                 let keys = Object.keys(player.__data__);
@@ -815,19 +847,11 @@ class Overall {
                         maxX = parseInt(player.__data__.year[that.xIndicator]);
                         maxPlayerX = player;
                     }
-                    if(parseInt(player.__data__.year[that.yIndicator]) >= maxY) {
-                        maxY = parseInt(player.__data__.year[that.yIndicator]);
-                        maxPlayerY = player;
-                    }
                 }
                 else {
                     if(parseInt(player.__data__[that.xIndicator]) >= maxX) {
                         maxX = parseInt(player.__data__[that.xIndicator]);
                         maxPlayerX = player;
-                    }
-                    if(parseInt(player.__data__[that.yIndicator]) >= maxY) {
-                        maxY = parseInt(player.__data__[that.yIndicator]);
-                        maxPlayerY = player;
                     }
                 }
             });
