@@ -68,6 +68,10 @@
     font-size: 24px;
 }
 
+.hoverHighlight {
+    stroke-width: 4px !important;
+}
+
 .labelArcs:hover {
     fill: grey;
 }
@@ -80,4 +84,8 @@
 .spiderChartDataPointsPlayer2 {
     fill: blue;
     stroke: blue;
+}
+
+.dashed {
+    stroke-dasharray: 5;
 }
