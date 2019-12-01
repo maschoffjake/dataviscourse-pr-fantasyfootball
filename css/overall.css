@@ -64,6 +64,13 @@ circle.selected {
     font-size: 12px;
     padding: 3px 6px 3px 6px;
     border-radius: 5px;
+    color: white;
+    background-color: #b3e2cd;
+    outline: none;
+}
+
+.toggleExtremes {
+    background-color : #04acc9 !important;
 }
 
 #chartSubheader {

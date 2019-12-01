@@ -15,6 +15,7 @@ class Main {
         function updateSelectedPlayer(player1) {
             that.player1 = player1;
             that.updateView();
+            overallView.updateSelectedYear([0]);
         }
 
         this.player1 = this.data[0];

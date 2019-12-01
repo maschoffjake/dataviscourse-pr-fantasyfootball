@@ -58,6 +58,28 @@ class Player {
     this.spiderChartToolTipBuffer = 50;
     this.spiderChartToolTipHeight = 200;
     this.spiderChartToolTipWidth = 200;
+
+    this.colorMap = {
+      'PointsFantasy Points': d3.schemeSet2[0],
+      'PointsPPR Points': d3.schemeSet2[1],
+      'PointsPPG': d3.schemeSet2[2],
+      'PointsPPRPG': d3.schemeSet2[3],
+      'PointsPosition Rank': d3.schemeSet2[4],
+      'PassingTouchdowns': d3.schemeSet2[0],
+      'PassingInterceptions': d3.schemeSet2[1],
+      'PassingPassing Yards': d3.schemeSet2[2],
+      'PassingCompletions': d3.schemeSet2[3],
+      'PassingAttempts': d3.schemeSet2[4],
+      'RushingTouchdowns': d3.schemeSet2[0],
+      'RushingRushing Yards': d3.schemeSet2[1],
+      'RushingAttempts': d3.schemeSet2[2],
+      'RushingYards Per Attempt': d3.schemeSet2[3],
+      'ReceivingTouchdowns': d3.schemeSet2[0],
+      'ReceivingReceiving Yards': d3.schemeSet2[1],
+      'ReceivingReceptions': d3.schemeSet2[2],
+      'ReceivingTargets': d3.schemeSet2[3],
+      'ReceivingYards Per Reception': d3.schemeSet2[4]
+    }
   }
 
   /**
