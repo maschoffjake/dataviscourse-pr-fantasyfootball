@@ -52,11 +52,12 @@ class Player {
     };
     this.spiderChartPlotCirclesRadiuses = 3;
     this.maxData = maxData;
-
     this.lineGraphWidth = 750;
     this.lineGraphHeight = 300;
-
     this.spiderChartDialogWidth = 300;
+    this.spiderChartToolTipBuffer = 50;
+    this.spiderChartToolTipHeight = 200;
+    this.spiderChartToolTipWidth = 200;
   }
 
   /**
@@ -84,10 +85,10 @@ class Player {
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
 
     // Create the tooltips associated with the spider charts
-    this.createSpiderChartToolTip('Points', spiderChartX, spiderChartY);
-    this.createSpiderChartToolTip('Passing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
-    this.createSpiderChartToolTip('Rushing', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
-    this.createSpiderChartToolTip('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
+    this.createSpiderChartToolTip('Points', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY);
+    this.createSpiderChartToolTip('Passing', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
+    this.createSpiderChartToolTip('Rushing', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
+    this.createSpiderChartToolTip('Receiving', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
@@ -377,45 +378,6 @@ class Player {
         return 'labelArc' + id + d.data;
       })
       .attr('d', arc);
-
-    // Add an onclick function to the pie arcs to rotate when they are clicked
-    arcs
-      .on('click', function(d) {
-        // Find the angle to which to rotate the spider chart
-        const rotate = -1 * ((d.startAngle + d.endAngle)/2 / Math.PI * 180);
-        pieArcs
-          .transition()
-          .attr('transform', `translate(100,100) rotate(${rotate})`)
-          .duration(1000);
-
-        text
-          .transition()
-          .attr('transform', `rotate(${rotate})`)
-          .duration(1000);
-
-        chartLines
-          .transition()
-          .attr('transform', `rotate(${rotate})`)
-          .duration(1000);
-
-        spiderPlotGroup
-          .transition()
-          .attr('transform', `rotate(${rotate})`)
-          .duration(1000);
-
-        spiderPlotPathGroup
-          .transition()
-          .attr('transform', `rotate(${rotate})`)
-          .duration(1000);
-
-        // Turn off the already selected pie arc
-        d3.select(`#spiderChart${id}`).select('.selectedArc')
-          .attr('class', 'labelArcs');
-
-        // Turn this arc to the select one
-        d3.select(this)
-          .attr('class', 'selectedArc');
-      });
     
     let that = this;
 
@@ -466,7 +428,6 @@ class Player {
         d3.select(`#spiderChart${id}`).select('.selectedArc')
           .attr('class', 'labelArcs');
 
-
         // Turn this arc to the select one
         const group = d3.select(`#spiderChart${id}`);
         const arcGroup = group.select(`#arcs${id}`);
@@ -478,6 +439,9 @@ class Player {
             break;
           }
         }
+
+        // Update the spider chart tool tip for the selected arc
+        that.updateSpiderChartToolTip(d,)
       });
 
 
@@ -810,17 +774,51 @@ class Player {
         .append('g')
         .attr('id', `spiderChartToolTip${id}`)
         .attr('transform', `translate(${x}, ${y})`);
+
+    const rects = toolTip
+      .append('rect')
+      .attr('height', 0)
+      .attr('width', 0)
+      .attr('rx', 15)
+      .attr('class', 'spiderChartToolTipRect');
+      
+    rects
+      .transition()
+      .duration(this.transitionTime)
+      .attr('height', this.spiderChartToolTipHeight)
+      .attr('width', this.spiderChartToolTipWidth);
+
+    rects
+      .append('h3')
+      .attr('class', 'titleHeader');
+
+    rects
+      .append('p')
+      .attr('class', 'textData');
   }
+
 
   /**
    * Used to update the tooltips next to the spider charts
    * @param {String} id ID of the spiderChartToolTip to update (ie: 'Passing', 'Rushing' etc)
-   * @param {String} player Used to indicate which player we are updating (ie: 'Player1' or 'Player2')
-   * @param {PlayerObject} playerData The player obejct data
-   * @param {Number} selectedYearIndex The current year that we are analyzing
    */
-  updateSpiderChartToolTip(id, player, playerData, selectedYearIndex) {
+  updateSpiderChartToolTip(id) {
 
+    // Select the data chart that we are changing
+    const spiderChartToolTipGroup = d3.select(`#spiderChartToolTip${id}`);
+
+    // Change the text of the header to what arc is selected
+    spiderChartToolTipGroup
+      .select('h3')
+      .text(id);
+
+    // See if we are comparing 2 players so we can display data for both players
+    if (this.compareEnable) {
+
+    }
+    else {
+
+    }
   }
 
   createLineGraphs(id, label, x, y) {

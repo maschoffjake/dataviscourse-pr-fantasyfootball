@@ -77,3 +77,9 @@
     fill: blue;
     stroke: blue;
 }
+
+.spiderChartToolTipRect {
+    fill: none;
+    stroke: black;
+    stroke-width: .5px;
+}
