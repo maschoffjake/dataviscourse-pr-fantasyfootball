@@ -341,9 +341,14 @@ class Overall {
             })
             .classed('selected', function(d) {
                 if((that.player1 != null) && (d.name === that.player1.name)) {
+                    d3.select(this).raise();
                     return true;
                 }
-                return (that.player2 != null) && (d.name === that.player2.name);
+                if((that.player2 != null) && (d.name === that.player2.name)) {
+                    d3.select(this).raise();
+                    return true;
+                }
+                // return (that.player2 != null) && (d.name === that.player2.name);
             })
             .transition()
             .duration(1500)
@@ -565,6 +570,7 @@ class Overall {
         // original player objects from parsed csv
         this.player1 = player1;
         this.player2 = player2;
+        this.updateChart();
     }
 
     updateSelectedYear(yearIndex) {
@@ -655,11 +661,11 @@ class Overall {
             });
             this.playerXToolTip
                 .transition()
-                .duration(500)
+                .duration(200)
                 .style("opacity", 0);
             this.playerYToolTip
                 .transition()
-                .duration(500)
+                .duration(200)
                 .style("opacity", 0);
         }
         else {
@@ -688,14 +694,8 @@ class Overall {
             maxPlayers.forEach(function(player) {
                 player.classList = ['extremes'];
             });
-
-            this.playerXToolTip
-                .transition()
-                .duration(500)
-                .style("opacity", .8)
-                .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
-                .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
             let playerXData = maxPlayers[0].__data__;
+            let playerYData = maxPlayers[1].__data__;
 
             let playerXCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
             let playerXValForCategory = this.xIndicator;
@@ -725,14 +725,6 @@ class Overall {
             d3.select('#playerXToolTipLine1')
                 .text(`${playerXData.name.toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${teamX}.`);
 
-            this.playerYToolTip
-                .transition()
-                .duration(500)
-                .style("opacity", .8)
-                .style("left", `${1100 + maxPlayers[1].cx.baseVal.value}` + "px")
-                .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
-            let playerYData = maxPlayers[1].__data__;
-
             let playerYCategory = this.dropdownData.filter((d) => d[0] === this.yIndicator)[0][1];
             let playerYValForCategory = this.yIndicator;
             if(this.yIndicator.includes('PASS')) {
@@ -760,6 +752,30 @@ class Overall {
             let teamY = (Object.keys(playerYData).includes('year')) ? playerYData.year.team : playerYData.team;
             d3.select('#playerYToolTipLine1')
                 .text(`${playerYData.name.toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${teamY}.`);
+
+            if (maxPlayers[0] !== maxPlayers[1]) {
+                this.playerXToolTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", .8)
+                    .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
+                    .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+
+                this.playerYToolTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", .8)
+                    .style("left", `${1100 + maxPlayers[1].cx.baseVal.value}` + "px")
+                    .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
+            }
+            else {
+                this.playerXToolTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", .8)
+                    .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
+                    .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+            }
         }
         this.showExtremes = !this.showExtremes;
     }
