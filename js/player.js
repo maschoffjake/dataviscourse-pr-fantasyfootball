@@ -981,6 +981,10 @@ class Player {
       .attr('cy', d => d.y)
       .style('opacity', 1)
       .attr('r', 5);
+
+    circles
+      .append('title')
+      .text(d => d.value);
   }
 
   /**
@@ -1052,10 +1056,10 @@ class Player {
           if (attribute === 'positionRank') {
             value = max - value;
           }
-          value = dataScale(value);
           let toAddObj = {
             'x': yearScale(parseInt(yearObj.year)),
-            'y': value
+            'y': dataScale(value),
+            'value': value
           };
           toAdd.years.push(toAddObj);
           years.push(toAddObj);
