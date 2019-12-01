@@ -1013,10 +1013,15 @@ class Player {
 
     lines
       .on('mouseover', function() {
+        lineGroup.selectAll('path')
+          .style('opacity', 0.3);
         d3.select(this)
-          .classed('hoverHighlight', true);
+          .classed('hoverHighlight', true)
+          .style('opacity', 1);
       })
       .on('mouseout', function() {
+        lineGroup.selectAll('path')
+          .style('opacity', 1);
         d3.select(this)
           .classed('hoverHighlight', false);
       });

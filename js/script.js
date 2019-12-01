@@ -44,6 +44,9 @@ async function loadFile(file) {
             //Data for each year for current player parsed into an object
             let yearList = [];
             for(let row of yearData) {
+                if (row.FantPos === '') {
+                    continue;
+                }
                 let year = row.Year;
                 let obj = {
                     "year": year,
@@ -86,7 +89,9 @@ async function loadFile(file) {
                 "name": player,
                 "years": yearList
             };
-            pastData.push(playerObj);
+            if (yearList.length !== 0) {
+                pastData.push(playerObj);
+            }
         };
 
         // Render the dropdown menu with all the player names
