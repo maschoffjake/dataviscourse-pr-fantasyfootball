@@ -569,7 +569,7 @@ class Overall {
         //update player data and highlighting if needed
         // original player objects from parsed csv
         this.player1 = player1;
-        this.player2 = player2;
+        this.player2 = (!this.compareEnable) ? null : player2;
         this.updateChart();
     }
 
