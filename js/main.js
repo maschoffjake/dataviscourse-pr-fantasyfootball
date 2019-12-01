@@ -3,13 +3,18 @@ class Main {
     constructor(data, maxData) {
         this.data = data;
         let playerView = new Player(updateSelectedYear, maxData);
-        let overallView = new Overall(this.data, this.updateSelectedPlayer);
+        let overallView = new Overall(this.data, updateSelectedPlayer);
 
         this.playerView = playerView;
         this.overallView = overallView;
 
         function updateSelectedYear(yearIndex) {
             overallView.updateSelectedYear(yearIndex);
+        }
+        let that = this;
+        function updateSelectedPlayer(player1) {
+            that.player1 = player1;
+            that.updateView();
         }
 
         this.player1 = this.data[0];
@@ -90,11 +95,6 @@ class Main {
 
     removePlayer2Dropdown() {
         $('#player2DropdownContainer').hide(1000);
-    }
-
-    updateSelectedPlayer(player1) {
-        this.player1 = player1;
-        this.updateView();
     }
 
     setCompareMode() {

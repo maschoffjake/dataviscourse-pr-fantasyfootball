@@ -62,14 +62,14 @@ async function loadFile(file) {
                     "rushing": {
                         "attempts": row.RushAtt,
                         "rushingYards": row.RushYds,
-                        "yardsPerAttempt": row["Y/A"],
+                        "yardsPerAttempt": (row["Y/A"] !== '' || row["Y/A"] > 0) ? row["Y/A"] : '0',
                         "rushingTouchdowns": row.RushTD
                     },
                     "receiving": {
                         "target": row.Tgt,
                         "receptions": row.Rec,
                         "receivingYards": row.RecYds,
-                        "yardsPerReception": row["Y/R"],
+                        "yardsPerReception": (row["Y/R"] !== '' || row["Y/R"] > 0) ? row["Y/R"] : '0',
                         "receivingTouchdowns": row.RecTD
                     },
                     "fantasyPoints": (row.FantPt !== '' || row.Fantpt > 0) ? row.FantPt : '0',

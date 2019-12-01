@@ -5,9 +5,11 @@ class Overall {
         this.overallData = data;
         this.player1 = null;
         this.player2 = null;
+        this.selectedPlayers = [];
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
         this.selectedYear = 0;
         this.compareEnable = false;
+        this.showExtremes = false;
         this.xIndicator = 'fantasyPoints';
         this.yIndicator = 'gamesStarted';
         this.dropdownData = [
@@ -38,6 +40,12 @@ class Overall {
         //Create a group for the overall chart
         let overallDiv = d3.select('#overallView');
 
+        overallDiv
+            .append('button')
+            .text('Extremes')
+            .attr('id', 'extremesButton')
+            .on('click', () => this.toggleExtremes());
+
         this.toolTip = overallDiv
             .append('div')
             .classed('overallToolTip', true)
@@ -52,75 +60,82 @@ class Overall {
             .append("h6")
             .attr("id", "toolTipLine3");
 
+        this.playerXToolTip = overallDiv
+            .append('div')
+            .classed('extremeToolTip', true)
+            .style("opacity", 0);
+        this.playerXToolTip
+            .append("p")
+            .attr("id", "playerXToolTipLine1");
+        // this.playerXToolTip
+        //     .append("h6")
+        //     .attr("id", "playerXToolTipLine2");
+        // this.playerXToolTip
+        //     .append("h6")
+        //     .attr("id", "playerXToolTipLine3");
+
+        this.playerYToolTip = overallDiv
+            .append('div')
+            .classed('extremeToolTip', true)
+            .style("opacity", 0);
+        this.playerYToolTip
+            .append("p")
+            .attr("id", "playerYToolTipLine1");
+        // this.playerYToolTip
+        //     .append("h6")
+        //     .attr("id", "playerYToolTipLine2");
+        // this.playerYToolTip
+        //     .append("h6")
+        //     .attr("id", "playerYToolTipLine3");
+
         //Create an svg for the chart and add a header
         overallDiv
             .append('svg')
             .attr('width', 500)
-            .attr('height', 800)
+            .attr('height', 650)
             .append('g')
             .attr('id', 'overallChartGroup')
             .append('text')
-            .text('Overall Data for Year')
-            .style('font-size', '38px')
+            .text('Overall Player Data')
+            .style('font-size', '32px')
+            .attr('id', 'chartTitle')
             .attr('x', 100)
-            .attr('y', 150);
+            .attr('y', 50);
+        overallDiv
+            .select('svg')
+            .append('text')
+            .text('2016')
+            .attr('id', 'chartSubheader')
+            .attr('x', 225)
+            .attr('y', 100);
 
         //Create the x-axis label to display the data being represented
         let chartGroup = overallDiv.select('g');
         chartGroup
             .append('text')
             .attr('id', 'xAxisLabel')
-            .attr('transform', 'translate(225, 700)')
+            .attr('transform', 'translate(225, 620)')
             .text('Fantasy Points')
             .classed('axisLabel', true);
         //Create the y-axis label to display the data being represented (should always be player name)
         chartGroup
             .append('text')
             .attr('id', 'yAxisLabel')
-            .attr('transform', 'translate(20, 470) rotate(90) scale(-1,-1)')
+            .attr('transform', 'translate(20, 420) rotate(90) scale(-1,-1)')
             .text('Games Started')
             .classed('axisLabel', true);
-
-        //Get fantasy points from parsed data to find the max to be displayed on the x-axis
-        // let ptList = [];
-        // this.overallData.forEach(function(player) {
-        //     ptList.push(player.year.fantasyPoints);
-        // });
 
         //Create the x-axis group and scale
         let xAxisGroup = chartGroup
             .append('g')
             .attr('id', 'xAxis')
-            .attr('transform', 'translate(0,630)');
-
-        // this.xScale = d3
-        //     .scaleLinear()
-        //     .domain([0, Math.max(...ptList)])
-        //     .range([60, 480])
-        //     .nice();
-        //
-        // this.xAxis = d3.axisBottom();
-        // this.xAxis.scale(this.xScale);
-
-        // xAxisGroup.call(this.xAxis);
+            .attr('transform', 'translate(0,580)');
 
         //Create the y-axis group and scale
         let yAxisGroup = chartGroup
             .append('g')
             .attr('id', 'yAxis')
             .attr('transform', 'translate(60,0)');//translate transform to get axis in proper spot
-
-        // this.yScale = d3
-        //     .scaleLinear()
-        //     .domain([Math.max(...ptList), 0])
-        //     .range([210, 630])
-        //     .nice();
-        //
-        // this.yAxis = d3.axisLeft();
-        // this.yAxis.scale(this.yScale);
-        //
-        // yAxisGroup.call(this.yAxis);
-        // this.updateChart();
 
         let dropdownWrapper = overallDiv.append('div')
             .classed('dropdownWrapper', true);
@@ -146,11 +161,6 @@ class Overall {
             .append('select');
 
         this.drawDropDowns();
-
-        overallDiv
-            .append('button')
-            .text('Extremes')
-            .attr('id', 'extremesButton');
     }
 
     drawDropDowns() {
@@ -178,15 +188,15 @@ class Overall {
             .attr('selected', true);
 
         dropX.on('change', function(d, i) {
-            d3.select('#xAxisLabel')
-                .text(this.options[this.selectedIndex].label);
-            that.xIndicator = this.options[this.selectedIndex].value;
-            that.updateChart();
-            // let xValue = this.options[this.selectedIndex].value;
-            // let yValue = dropY.node().value;
-            // let cValue = dropC.node().value;
-            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
-            // that.updateCountry
+            if(!that.showExtremes) {
+                d3.select('#xAxisLabel')
+                    .text(this.options[this.selectedIndex].label);
+                that.xIndicator = this.options[this.selectedIndex].value;
+                let yLabel = that.dropdownData.filter(d => d[0] === that.yIndicator)[0][1];
+                // d3.select('#chartTitle')
+                //     .text(`${this.options[this.selectedIndex].label} vs. ${yLabel}`);
+                that.updateChart();
+            }
         });
 
         let dropY = d3.select('#yDropdown').select('.dropdownContent').select('select');
@@ -209,15 +219,15 @@ class Overall {
             .attr('selected', true);
 
         dropY.on('change', function(d, i) {
-            d3.select('#yAxisLabel')
-                .text(this.options[this.selectedIndex].label);
-            that.yIndicator = this.options[this.selectedIndex].value;
-            that.updateChart();
-            // let xValue = this.options[this.selectedIndex].value;
-            // let yValue = dropY.node().value;
-            // let cValue = dropC.node().value;
-            // that.updatePlot(that.activeYear, xValue, yValue, cValue);
-            // that.updateCountry
+            if(!that.showExtremes) {
+                d3.select('#yAxisLabel')
+                    .text(this.options[this.selectedIndex].label);
+                that.yIndicator = this.options[this.selectedIndex].value;
+                let xLabel = that.dropdownData.filter(d => d[0] === that.xIndicator)[0][1];
+                // d3.select('#chartTitle')
+                //     .text(`${xLabel} vs. ${this.options[this.selectedIndex].label}`);
+                that.updateChart();
+            }
         });
     }
 
@@ -250,70 +260,72 @@ class Overall {
         let that = this; //If reference to Overall class is needed for click events
         circles
             .on('mouseover', function(d) {
-                that.toolTip
-                    .select('#toolTipLine1')
-                    .text(d.name)
-                    .attr('y', '20px');
-                let line2Label = that.dropdownData.filter((d) => d[0] === that.xIndicator)[0][1];
-                let line2Value = that.xIndicator;
-                if(that.xIndicator.includes('PASS')) {
-                    line2Value = that.xIndicator.replace('PASS', '');
-                    // line2Value = d.year.passing[line2Value];
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year.passing[line2Value] : d.passing[line2Value];
+                if(!that.showExtremes) {
+                    that.toolTip
+                        .select('#toolTipLine1')
+                        .text(d.name)
+                        .attr('y', '20px');
+                    let line2Label = that.dropdownData.filter((d) => d[0] === that.xIndicator)[0][1];
+                    let line2Value = that.xIndicator;
+                    if(that.xIndicator.includes('PASS')) {
+                        line2Value = that.xIndicator.replace('PASS', '');
+                        // line2Value = d.year.passing[line2Value];
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year.passing[line2Value] : d.passing[line2Value];
+                    }
+                    else if(that.xIndicator.includes('RUSH')) {
+                        line2Value = that.xIndicator.replace('RUSH', '');
+                        // line2Value = d.year.rushing[line2Value];
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year.rushing[line2Value] : d.rushing[line2Value];
+                    }
+                    else if(that.xIndicator.includes('REC')) {
+                        line2Value = that.xIndicator.replace('REC', '');
+                        // line2Value = d.year.receiving[line2Value];
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year.receiving[line2Value] : d.receiving[line2Value];
+                    }
+                    else {
+                        let keys = Object.keys(d);
+                        line2Value = (keys.includes('year')) ? d.year[line2Value] : d[line2Value];
+                    }
+                    that.toolTip
+                        .select('#toolTipLine2')
+                        .text(`${line2Label}: ${line2Value}`); // will need to parse pass, rush, rec attributes
+                    let line3Label = that.dropdownData.filter((d) => d[0] === that.yIndicator)[0][1];
+                    let line3Value = that.yIndicator;
+                    if(that.yIndicator.includes('PASS')) {
+                        line3Value = that.yIndicator.replace('PASS', '');
+                        // line3Value = d.year.passing[line3Value];
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year.passing[line3Value] : d.passing[line3Value];
+                    }
+                    else if(that.yIndicator.includes('RUSH')) {
+                        line3Value = that.yIndicator.replace('RUSH', '');
+                        // line3Value = d.year.rushing[line3Value];
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year.rushing[line3Value] : d.rushing[line3Value];
+                    }
+                    else if(that.yIndicator.includes('REC')) {
+                        line3Value = that.yIndicator.replace('REC', '');
+                        // line3Value = d.year.receiving[line3Value];
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year.receiving[line3Value] : d.receiving[line3Value];
+                    }
+                    else {
+                        let keys = Object.keys(d);
+                        line3Value = (keys.includes('year')) ? d.year[line3Value] : d[line3Value];
+                    }
+                    that.toolTip
+                        .select('#toolTipLine3')
+                        .text(`${line3Label}: ${line3Value}`); // will need to parse pass, rush, rec attributes
+                    that.toolTip
+                        .transition()
+                        .duration(500)
+                        .style("opacity", .8)
+                        .style("left", (d3.event.pageX - 200) + "px")
+                        .style("top", (d3.event.pageY - 75) + "px");
                 }
-                else if(that.xIndicator.includes('RUSH')) {
-                    line2Value = that.xIndicator.replace('RUSH', '');
-                    // line2Value = d.year.rushing[line2Value];
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year.rushing[line2Value] : d.rushing[line2Value];
-                }
-                else if(that.xIndicator.includes('REC')) {
-                    line2Value = that.xIndicator.replace('REC', '');
-                    // line2Value = d.year.receiving[line2Value];
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year.receiving[line2Value] : d.receiving[line2Value];
-                }
-                else {
-                    let keys = Object.keys(d);
-                    line2Value = (keys.includes('year')) ? d.year[line2Value] : d[line2Value];
-                }
-                that.toolTip
-                    .select('#toolTipLine2')
-                    .text(`${line2Label}: ${line2Value}`); // will need to parse pass, rush, rec attributes
-                let line3Label = that.dropdownData.filter((d) => d[0] === that.yIndicator)[0][1];
-                let line3Value = that.yIndicator;
-                if(that.yIndicator.includes('PASS')) {
-                    line3Value = that.yIndicator.replace('PASS', '');
-                    // line3Value = d.year.passing[line3Value];
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year.passing[line3Value] : d.passing[line3Value];
-                }
-                else if(that.yIndicator.includes('RUSH')) {
-                    line3Value = that.yIndicator.replace('RUSH', '');
-                    // line3Value = d.year.rushing[line3Value];
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year.rushing[line3Value] : d.rushing[line3Value];
-                }
-                else if(that.yIndicator.includes('REC')) {
-                    line3Value = that.yIndicator.replace('REC', '');
-                    // line3Value = d.year.receiving[line3Value];
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year.receiving[line3Value] : d.receiving[line3Value];
-                }
-                else {
-                    let keys = Object.keys(d);
-                    line3Value = (keys.includes('year')) ? d.year[line3Value] : d[line3Value];
-                }
-                that.toolTip
-                    .select('#toolTipLine3')
-                    .text(`${line3Label}: ${line3Value}`); // will need to parse pass, rush, rec attributes
-                that.toolTip
-                    .transition()
-                    .duration(500)
-                    .style("opacity", .8)
-                    .style("left", (d3.event.pageX - 200) + "px")
-                    .style("top", (d3.event.pageY - 75) + "px");
             })
             .on('mouseout', function() {
                 that.toolTip
@@ -322,8 +334,10 @@ class Overall {
                     .style("opacity", 0);
             })
             .on('click', function(d) {
-                let selectedPlayer = that.allData.filter((player) => {return player.name === d.name})[0];
-                that.updateSelectedPlayer(selectedPlayer);
+                if(!that.showExtremes) {
+                    let selectedPlayer = that.allData.filter((player) => {return player.name === d.name})[0];
+                    that.updateSelectedPlayer(selectedPlayer);
+                }
             })
             .classed('selected', function(d) {
                 if((that.player1 != null) && (d.name === that.player1.name)) {
@@ -347,11 +361,9 @@ class Overall {
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
                     let keys = Object.keys(d);
-                    return that.xScale((keys.includes('year')) ? d.year.receiving[key] : d.receiving[key]);
+                    return that.xScale((keys.includes('year')) ? parseFloat(d.year.receiving[key]) : parseFloat(d.receiving[key]));
                 }
                 else {
-                    // return that.xScale(d.years[that.selectedYear][that.xIndicator]);
-                    // return that.xScale(d.year[that.xIndicator]);
                     let keys = Object.keys(d);
                     return that.xScale((keys.includes('year')) ? d.year[that.xIndicator] : d[that.xIndicator]);
                 }
@@ -378,7 +390,7 @@ class Overall {
                     return that.yScale((keys.includes('year')) ? d.year[that.yIndicator] : d[that.yIndicator]);
                 }
             })
-            .attr('r', 3);
+            .attr('r', 5);
     }
 
     updateScales() {
@@ -450,7 +462,7 @@ class Overall {
         this.yScale = d3
             .scaleLinear()
             .domain([Math.max(...yValueList), 0])
-            .range([210, 630])
+            .range([160, 580])
             .nice();
 
         this.yAxis = d3.axisLeft();
@@ -489,11 +501,6 @@ class Overall {
 
     parseDataForYears(years, position) {
         let updateData = [];
-        //receiving years already in proper format
-        // let years = [];
-        // for(let i = 0; i < yearIndices.length; i++) {
-        //     years.push(this.player1.years[i].year);
-        // }
         this.allData.map(function(player) {
             let x = Object.values(player.years);
             let val = x.filter(d => years.includes(d.year) && (d.position === position[0] || d.position === position[1]));
@@ -534,7 +541,7 @@ class Overall {
                     };
                     val.forEach(function(year) {
                         Object.keys(year).forEach(function(key) {
-                            if(key != 'year' && key != 'team' && key != 'position' && key != 'age') {
+                            if(key !== 'year' && key !== 'team' && key !== 'position' && key !== 'age') {
                                 if(key === 'passing' || key === 'rushing' || key === 'receiving') {
                                     Object.keys(year[key]).forEach(function(attr) {
                                         playerObj[key][attr] += parseInt(year[key][attr]);
@@ -561,40 +568,52 @@ class Overall {
     }
 
     updateSelectedYear(yearIndex) {
-        //will receive an index, so access year via this.player1.years
-        //will need to parse the data set for the year and position again
-        // this.selectedYear = year;
         let that = this;
-        console.log(`Update Selected Year: ${yearIndex}`);
+        //Check if comparing players
         if(this.compareEnable) {
+            //Check if comparing players for multiple years
             if(yearIndex.length > 1) {
+                //TODO: player two indices are incorrect. need to fix. player1Years & player2Years will
+                // likely be out of bounds when fixed
+                console.log("yearIndex: " + yearIndex);
                 let years = [];
-                let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
-                let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1]);
+                let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1] + 1);
+                let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1] + 1);
                 years = player1Years.concat(player2Years).map(d => d.year);
                 let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
                 years = removeDups(years);
                 let position = [this.player1.years[0].position, this.player2.years[0].position];
                 this.selectedYear = years;
+                //TODO: find out why this is not working properly
+                console.log(this.selectedYear);
+                d3.select('#chartSubheader')
+                    .text(`${d3.min(this.selectedYear)} - ${d3.max(this.selectedYear)}`);
                 this.parseDataForYears(this.selectedYear, position)
             }
+            //Multiple players, single year
             else {
                 let yearObj = this.player1.years[yearIndex[0]];
                 let year = yearObj.year;
                 this.selectedYear = yearIndex[0];
                 let position = yearObj.position;
+                d3.select('#chartSubheader')
+                    .text(year);
                 this.parseDataForYear(year, position);
             }
         }
         //For multiples years selected for single player
         else if(yearIndex[0].length > 1) {
             let years = [];
-            let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1]);
+            let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1] + 1);
             years = player1Years.map(d => d.year);
             let removeDups = (years) => years.filter((v,i) => years.indexOf(v) === i);
             years = removeDups(years);
             let position = [this.player1.years[0].position];
             this.selectedYear = years;
+            let yearLabel = (this.selectedYear.length > 1) ? `${d3.min(this.selectedYear)} - ${d3.max(this.selectedYear)}` : `${this.selectedYear}`;
+            console.log(this.selectedYear);
+            d3.select('#chartSubheader')
+                .text(yearLabel);
             this.parseDataForYears(this.selectedYear, position)
         }
         //Single year selected for single player
@@ -603,26 +622,298 @@ class Overall {
             let year = yearObj.year;
             this.selectedYear = yearIndex;
             let position = yearObj.position;
+            d3.select('#chartSubheader')
+                .text(`${year}`);
             this.parseDataForYear(year, position);
         }
-        // let yearObj = this.player1.years[yearIndex];
-        // let year = yearObj.year;
-        // this.selectedYear = yearIndex;
-        // let position = yearObj.position;
-        // // this.parseDataForYears([0,1], 'TE');
-        // this.parseDataForYear(year, position);
-        //TODO: call updateChart once refactored to handle multiple years
+
         this.updateChart();
     }
 
     updateView() {
-        //updateChart
-        console.log('updateView');
-        // this.parseDataForYear(this.selectedYear,this.player1.years[])
         this.updateChart();
     }
 
     setCompareMode(compareEnable) {
         this.compareEnable = compareEnable;
+    }
+
+    toggleExtremes() {
+        //TODO: Need to make sure yearSelector cannot be toggled when extremes are being shown
+        if(this.showExtremes) {
+            let circles = d3.select('#overallView')
+                .selectAll('circle');
+            circles
+                .classed('faded', false)
+                .classed('extremes', false);
+
+            this.selectedPlayers.forEach(function(player) {
+                player.classList = ['selected'];
+            });
+            this.playerXToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", 0);
+            this.playerYToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", 0);
+        }
+        else {
+            let circles = d3.select('#overallView')
+                .selectAll('circle');
+            let selected = d3.select('#overallView')
+                .selectAll('.selected');
+
+            let tempSelected = [];
+            selected._groups[0].forEach(function(d) {
+               tempSelected.push(d);
+            });
+            this.selectedPlayers = tempSelected;
+
+            selected
+                .classed('selected', false);
+
+            circles
+                .classed('faded', true);
+
+            //TODO: if the maxPlayerX and maxPlayerY are the same, only display one extreme tooltip.. (like x)
+            let maxPlayers = this.getMaxPlayers();
+            maxPlayers.forEach(function(player) {
+                player.classList = ['extremes'];
+            });
+
+            this.playerXToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", .8)
+                .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
+                .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+            let playerXData = maxPlayers[0].__data__;
+
+            let playerXCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
+            let playerXValForCategory = this.xIndicator;
+            if(this.xIndicator.includes('PASS')) {
+                playerXValForCategory = this.xIndicator.replace('PASS', '');
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year.passing[playerXValForCategory] : playerXData.passing[playerXValForCategory];
+            }
+            else if(this.xIndicator.includes('RUSH')) {
+                playerXValForCategory = this.xIndicator.replace('RUSH', '');
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year.rushing[playerXValForCategory] : playerXData.rushing[playerXValForCategory];
+            }
+            else if(this.xIndicator.includes('REC')) {
+                playerXValForCategory = this.xIndicator.replace('REC', '');
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year.receiving[playerXValForCategory] : playerXData.receiving[playerXValForCategory];
+            }
+            else {
+                let keys = Object.keys(playerXData);
+                playerXValForCategory = (keys.includes('year')) ? playerXData.year[playerXValForCategory] : playerXData[playerXValForCategory];
+            }
+
+            //TODO: maybe make dictionary to display actual team name instead of abbrev.
+            // Need to check if this is for multiple years or not as well
+            let teamX = (Object.keys(playerXData).includes('year')) ? playerXData.year.team : playerXData.team;
+            d3.select('#playerXToolTipLine1')
+                .text(`${playerXData.name.toUpperCase()} had the most ${playerXCategory} out of any player during this season(s) with ${playerXValForCategory} while playing for ${teamX}.`);
+
+            this.playerYToolTip
+                .transition()
+                .duration(500)
+                .style("opacity", .8)
+                .style("left", `${1100 + maxPlayers[1].cx.baseVal.value}` + "px")
+                .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
+            let playerYData = maxPlayers[1].__data__;
+
+            let playerYCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
+            let playerYValForCategory = this.yIndicator;
+            if(this.yIndicator.includes('PASS')) {
+                playerYValForCategory = this.yIndicator.replace('PASS', '');
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year.passing[playerYValForCategory] : playerXData.passing[playerYValForCategory];
+            }
+            else if(this.yIndicator.includes('RUSH')) {
+                playerYValForCategory = this.yIndicator.replace('RUSH', '');
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year.rushing[playerYValForCategory] : playerXData.rushing[playerYValForCategory];
+            }
+            else if(this.yIndicator.includes('REC')) {
+                playerYValForCategory = this.yIndicator.replace('REC', '');
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year.receiving[playerYValForCategory] : playerXData.receiving[playerYValForCategory];
+            }
+            else {
+                let keys = Object.keys(playerXData);
+                playerYValForCategory = (keys.includes('year')) ? playerXData.year[playerYValForCategory] : playerXData[playerYValForCategory];
+            }
+
+            //TODO: maybe make dictionary to display actual team name instead of abbrev.
+            // Need to check if this is for multiple years or not as well
+            let teamY = (Object.keys(playerYData).includes('year')) ? playerYData.year.team : playerYData.team;
+            d3.select('#playerYToolTipLine1')
+                .text(`${playerYData.name.toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${teamY}.`);
+        }
+        this.showExtremes = !this.showExtremes;
+    }
+
+    getMaxPlayers() {
+        let that = this;
+        let circles = d3.select('#overallView')
+            .selectAll('circle');
+
+        let circleObjs = circles._groups[0];
+        //Set up variables to extract minPlayer
+        let maxX = 0,
+            maxY = 0;
+        let maxPlayerX = null,
+            maxPlayerY = null;
+        //Iterate over circles to find the player with the lowest xIndicator and yIndicator values
+        //TODO: need to check xIndicator and yIndicator for PASS, RUSH, REC & not else ifs
+        if (that.yIndicator.includes('PASS')) {
+            circleObjs.forEach(function(player) {
+                let keyY = that.yIndicator.replace('PASS', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.passing[keyY]) >= maxY) {
+                        maxY = parseInt(player.__data__.year.passing[keyY]);
+                        maxPlayerY = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.passing[keyY]) >= maxY) {
+                        maxY = parseInt(player.__data__.passing[keyY]);
+                        maxPlayerY = player;
+                    }
+                }
+            });
+        }
+        else if (that.yIndicator.includes('RUSH')) {
+            circleObjs.forEach(function(player) {
+                let keyY = that.yIndicator.replace('RUSH', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.rushing[keyY]) >= maxY) {
+                        maxY = parseInt(player.__data__.year.rushing[keyY]);
+                        maxPlayerY = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.rushing[keyY]) >= maxY) {
+                        maxY = parseInt(player.__data__.rushing[keyY]);
+                        maxPlayerY = player;
+                    }
+                }
+            });
+        }
+       else if (that.yIndicator.includes('REC')) {
+            circleObjs.forEach(function(player) {
+                let keyY = that.yIndicator.replace('REC', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.receiving[keyY]) >= maxY) {
+                        maxY = parseInt(player.__data__.year.receiving[keyY]);
+                        maxPlayerY = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.receiving[keyY]) >= maxY) {
+                        maxY = parseInt(player.__data__.receiving[keyY]);
+                        maxPlayerY = player;
+                    }
+                }
+            });
+        }
+        else {
+            circleObjs.forEach(function(player) {
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if (parseInt(player.__data__.year[that.yIndicator]) >= maxY) {
+                        maxY = parseInt(player.__data__.year[that.yIndicator]);
+                        maxPlayerY = player;
+                    }
+                }
+                else {
+                    if (parseInt(player.__data__[that.yIndicator]) >= maxY) {
+                        maxY = parseInt(player.__data__[that.yIndicator]);
+                        maxPlayerY = player;
+                    }
+                }
+            });
+        }
+        if(that.xIndicator.includes('PASS')) {
+            circleObjs.forEach(function(player) {
+                let keyX = that.xIndicator.replace('PASS', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.passing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.year.passing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.passing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.passing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+            });
+        }
+        else if (that.xIndicator.includes('RUSH')) {
+            circleObjs.forEach(function(player) {
+                let keyX = that.xIndicator.replace('RUSH', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.rushing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.year.rushing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.rushing[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.rushing[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+            });
+        }
+        else if (that.xIndicator.includes('REC')) {
+            circleObjs.forEach(function(player) {
+                let keyX = that.xIndicator.replace('REC', '');
+                let keys = Object.keys(player.__data__);
+                if (keys.includes('year')) {
+                    if(parseInt(player.__data__.year.receiving[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.year.receiving[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__.receiving[keyX]) >= maxX) {
+                        maxX = parseInt(player.__data__.receiving[keyX]);
+                        maxPlayerX = player;
+                    }
+                }
+            });
+        }
+        else {
+            circleObjs.forEach(function(player) {
+                let keys = Object.keys(player.__data__);
+                if(keys.includes('year')) {
+                    if(parseInt(player.__data__.year[that.xIndicator]) >= maxX) {
+                        maxX = parseInt(player.__data__.year[that.xIndicator]);
+                        maxPlayerX = player;
+                    }
+                }
+                else {
+                    if(parseInt(player.__data__[that.xIndicator]) >= maxX) {
+                        maxX = parseInt(player.__data__[that.xIndicator]);
+                        maxPlayerX = player;
+                    }
+                }
+            });
+        }
+
+        return [maxPlayerX, maxPlayerY];
     }
 }

@@ -1,3 +1,10 @@
+#overallView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /*justify-content: space-evenly;*/
+}
+
 circle {
     stroke-width: 1px;
     stroke: #000000;
@@ -12,6 +19,7 @@ circle {
 div.dropdownWrapper {
     display: inline-block;
     margin-left: 75px;
+    margin-top: 50px;
     width: 320px;
     height: 130px;
     padding: 2px;
@@ -57,3 +65,40 @@ circle.selected {
     padding: 3px 6px 3px 6px;
     border-radius: 5px;
 }
+
+#chartSubheader {
+    font-size: 24px;
+    fill: slategrey;
+}
+
+.faded {
+    fill: lightgrey;
+    stroke: lightgrey;
+}
+
+.extremes {
+    fill: #4900db;
+    stroke: black;
+}
+
+div.extremeToolTip {
+    position: absolute;
+    text-align: center;
+    width: 300px;
+    height: 80px;
+    padding: 2px;
+    font: 20px sans-serif;
+    background: black;
+    border: 1px;
+    border-radius: 8px;
+    border-color: #00a7d1;
+    pointer-events: none;
+}
+
+#playerXToolTipLine1 ,
+#playerYToolTipLine1 {
+    font-size: 16px;
+    color: lightgrey;
+    padding: 3px;
+}
+

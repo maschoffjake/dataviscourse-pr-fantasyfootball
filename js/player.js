@@ -8,18 +8,22 @@ class Player {
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
 
     this.svgWidth = 1300;
-    this.svgHeight = 1300;
+    this.svgHeight = 1350;
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
 
     this.yearRangeIndexPlayer1 = {
       min: 0,
-      max: 10
+      minYear: 0,
+      max: 10,
+      maxYear: 10
     };
     this.yearRangeIndexPlayer2 = {
       min: 0,
-      max: 10
+      minYear: 0,
+      max: 10,
+      maxYear: 10
     };
     this.selectedYearIndexPlayer1 = 0;
     this.selectedYearIndexPlayer2 = 0;
@@ -87,10 +91,10 @@ class Player {
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
-    this.createLineGraphs('points', 'Points', lineGraphOffsetX, lineGraphOffsetY);
-    this.createLineGraphs('passing', 'Passing', lineGraphOffsetX, lineGraphOffsetY);
-    this.createLineGraphs('rushing', 'Rushing', lineGraphOffsetX, lineGraphOffsetY);
-    this.createLineGraphs('receiving', 'Receiving', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('Points', 'Points', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('Passing', 'Passing', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('Rushing', 'Rushing', lineGraphOffsetX, lineGraphOffsetY);
+    this.createLineGraphs('Receiving', 'Receiving', lineGraphOffsetX, lineGraphOffsetY);
   }
 
   /**
@@ -109,18 +113,7 @@ class Player {
     this.updateYearBarAndBrush('Player2', this.player2, xPlayer2, y);
 
     this.updateSpiderChartDriver();
-
-    let lineGraphOffsetX = 550;
-    let lineGraphOffsetY = 150;
-    let lineGraphYBuffer = 0;
-    this.updateLineGraphs('points', lineGraphOffsetX, lineGraphOffsetY,
-      ['fantasyPoints', 'ppg', 'ppr', 'pprpg', 'positionRank']);
-    this.updateLineGraphs('passing', lineGraphOffsetX, lineGraphOffsetY + this.lineGraphHeight + lineGraphYBuffer,
-      ['attempts', 'completions', 'interceptions', 'passingYards', 'touchdownPasses']);
-    this.updateLineGraphs('rushing', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 2) + lineGraphYBuffer,
-      ['target', 'reception', 'receivingYards', 'yardsPerReception', 'receivingTouchdowns']);
-    this.updateLineGraphs('receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer,
-      ['attempts', 'rushingYards', 'yardsPerAttempt', 'rushingTouchdowns']);
+    this.updateLineGraphsDriver();
   }
 
   /**
@@ -136,6 +129,20 @@ class Player {
     this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
     this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
     this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+  }
+
+  updateLineGraphsDriver() {
+    let lineGraphOffsetX = 550;
+    let lineGraphOffsetY = 150;
+    let lineGraphYBuffer = 0;
+    this.updateLineGraphs('Points', lineGraphOffsetX, lineGraphOffsetY,
+      ['fantasyPoints', 'ppg', 'ppr', 'pprpg', 'positionRank']);
+    this.updateLineGraphs('Passing', lineGraphOffsetX, lineGraphOffsetY + this.lineGraphHeight + lineGraphYBuffer,
+      ['attempts', 'completions', 'interceptions', 'passingYards', 'touchdownPasses']);
+    this.updateLineGraphs('Rushing', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 2) + lineGraphYBuffer,
+      ['attempts', 'rushingYards', 'yardsPerAttempt', 'rushingTouchdowns']);
+    this.updateLineGraphs('Receiving', lineGraphOffsetX, lineGraphOffsetY + (this.lineGraphHeight * 3) + lineGraphYBuffer,
+      ['target', 'receptions', 'receivingYards', 'yardsPerReception', 'receivingTouchdowns']);
   }
 
   /**
@@ -851,28 +858,25 @@ class Player {
       .style('opacity', 1)
       .attr('transform', `translate(${x}, ${y})`);
 
-    let startYear = parseInt(this.player1.years[0].year);
-    let endYear = parseInt(this.player1.years[this.player1.years.length - 1].year);
-
-
-    let formatedDataPlayer = this.formatDataForLineGraph(this.player2, attributes, id, 'player1');
+    let startYear = this.yearRangeIndexPlayer1.minYear;
+    let endYear = this.yearRangeIndexPlayer1.maxYear;
 
     if (this.compareEnable) {
-      let player2StartYear = parseInt(this.player2.years[0].year);
-      let player2EndYear = parseInt(this.player2.years[this.player2.years.length - 1].year);
-      if (startYear > player2StartYear) {
-        startYear = player2StartYear;
-      }
-      if (endYear < player2EndYear) {
-        endYear = player2EndYear;
-      }
-      formatedDataPlayer = formatedDataPlayer.concat(this.formatDataForLineGraph(this.player2, attributes, id, 'player2'));
+      startYear = d3.min([startYear, this.yearRangeIndexPlayer2.minYear]);
+      endYear = d3.max([endYear, this.yearRangeIndexPlayer2.maxYear]);
     }
 
     let yearScale = d3
       .scaleLinear()
       .domain([startYear, endYear])
       .range([0, this.lineGraphWidth - 25]);
+
+    let formatedDataPlayer = this.formatDataForLineGraph(this.player1, attributes, id,
+      'player1', yearScale, startYear, endYear);
+    if (this.compareEnable) {
+      formatedDataPlayer = formatedDataPlayer.concat(this.formatDataForLineGraph(this.player2, attributes, id,
+        'player2', yearScale, startYear, endYear));
+    }
 
     let yearAxis = d3.axisBottom()
       .tickFormat(d3.format('d'))
@@ -891,46 +895,113 @@ class Player {
       .duration(this.transitionTime)
       .attr('transform', `translate(0, ${this.lineGraphHeight-50})`);
 
-    
+    //This is the accessor function we talked about above
+    let lineFunction = d3.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; })
+      .curve(d3.curveLinear);
+
+
+    let lineGroup = lineGraph.select(`#${id}Lines`);
+
+    let lines = lineGroup
+      .selectAll('path')
+      .data(formatedDataPlayer);
+
+    let newLines = lines.enter()
+      .append('path')
+      .style('opacity', 0);
+
+    lines.exit()
+      .transition()
+      .duration(this.transitionTime)
+      .style('opacity', 0)
+      .remove();
+
+    lines = newLines.merge(lines);
+
+    lines
+      .transition()
+      .duration(this.transitionTime)
+      .attr('d', (d) => { return lineFunction(d.years); })
+      .attr('id', (d) => { return d.elementID; })
+      .style('fill', 'none')
+      .style('stroke', 'black')
+      .style('opacity', 1);
   }
 
   /**
    * Formats player data to be used for line graphs
    * @param player - player for the line graph
-   * @param id - id of the line graph group
+   * @param ID - id of the line graph group
    * @param attributes
-   * @param player
+   * @param playerID
+   * @param yearScale
    */
-  formatDataForLineGraph(player, attributes, id, playerID) {
+  formatDataForLineGraph(player, attributes, ID, playerID, yearScale, minYear, maxYear) {
+    let mappedAttributesMaxData = {
+      'fantasyPoints': 'Fantasy Points',
+      'ppr': 'PPR Points',
+      'ppg': 'PPG',
+      'pprpg': 'PPRPG',
+      'positionRank': 'Position Rank',
+      'attempts': 'Attempts',
+      'completions': 'Completions',
+      'interceptions': 'Interceptions',
+      'passingYards': 'Passing Yards',
+      'touchdownPasses': 'Touchdowns',
+      'target': 'Targets',
+      'receptions': 'Receptions',
+      'receivingYards': 'Receiving Yards',
+      'yardsPerReception': 'Yards Per Reception',
+      'receivingTouchdowns': 'Touchdowns',
+      'rushingYards': 'Rushing Yards',
+      'yardsPerAttempt': 'Yards Per Attempt',
+      'rushingTouchdowns': 'Touchdowns'
+    };
     let toReturn = [];
-    attributes.forEach((d) => {
+    let id = ID.toLowerCase();
+    attributes.forEach((attribute) => {
       let toAdd = {};
-      toAdd.id = d;
-      toAdd.elementID = d + playerID;
-      toAdd.min = d3.min(player.years, (yearObj) => {
-        if (id === 'points') {
-          return yearObj[d];
+      toAdd.id = attribute;
+      toAdd.elementID = attribute + playerID;
+
+      let min = 0;
+      let max = d3.max(Object.keys(this.maxData), (key) => {
+        if (key >= minYear && key <= maxYear) {
+          let playerPosition = player.years[0].position;
+          return this.maxData[key][playerPosition][ID][mappedAttributesMaxData[attribute]];
         }
-        return yearObj[id][d];
       });
-      toAdd.max = d3.max(player.years, (yearObj) => {
-        if (id === 'points') {
-          return yearObj[d];
-        }
-        return yearObj[id][d];
-      });
+
+      let dataScale = d3.scaleLinear()
+        .domain([min, max])
+        .range([this.lineGraphHeight - 50, 0]);
+
+      if (attribute === 'positionRank') {
+        dataScale = d3.scaleLinear()
+          .domain([min, max])
+          .range([0, this.lineGraphHeight - 50]);
+      }
 
       toAdd.years = [];
       player.years.forEach((yearObj) => {
-        let value = yearObj[d];
-        if (id !== 'points') {
-          return yearObj[id][d];
+        if (parseInt(yearObj.year) >= minYear && parseInt(yearObj.year) <= maxYear) {
+          let value = yearObj[attribute];
+          if (id !== 'points') {
+            value = yearObj[id][attribute];
+          }
+          value = parseFloat(value);
+          if (!value || value < 0) {
+            value = 0;
+          }
+          value = dataScale(value);
+          let toAddObj = {
+            'x': yearScale(parseInt(yearObj.year)),
+            'y': value
+          };
+          toAdd.years.push(toAddObj);
         }
-        let toAddObj = {
-          'year': parseInt(yearObj.year),
-          'val': parseFloat(yearObj[d])
-        };
-        toAdd.years.push(toAddObj);
       });
       toReturn.push(toAdd);
     });
@@ -956,7 +1027,18 @@ class Player {
    */
   updateCurrentPlayers(player1, player2) {
     this.player1 = player1;
+    this.yearRangeIndexPlayer1.min = 0;
+    this.yearRangeIndexPlayer1.minYear = parseInt(player1.years[0].year);
+    let maxIndex = player1.years.length - 1;
+    this.yearRangeIndexPlayer1.max = maxIndex;
+    this.yearRangeIndexPlayer1.maxYear = parseInt(player1.years[maxIndex].year);
+
     this.player2 = player2;
+    this.yearRangeIndexPlayer2.min = 0;
+    this.yearRangeIndexPlayer2.minYear = parseInt(player2.years[0].year);
+    maxIndex = player2.years.length - 1;
+    this.yearRangeIndexPlayer2.max = maxIndex;
+    this.yearRangeIndexPlayer2.maxYear = parseInt(player2.years[maxIndex].year);
   }
 
   /**
@@ -978,6 +1060,14 @@ class Player {
     d3.select(`#${playerGroup}`).selectAll('text')
       .classed('selected_years_brush', false);
     if (!s) {
+      if (playerGroup.includes('Player1')) {
+        this.yearRangeIndexPlayer1.minYear = parseInt(this.player1.years[0].year);
+        this.yearRangeIndexPlayer1.maxYear = parseInt(this.player1.years[this.player1.years.length - 1].year);
+      } else {
+        this.yearRangeIndexPlayer2.minYear = parseInt(this.player2.years[0].year);
+        this.yearRangeIndexPlayer2.maxYear = parseInt(this.player2.years[this.player2.years.length - 1].year);
+      }
+      this.updateLineGraphsDriver();
       return;
     }
 
@@ -1018,15 +1108,20 @@ class Player {
       }
       this.yearRangeIndexPlayer1.min = minIndex;
       this.yearRangeIndexPlayer1.max = maxIndex;
+      this.yearRangeIndexPlayer1.minYear = parseInt(this.player1.years[minIndex].year);
+      this.yearRangeIndexPlayer1.maxYear = parseInt(this.player1.years[maxIndex].year);
     } else {
       if (this.yearRangeIndexPlayer2.min !== minIndex || this.yearRangeIndexPlayer2.max !== maxIndex) {
         updateOverallViewToggle = true;
       }
       this.yearRangeIndexPlayer2.min = minIndex;
       this.yearRangeIndexPlayer2.max = maxIndex;
+      this.yearRangeIndexPlayer2.minYear = parseInt(this.player2.years[minIndex].year);
+      this.yearRangeIndexPlayer2.maxYear = parseInt(this.player2.years[maxIndex].year);
     }
 
     if (updateOverallViewToggle) {
+      this.updateLineGraphsDriver();
       let yearsToForward = [];
       yearsToForward.push([this.yearRangeIndexPlayer1.min, this.yearRangeIndexPlayer1.max]);
       if (this.compareEnable) {
