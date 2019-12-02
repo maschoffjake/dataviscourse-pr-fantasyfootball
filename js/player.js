@@ -12,6 +12,7 @@ class Player {
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
+    this.bufferFromTop = 132;
 
     this.yearRangeIndexPlayer1 = {
       min: 0,
@@ -80,7 +81,13 @@ class Player {
       'ReceivingTargets': d3.schemeSet2[3],
       'ReceivingYards Per Reception': d3.schemeSet2[4]
     }
-
+    this.selectedAttributes = {
+      'Points': 'Fantasy Points',
+      'Passing': 'Touchdowns',
+      'Rushing': 'Touchdowns',
+      'Receiving': 'Touchdowns'
+    }
+    console.log(this.maxData);
   }
 
   
@@ -110,10 +117,10 @@ class Player {
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
 
     // Create the tooltips associated with the spider charts
-    this.createSpiderChartToolTip('Points', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY);
-    this.createSpiderChartToolTip('Passing', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
-    this.createSpiderChartToolTip('Rushing', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
-    this.createSpiderChartToolTip('Receiving', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
+    this.createSpiderChartToolTip('Points', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), this.bufferFromTop + spiderChartY);
+    this.createSpiderChartToolTip('Passing', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer),this.bufferFromTop + spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
+    this.createSpiderChartToolTip('Rushing', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), this.bufferFromTop + spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
+    this.createSpiderChartToolTip('Receiving', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), this.bufferFromTop + spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
@@ -155,6 +162,11 @@ class Player {
     this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
     this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
     this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+
+    this.updateSpiderChartToolTip('Passing', this.selectedAttributes['Passing']);
+    this.updateSpiderChartToolTip('Rushing', this.selectedAttributes['Rushing']);
+    this.updateSpiderChartToolTip('Points', this.selectedAttributes['Points']);
+    this.updateSpiderChartToolTip('Receiving', this.selectedAttributes['Receiving']);
   }
 
   updateLineGraphsDriver() {
@@ -450,6 +462,9 @@ class Player {
 
       // Update the spider chart tool tip for the selected arc
       that.updateSpiderChartToolTip(id, d.data);
+
+      // Update the currently selected arc
+      that.selectedAttributes[id] = d.data;
     });
   
     // Append text within the pie chart 
@@ -521,6 +536,9 @@ class Player {
 
         // Update the spider chart tool tip for the selected arc
         that.updateSpiderChartToolTip(id, d);
+
+        // Update the currently selected arc
+        that.selectedAttributes[id] = d;
       });
 
 
@@ -849,43 +867,29 @@ class Player {
    */
   createSpiderChartToolTip(id, x, y) {
     // Create the spider chart with the passed in id
-    const toolTip = this.svg
-        .append('g')
+    const toolTip = d3.select('#playerViewSVGDiv')
+        .append('div')
         .attr('id', `spiderChartToolTip${id}`)
-        .attr('transform', `translate(${x}, ${y})`);
-
-    const rects = toolTip
-      .append('rect')
-      .attr('height', 0)
-      .attr('width', 0)
-      .attr('rx', 15)
-      .attr('class', 'spiderChartToolTipRect');
-      
-    rects
-      .transition()
-      .duration(this.transitionTime)
-      .attr('height', this.spiderChartToolTipHeight)
-      .attr('width', this.spiderChartToolTipWidth);
+        .attr('class', 'spiderChartToolTip');
 
     toolTip
-      .append('text')
-      .attr('x', this.spiderChartToolTipWidth/2)
-      .attr('y', 20)
+      .style('top', `${y}px`)
+      .style('left', `${x}px`);
+
+    toolTip
+      .append('h6')
       .attr('class', 'titleHeader');
 
     toolTip
-      .append('text')
+      .append('p')
       .attr('class', 'textData')
-      .attr('x', 10)
-      .attr('y', 40)
       .attr('id', 'player1DataText');
 
     toolTip
-      .append('text')
+      .append('p')
       .attr('class', 'textData')
-      .attr('x', 10)
-      .attr('y', this.spiderChartToolTipWidth/2)
-      .attr('id', 'player2DataText');
+      .attr('id', 'player2DataText')
+      .style('margin-top', '50px');
   }
 
 
@@ -904,7 +908,10 @@ class Player {
       .select('.titleHeader');
 
     const dataPlayer1 = spiderChartToolTipGroup
-      .select('.textData');
+      .select('#player1DataText');
+
+    const dataPlayer2 = spiderChartToolTipGroup
+      .select('#player2DataText');
 
     header
       .text(d);
@@ -1082,12 +1089,32 @@ class Player {
 
     // See if we are comparing 2 players so we can display data for both players
     if (this.compareEnable) {
+      console.log(player1ActualData);
+      const htmlValuePlayer1 = `<b>${this.player1.name}</b>
+                        had ${player1Data} ${d} in ${player1ActualData.year}<br>
+                        The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s
+                        `
 
+      const htmlValuePlayer2 = `<b>${this.player2.name}</b>
+                        had ${player2Data} ${d} in ${player2ActualData.year}<br>
+                        The best in ${player2ActualData.year} was ${this.maxData[player2ActualData.year][player2ActualData.position][id][d]} for ${player2ActualData.position}s
+                        `
+      dataPlayer1
+        .html(htmlValuePlayer1);
+
+      dataPlayer2
+        .html(htmlValuePlayer2);
     }
     else {
-      const textValue = this.player1.name + ' had ' + player1Data + ' ' + d + ' in ' + player1ActualData.year;
+      const htmlValuePlayer1 = `<b>${this.player1.name}</b>
+                        had ${player1Data} ${d} in ${player1ActualData.year}<br>
+                        The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s
+                        `
       dataPlayer1
-        .text(textValue);
+        .html(htmlValuePlayer1);
+
+      dataPlayer2
+        .html(null);
     }
   }
 
