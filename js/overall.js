@@ -507,7 +507,11 @@ class Overall {
         this.allData.map(function(player){
             let x = Object.values(player.years);
             let val = x.filter(d => d.year === year);
+            // let val = x.filter(d => year.includes(d.year) && (d.position === position[0] || d.position === position[1]));
 
+            // if(val.length > 0) {
+            //     // if(position)
+            // }
             if(val.length > 0) {
                 if(val[0].position === position) {
                     let playerObj = {
@@ -595,10 +599,10 @@ class Overall {
         //Check if comparing players
         if(this.compareEnable) {
             //Check if comparing players for multiple years
-            if(yearIndex.length > 1) {
+            console.log(typeof yearIndex[0] !== typeof 0);
+            if(typeof yearIndex[0] !== typeof 0) {
                 //TODO: player two indices are incorrect. need to fix. player1Years & player2Years will
                 // likely be out of bounds when fixed
-                console.log("yearIndex: " + yearIndex);
                 let years = [];
                 let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1] + 1);
                 let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1] + 1);
@@ -615,13 +619,17 @@ class Overall {
             }
             //Multiple players, single year
             else {
-                let yearObj = this.player1.years[yearIndex[0]];
-                let year = yearObj.year;
+                //TODO: check if player2 null to select off of correct years
+                let yearObjPlayer1 = this.player1.years[yearIndex[0]];
+                let yearObjPlayer2 = this.player2.years[yearIndex[1]];
+                let year1 = yearObjPlayer1.year;
+                let year2 = yearObjPlayer2.year;
+
                 this.selectedYear = yearIndex[0];
-                let position = yearObj.position;
+                let position = [yearObjPlayer1.position, yearObjPlayer2.position];
                 d3.select('#chartSubheader')
-                    .text(year);
-                this.parseDataForYear(year, position);
+                    .text(`${Math.min(year1, year2)} - ${Math.max(year1, year2)}`);
+                this.parseDataForYears([year1, year2], position);
             }
         }
         //For multiples years selected for single player

@@ -17,6 +17,11 @@ class Main {
           that.player1 = player1;
           that.updateView();
           overallView.updateSelectedYear([0]);
+          if (that.compareEnable) {
+            overallView.updateSelectedYear([0, 0]);
+          } else {
+            overallView.updateSelectedYear([0]);
+          }
           $("#player1Dropdown").selectpicker("val", player1.name);
         }
 
@@ -52,7 +57,11 @@ class Main {
                 }
             });
           that.updateView();
-          that.overallView.updateSelectedYear([0]);
+          if (that.compareEnable) {
+            that.overallView.updateSelectedYear([0, 0]);
+          } else {
+            that.overallView.updateSelectedYear([0]);
+          }
         });
 
         // Setup dropdown player selection event listener
@@ -64,7 +73,11 @@ class Main {
                 }
             });
           that.updateView();
-          that.overallView.updateSelectedYear([0]);
+          if (that.compareEnable) {
+            that.overallView.updateSelectedYear([0, 0]);
+          } else {
+            that.overallView.updateSelectedYear([0]);
+          }
         });
 
         // Setup compare button event listener
