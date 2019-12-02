@@ -89,7 +89,6 @@ class Player {
       'Rushing': 'Touchdowns',
       'Receiving': 'Touchdowns'
     }
-    console.log(this.maxData);
   }
 
   
@@ -1116,7 +1115,6 @@ class Player {
 
     // See if we are comparing 2 players so we can display data for both players
     if (this.compareEnable) {
-      console.log(player1ActualData);
       const htmlValuePlayer1 = `<b>${this.player1.name}</b>
                         had ${player1Data} ${d} in ${player1ActualData.year}<br>
                         The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s

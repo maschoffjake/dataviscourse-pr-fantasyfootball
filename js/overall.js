@@ -608,7 +608,6 @@ class Overall {
                 let position = [this.player1.years[0].position, this.player2.years[0].position];
                 this.selectedYear = years;
                 //TODO: find out why this is not working properly
-                console.log(this.selectedYear);
                 d3.select('#chartSubheader')
                     .text(`${d3.min(this.selectedYear)} - ${d3.max(this.selectedYear)}`);
                 this.parseDataForYears(this.selectedYear, position)
@@ -638,7 +637,6 @@ class Overall {
             let position = [this.player1.years[0].position];
             this.selectedYear = years;
             let yearLabel = (this.selectedYear.length > 1) ? `${d3.min(this.selectedYear)} - ${d3.max(this.selectedYear)}` : `${this.selectedYear}`;
-            console.log(this.selectedYear);
             d3.select('#chartSubheader')
                 .text(yearLabel);
             this.parseDataForYears(this.selectedYear, position)
