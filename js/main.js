@@ -42,7 +42,7 @@ class Main {
 
       this.compareEnable = false;
     }
-  
+
     setupView() {
         let that = this;
 
