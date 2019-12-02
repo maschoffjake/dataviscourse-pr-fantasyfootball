@@ -21,6 +21,25 @@ loadFile('data/Raw_Data_10yrs.csv').then(data => {
     // }
 });
 
+// Workaround since jQuery can't click D3 generated element... taken from
+// https://stackoverflow.com/questions/9063383/how-to-invoke-click-event-programmatically-in-d3
+jQuery.fn.d3Click = function () {
+    this.each(function (i, e) {
+      var evt = new MouseEvent("click");
+      e.dispatchEvent(evt);
+    });
+  };
+
+// Click the arcs to show rotation for the user and get default data
+$(document).ready(function() {
+    setTimeout(function() {
+        $('#clickOnStartupPoints').d3Click();
+        $('#clickOnStartupPassing').d3Click();
+        $('#clickOnStartupRushing').d3Click();
+        $('#clickOnStartupReceiving').d3Click();
+    }, 1200);
+});
+
 async function loadFile(file) {
     let data = await d3.csv(file).then(d => {
 
