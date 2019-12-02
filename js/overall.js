@@ -383,7 +383,7 @@ class Overall {
                 else if(that.xIndicator.includes('REC')) {
                     let key = that.xIndicator.replace('REC', '');
                     let keys = Object.keys(d);
-                    return that.xScale((keys.includes('year')) ? parseFloat(d.year.receiving[key]) : parseFloat(d.receiving[key]));
+                    return that.xScale((keys.includes('year')) ? d.year.receiving[key] : d.receiving[key]);
                 }
                 else {
                     let keys = Object.keys(d);
