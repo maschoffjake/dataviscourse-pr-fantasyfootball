@@ -4,6 +4,7 @@ class Player {
     this.player2 = null;
     this.compareEnable = false;
     this.toggleExtremes = false;
+    console.log(d3.schemeTableau10);
 
     // Callbacks
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
@@ -1207,6 +1208,7 @@ class Player {
     this.toggleExtremes = toggleExtremes;
     if (toggleExtremes) {
       this.brush.on('start brush end', null);
+      $('#playerView').fadeTo("slow", 0.2);
     } else {
       let that = this;
       this.brush.on('start brush end', function () {
@@ -1214,7 +1216,9 @@ class Player {
       });
       d3.selectAll('.brush')
         .call(this.brush.move, null);
+      $('#playerView').fadeTo("slow", 1);
     }
+    $("#compareButton").prop("disabled", toggleExtremes);
   }
 
   /**
