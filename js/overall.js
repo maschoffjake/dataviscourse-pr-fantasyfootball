@@ -407,7 +407,6 @@ class Overall {
                     return that.yScale((keys.includes('year')) ? d.year.receiving[key] : d.receiving[key]);
                 }
                 else {
-                    // return that.yScale(d.years[that.selectedYear][that.yIndicator]);
                     let keys = Object.keys(d);
                     return that.yScale((keys.includes('year')) ? d.year[that.yIndicator] : d[that.yIndicator]);
                 }
@@ -435,10 +434,8 @@ class Overall {
                 xValueList.push((keys.includes('year')) ? player.year.receiving[key] : player.receiving[key]);
             }
             else {
-                // xValueList.push(player.years.filter((d, i) => i === that.selectedYear)[0][that.xIndicator]);
                 let keys = Object.keys(player);
                 xValueList.push((keys.includes('year')) ? player.year[that.xIndicator] : player[that.xIndicator]);
-                // xValueList.push(player.year[that.xIndicator]);
             }
         });
 
@@ -599,7 +596,6 @@ class Overall {
         //Check if comparing players
         if(this.compareEnable) {
             //Check if comparing players for multiple years
-            console.log(typeof yearIndex[0] !== typeof 0);
             if(typeof yearIndex[0] !== typeof 0) {
                 //TODO: player two indices are incorrect. need to fix. player1Years & player2Years will
                 // likely be out of bounds when fixed
