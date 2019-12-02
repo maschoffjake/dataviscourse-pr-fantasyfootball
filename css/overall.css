@@ -33,6 +33,13 @@ div.dropdownWrapper {
     margin: 3px;
 }
 
+select {
+    background-color: #b3e2cd;
+    color: white;
+    border: none;
+    outline: none;
+}
+
 .dropdownLabel {
     width: 1%7;
     display: inline-block;
@@ -88,6 +95,7 @@ circle.RB {
     color: white;
     background-color: #b3e2cd;
     outline: none;
+    border: none;
 }
 
 .toggleExtremes {
