@@ -1122,7 +1122,7 @@ class Player {
 
       let dataScale = d3.scaleLinear()
         .domain([min, max])
-        .range([this.lineGraphHeight - 50, 0]);
+        .range([this.lineGraphHeight - 50, 25]);
 
       toAdd.years = [];
       player.years.forEach((yearObj) => {
