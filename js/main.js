@@ -44,7 +44,7 @@ class Main {
 
       console.log(this.data);
     }
-  
+
     setupView() {
         let that = this;
 
