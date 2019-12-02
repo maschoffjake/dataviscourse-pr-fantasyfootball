@@ -8,6 +8,7 @@ body {
 
 .title h2 {
     margin: 15px;
+    font-size: 45px;
 }
 
 .flex_col {
@@ -30,7 +31,12 @@ body {
     font-size: 12px;
     padding: 3px 6px 3px 6px;
     color: white;
-    background-color: #b3e2cd;
+    background-color: #76b7b2;
+    font-weight: bold;
+}
+
+#compareButton:active {
+    background-color : #04acc9;
 }
 
 #playerView {
@@ -46,7 +52,14 @@ body {
 #playerSelect button {
     color: white;
     font-weight: bold;
-    background-color: #b3e2cd;
+}
+
+#player1DropdownContainer button {
+    background-color: #e15759;
+}
+
+#player2DropdownContainer button {
+    background-color: #4e79a7;
 }
 
 #player1DropdownContainer {
@@ -68,7 +81,7 @@ body {
     text-align: center;
 }
 
-.text-muted {
-    color: grey !important;
+.filter-option-inner-inner small {
+    color: lightgoldenrodyellow !important;
     margin-left: 5px;
 }

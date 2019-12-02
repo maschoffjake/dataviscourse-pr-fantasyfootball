@@ -4,7 +4,6 @@ class Player {
     this.player2 = null;
     this.compareEnable = false;
     this.toggleExtremes = false;
-    console.log(d3.schemeTableau10);
 
     // Callbacks
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
@@ -14,6 +13,7 @@ class Player {
 
     this.yearSelectorWidth = 500;
     this.yearSelectorHeight = 50;
+    this.bufferFromTop = 132;
 
     this.yearRangeIndexPlayer1 = {
       min: 0,
@@ -83,7 +83,16 @@ class Player {
       'ReceivingTargets': d3.schemeSet2[3],
       'ReceivingYards Per Reception': d3.schemeSet2[4]
     }
+    this.selectedAttributes = {
+      'Points': 'Fantasy Points',
+      'Passing': 'Touchdowns',
+      'Rushing': 'Touchdowns',
+      'Receiving': 'Touchdowns'
+    }
+    console.log(this.maxData);
   }
+
+  
 
   /**
    * Creates all the component for player view.
@@ -110,10 +119,10 @@ class Player {
     this.createSpiderChart('Receiving', spiderChartX, spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3, receivingLabels);
 
     // Create the tooltips associated with the spider charts
-    this.createSpiderChartToolTip('Points', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY);
-    this.createSpiderChartToolTip('Passing', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
-    this.createSpiderChartToolTip('Rushing', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
-    this.createSpiderChartToolTip('Receiving', spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
+    this.createSpiderChartToolTip('Points', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), this.bufferFromTop + spiderChartY);
+    this.createSpiderChartToolTip('Passing', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer),this.bufferFromTop + spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer));
+    this.createSpiderChartToolTip('Rushing', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), this.bufferFromTop + spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 2);
+    this.createSpiderChartToolTip('Receiving', 10 + spiderChartX + (this.spiderChartRadius * 2 + this.spiderChartToolTipBuffer), this.bufferFromTop + spiderChartY + (this.spiderChartRadius * 2 + this.circleBuffer) * 3);
 
     let lineGraphOffsetX = 550;
     let lineGraphOffsetY = 150;
@@ -155,6 +164,11 @@ class Player {
     this.updateSpiderChart('Rushing', 'Player2', this.player2, this.selectedYearIndexPlayer2, 4);
     this.updateSpiderChart('Receiving', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
     this.updateSpiderChart('Points', 'Player2', this.player2, this.selectedYearIndexPlayer2, 5);
+
+    this.updateSpiderChartToolTip('Passing', this.selectedAttributes['Passing']);
+    this.updateSpiderChartToolTip('Rushing', this.selectedAttributes['Rushing']);
+    this.updateSpiderChartToolTip('Points', this.selectedAttributes['Points']);
+    this.updateSpiderChartToolTip('Receiving', this.selectedAttributes['Receiving']);
   }
 
   updateLineGraphsDriver() {
@@ -186,6 +200,11 @@ class Player {
       .attr('y1', this.yearSelectorHeight*.7)
       .attr('x2', this.yearSelectorWidth)
       .attr('y2', this.yearSelectorHeight*.7)
+      .attr('class', () => {
+        if (player === 'Player2') {
+          return 'dashed'
+        }
+      })
       .classed('year_line', true);
 
     yearGroup.append('g')
@@ -257,7 +276,12 @@ class Player {
       .attr('cy', this.yearSelectorHeight*.7)
       .attr('r', 0)
       .style('opacity', 0)
-      .style('fill', d3.schemePaired[0]);
+      .style('fill', () => {
+        if (player === 'Player1') {
+          return d3.schemeTableau10[2];
+        }
+        return d3.schemeTableau10[0];
+      });
 
     circles.exit()
       .transition()
@@ -407,10 +431,11 @@ class Player {
       })
       .attr('d', arc)
       .style('fill', d => {
-        const value = id + d.data
-        console.log(value);
+        const value = id + d.data;
         return this.colorMap[value];
       });
+
+    let that = this;
 
     // Add an onclick function to the pie arcs to rotate when they are clicked
     arcs
@@ -449,10 +474,14 @@ class Player {
       // Turn this arc to the select one
       d3.select(this)
         .attr('class', 'selectedArc');
-    });
-    
-    let that = this;
 
+      // Update the spider chart tool tip for the selected arc
+      that.updateSpiderChartToolTip(id, d.data);
+
+      // Update the currently selected arc
+      that.selectedAttributes[id] = d.data;
+    });
+  
     // Append text within the pie chart 
     const text = pieArcs
       .selectAll('.labelText')
@@ -468,6 +497,14 @@ class Player {
       .append('textPath')
       .attr('xlink:href', (d) => {return '#labelArc' + id + d;})
       .text(d => {return d;})
+      .attr('id', d => {
+        if (d === 'Touchdowns' || d === 'Fantasy Points') {
+          return 'clickOnStartup' + id;
+        }
+        else {
+          return 'noClickOnStartup';
+        }
+      })
       .on('click', function(d) {
         // Find the angle to which to rotate the spider chart
         const rotate = -1 * (that.dataToRadian[id][d] / Math.PI * 180);
@@ -514,6 +551,9 @@ class Player {
 
         // Update the spider chart tool tip for the selected arc
         that.updateSpiderChartToolTip(id, d);
+
+        // Update the currently selected arc
+        that.selectedAttributes[id] = d;
       });
 
 
@@ -842,31 +882,29 @@ class Player {
    */
   createSpiderChartToolTip(id, x, y) {
     // Create the spider chart with the passed in id
-    const toolTip = this.svg
-        .append('g')
+    const toolTip = d3.select('#playerViewSVGDiv')
+        .append('div')
         .attr('id', `spiderChartToolTip${id}`)
-        .attr('transform', `translate(${x}, ${y})`);
-
-    const rects = toolTip
-      .append('rect')
-      .attr('height', 0)
-      .attr('width', 0)
-      .attr('rx', 15)
-      .attr('class', 'spiderChartToolTipRect');
-      
-    rects
-      .transition()
-      .duration(this.transitionTime)
-      .attr('height', this.spiderChartToolTipHeight)
-      .attr('width', this.spiderChartToolTipWidth);
+        .attr('class', 'spiderChartToolTip');
 
     toolTip
-      .append('text')
+      .style('top', `${y}px`)
+      .style('left', `${x}px`);
+
+    toolTip
+      .append('h6')
       .attr('class', 'titleHeader');
 
     toolTip
-      .append('text')
-      .attr('class', 'textData');
+      .append('p')
+      .attr('class', 'textData')
+      .attr('id', 'player1DataText');
+
+    toolTip
+      .append('p')
+      .attr('class', 'textData')
+      .attr('id', 'player2DataText')
+      .style('margin-top', '50px');
   }
 
 
@@ -879,23 +917,219 @@ class Player {
 
     // Select the data chart that we are changing
     const spiderChartToolTipGroup = d3.select(`#spiderChartToolTip${id}`);
-    console.log(spiderChartToolTipGroup);
 
-    console.log('Changing', id);
     // Change the text of the header to what arc is selected
     const header = spiderChartToolTipGroup
       .select('.titleHeader');
 
-    console.log(header);
+    const dataPlayer1 = spiderChartToolTipGroup
+      .select('#player1DataText');
+
+    const dataPlayer2 = spiderChartToolTipGroup
+      .select('#player2DataText');
+
     header
       .text(d);
+ 
+    let player1Data = null;
+    let player2Data = null;
+    let player1ActualData = this.player1.years[this.selectedYearIndexPlayer1];
+    let player2ActualData = this.player2.years[this.selectedYearIndexPlayer2];
+    switch (id) {
+      case 'Passing' :
+        switch (d) {
+          case 'Attempts':
+            // See if we are comparing 2 players so we can display data for both players
+            player1Data = player1ActualData.passing.attempts;
+            if (this.compareEnable) {
+              player2Data = player2ActualData.passing.attempts;
+            }
+            break;
+          case 'Completions':
+            // See if we are comparing 2 players so we can display data for both players
+            player1Data = player1ActualData.passing.completions;
+            if (this.compareEnable) {
+              player2Data = player2ActualData.passing.completions;
+            }
+              break;
+          case 'Interceptions':
+            // See if we are comparing 2 players so we can display data for both players
+            player1Data = player1ActualData.passing.interceptions;
+            if (this.compareEnable) {
+              player2Data = player2ActualData.passing.interceptions;
+            }
+            break;
+          case 'Passing Yards':
+            // See if we are comparing 2 players so we can display data for both players
+            player1Data = player1ActualData.passing.passingYards;
+            if (this.compareEnable) {
+              player2Data = player2ActualData.passing.passingYards;
+            }
+            break;
+          case 'Touchdowns':
+            // See if we are comparing 2 players so we can display data for both players
+            player1Data = player1ActualData.passing.touchdownPasses;
+            if (this.compareEnable) {
+              player2Data = player2ActualData.passing.touchdownPasses;
+            }
+          break;
+          default:
+            console.log('Error not found!')
+            break;
+        }
+        break;
+      case 'Rushing' :
+          switch (d) {
+            case 'Touchdowns':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.rushing.rushingTouchdowns;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.rushing.rushingTouchdowns;
+              }
+              break;
+            case 'Rushing Yards':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.rushing.rushingYards;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.rushing.rushingYards;
+              }
+                break;
+            case 'Attempts':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.rushing.attempts;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.rushing.attempts;
+              }
+              break;
+            case 'Yards Per Attempt':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.rushing.yardsPerAttempt;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.rushing.yardsPerAttempt;
+              }
+              break;
+            default:
+              console.log('Error not found!')
+              break;
+          }
+        break;
+      case 'Receiving' :
+          switch (d) {
+            case 'Yards Per Reception':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.receiving.yardsPerReception;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.receiving.yardsPerReception;
+              }
+              break;
+            case 'Receiving Yards':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.receiving.receivingYards;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.receiving.receivingYards;
+              }
+                break;
+            case 'Receptions':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.receiving.receptions;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.receiving.receptions;
+              }
+              break;
+            case 'Targets':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.receiving.target;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.receiving.target;
+              }
+              break;
+            case 'Touchdowns':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.receiving.receivingTouchdowns;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.receiving.receivingTouchdowns;
+              }
+            break;
+            default:
+              console.log('Error not found!')
+              break;
+          }
+        break;
+      case 'Points' :
+          switch (d) {
+            case 'Fantasy Points':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.fantasyPoints;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.fantasyPoints;
+              }
+              break;
+            case 'PPR Points':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.ppr;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.ppr;
+              }
+                break;
+            case 'PPG':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.ppg;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.ppg;
+              }
+              break;
+            case 'PPRPG':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.pprpg;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.pprpg;
+              }
+              break;
+            case 'Position Rank':
+              // See if we are comparing 2 players so we can display data for both players
+              player1Data = player1ActualData.positionRank;
+              if (this.compareEnable) {
+                player2Data = player2ActualData.positionRank;
+              }
+            break;
+            default:
+              console.log('Error not found!')
+              break;
+          }
+        break;
+      default :
+        console.log('Unable to find this ID:', id);
+        return;
+    }
 
     // See if we are comparing 2 players so we can display data for both players
     if (this.compareEnable) {
+      console.log(player1ActualData);
+      const htmlValuePlayer1 = `<b>${this.player1.name}</b>
+                        had ${player1Data} ${d} in ${player1ActualData.year}<br>
+                        The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s
+                        `
 
+      const htmlValuePlayer2 = `<b>${this.player2.name}</b>
+                        had ${player2Data} ${d} in ${player2ActualData.year}<br>
+                        The best in ${player2ActualData.year} was ${this.maxData[player2ActualData.year][player2ActualData.position][id][d]} for ${player2ActualData.position}s
+                        `
+      dataPlayer1
+        .html(htmlValuePlayer1);
+
+      dataPlayer2
+        .html(htmlValuePlayer2);
     }
     else {
+      const htmlValuePlayer1 = `<b>${this.player1.name}</b>
+                        had ${player1Data} ${d} in ${player1ActualData.year}<br>
+                        The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s
+                        `
+      dataPlayer1
+        .html(htmlValuePlayer1);
 
+      dataPlayer2
+        .html(null);
     }
   }
 
@@ -1228,7 +1462,12 @@ class Player {
   updateSelectedYears(playerGroup) {
     let s = d3.event.selection;
     d3.select(`#${playerGroup}`).selectAll('circle')
-      .style('fill', d3.schemePaired[0]);
+      .style('fill', () => {
+        if (playerGroup.includes('Player1')) {
+          return d3.schemeTableau10[2];
+        }
+        return d3.schemeTableau10[0];
+      });
     d3.select(`#${playerGroup}`).selectAll('text')
       .classed('selected_years_brush', false);
     if (!s) {
@@ -1260,7 +1499,12 @@ class Player {
         }
         return validCircle;
       })
-      .style('fill', d3.schemePaired[1]);
+      .style('fill', () => {
+        if (playerGroup.includes('Player1')) {
+          return d3.schemeTableau10[2];
+        }
+        return d3.schemeTableau10[0];
+      });
 
     d3.select(`#${playerGroup}`).selectAll('text')
       .filter(function(d, i) {

@@ -33,7 +33,6 @@
 }
 
 .selectedArc {
-    fill: darkseagreen;
     cursor: pointer;
 }
 
@@ -48,14 +47,14 @@
 }
 
 .spiderChartPlotPathPlayer1 {
-    stroke: crimson;
-    fill: crimson;
+    stroke: #e15759;
+    fill: #e15759;
     opacity: 0.6;
 }
 
 .spiderChartPlotPathPlayer2 {
-    stroke: blue;
-    fill: blue;
+    stroke: #4e79a7;
+    fill: #4e79a7;
     opacity: 0.6;
 }
 
@@ -68,18 +67,14 @@
     stroke-width: 4px !important;
 }
 
-.labelArcs:hover {
-    fill: grey;
-}
-
 .spiderChartDataPointsPlayer1 {
-    fill: red;
-    stroke: red;
+    fill: #e15759;
+    stroke: #e15759;
 }
 
 .spiderChartDataPointsPlayer2 {
-    fill: blue;
-    stroke: blue;
+    fill: #4e79a7;
+    stroke: #4e79a7;
 }
 
 .spiderChartToolTipRect {
@@ -90,4 +85,26 @@
 
 .dashed {
     stroke-dasharray: 5;
+}
+
+.titleHeader {
+    text-anchor: middle;
+    font-weight: bolder;
+}
+
+.textData {
+    font-size: 12px;
+}
+
+.spiderChartToolTip {
+    position: absolute;
+    text-align: center;
+    width: 200px;
+    height: 200px;
+    padding: 2px;
+    background: none;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color: black;
 }
