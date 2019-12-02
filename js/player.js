@@ -387,8 +387,6 @@ class Player {
         return yearScale(i) + centerOffset;
       })
       .style('opacity', 1);
-
-    // TODO: change color of selected block w/ brush
   }
 
 
@@ -471,13 +469,17 @@ class Player {
         .attr('transform', `rotate(${rotate})`)
         .duration(1000);
 
-      // Turn off the already selected pie arc
-      d3.select(`#spiderChart${id}`).select('.selectedArc')
-        .attr('class', 'labelArcs');
+      // Turn off the already selected pie text
+      d3.select(`#spiderChart${id}`).select('.labelTextSelected')
+        .attr('class', 'labelText');
 
+
+      const actualDataID = d.data.replace(/\s+/g, '');
+      const selectorString = `#text${id}${actualDataID}`;
       // Turn this arc to the select one
-      d3.select(this)
-        .attr('class', 'selectedArc');
+      const arctextToSelect = d3.select(`#spiderChart${id}`).select(selectorString);
+      arctextToSelect
+        .attr('class', 'labelTextSelected');
 
       // Update the spider chart tool tip for the selected arc
       that.updateSpiderChartToolTip(id, d.data);
@@ -496,18 +498,14 @@ class Player {
       .attr('dy', this.widthOfPieChart/2 + 3) // Get in the middle of the arc, seemed to work well
       .attr('x', (d) => {
         // Center the text in the middle of the pie charts (has to be dependent on length of the label, 4.5 times seemed to be a good number)
-        return (360/labels.length) - 4.5 * (d.length/2);
+        return (360/labels.length) - 6 * (d.length/2);
       })
       .append('textPath')
       .attr('xlink:href', (d) => {return '#labelArc' + id + d;})
       .text(d => {return d;})
       .attr('id', d => {
-        if (d === 'Touchdowns' || d === 'Fantasy Points') {
-          return 'clickOnStartup' + id;
-        }
-        else {
-          return 'noClickOnStartup';
-        }
+        const actualID = d.replace(/\s+/g, '');
+        return 'text' + id + actualID;
       })
       .on('click', function(d) {
         // Find the angle to which to rotate the spider chart
@@ -552,6 +550,16 @@ class Player {
             break;
           }
         }
+
+        // Turn off the already selected pie text
+        d3.select(`#spiderChart${id}`).select('.labelTextSelected')
+          .attr('class', 'labelText');
+        const actualDataID = d.replace(/\s+/g, '');
+        const selectorString = `#text${id}${actualDataID}`;
+        // Turn this arc to the select one
+        const arctextToSelect = d3.select(`#spiderChart${id}`).select(selectorString);
+        arctextToSelect
+          .attr('class', 'labelTextSelected');
 
         // Update the spider chart tool tip for the selected arc
         that.updateSpiderChartToolTip(id, d);
