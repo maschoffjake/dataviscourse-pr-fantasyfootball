@@ -1115,12 +1115,12 @@ class Player {
 
     // See if we are comparing 2 players so we can display data for both players
     if (this.compareEnable) {
-      const htmlValuePlayer1 = `<b>${this.player1.name}</b>
+      const htmlValuePlayer1 = `<b>${this.player1.name.split('_')[0]}</b>
                         had ${player1Data} ${d} in ${player1ActualData.year}<br>
                         The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s
                         `
 
-      const htmlValuePlayer2 = `<b>${this.player2.name}</b>
+      const htmlValuePlayer2 = `<b>${this.player2.name.split('_')[0]}</b>
                         had ${player2Data} ${d} in ${player2ActualData.year}<br>
                         The best in ${player2ActualData.year} was ${this.maxData[player2ActualData.year][player2ActualData.position][id][d]} for ${player2ActualData.position}s
                         `
@@ -1131,7 +1131,7 @@ class Player {
         .html(htmlValuePlayer2);
     }
     else {
-      const htmlValuePlayer1 = `<b>${this.player1.name}</b>
+      const htmlValuePlayer1 = `<b>${this.player1.name.split('_')[0]}</b>
                         had ${player1Data} ${d} in ${player1ActualData.year}<br>
                         The best in ${player1ActualData.year} was ${this.maxData[player1ActualData.year][player1ActualData.position][id][d]} for ${player1ActualData.position}s
                         `
