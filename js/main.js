@@ -18,9 +18,9 @@ class Main {
           that.updateView();
           overallView.updateSelectedYear([0]);
           if (that.compareEnable) {
-            overallView.updateSelectedYear([that.selectedYearIndexPlayer1, that.selectedYearIndexPlayer2]);
+            overallView.updateSelectedYear([0, 0]);
           } else {
-            overallView.updateSelectedYear([that.selectedYearIndexPlayer1]);
+            overallView.updateSelectedYear([0]);
           }
           $("#player1Dropdown").selectpicker("val", player1.name);
         }
@@ -58,9 +58,9 @@ class Main {
             });
           that.updateView();
           if (that.compareEnable) {
-            that.overallView.updateSelectedYear([that.selectedYearIndexPlayer1, that.selectedYearIndexPlayer2]);
+            that.overallView.updateSelectedYear([0, 0]);
           } else {
-            that.overallView.updateSelectedYear([that.selectedYearIndexPlayer1]);
+            that.overallView.updateSelectedYear([0]);
           }
         });
 
@@ -74,9 +74,9 @@ class Main {
             });
           that.updateView();
           if (that.compareEnable) {
-            that.overallView.updateSelectedYear([that.selectedYearIndexPlayer1, that.selectedYearIndexPlayer2]);
+            that.overallView.updateSelectedYear([0, 0]);
           } else {
-            that.overallView.updateSelectedYear([that.selectedYearIndexPlayer1]);
+            that.overallView.updateSelectedYear([0]);
           }
         });
 
