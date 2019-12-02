@@ -662,7 +662,6 @@ class Overall {
     }
 
     toggleExtremes() {
-        //TODO: Need to make sure yearSelector cannot be toggled when extremes are being shown
         if(this.showExtremes) {
             d3.select('#extremesButton')
                 .classed('toggleExtremes', false);
@@ -672,6 +671,10 @@ class Overall {
             circles
                 .classed('faded', false)
                 .classed('extremes', false);
+
+            // d3.selectAll('select')
+            //     .attr('disabled', 'false');
+            $("select").prop("disabled", false);
 
             this.selectedPlayers.forEach(function(player) {
                 player.classList = ['selected'];
@@ -703,6 +706,10 @@ class Overall {
                 .selectAll('circle');
             let selected = d3.select('#overallChartGroup')
                 .selectAll('.selected');
+
+            // d3.selectAll('select')
+            //     .attr('disabled', 'true');
+            $("select").prop("disabled", true);
 
             let tempSelected = [];
             selected._groups[0].forEach(function(d) {
