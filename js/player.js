@@ -4,7 +4,6 @@ class Player {
     this.player2 = null;
     this.compareEnable = false;
     this.toggleExtremes = false;
-    console.log(d3.schemeTableau10);
 
     // Callbacks
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
@@ -257,7 +256,12 @@ class Player {
       .attr('cy', this.yearSelectorHeight*.7)
       .attr('r', 0)
       .style('opacity', 0)
-      .style('fill', d3.schemePaired[0]);
+      .style('fill', () => {
+        if (player === 'Player1') {
+          return d3.schemeTableau10[2];
+        }
+        return d3.schemeTableau10[0];
+      });
 
     circles.exit()
       .transition()
@@ -407,8 +411,7 @@ class Player {
       })
       .attr('d', arc)
       .style('fill', d => {
-        const value = id + d.data
-        console.log(value);
+        const value = id + d.data;
         return this.colorMap[value];
       });
 
@@ -1228,7 +1231,12 @@ class Player {
   updateSelectedYears(playerGroup) {
     let s = d3.event.selection;
     d3.select(`#${playerGroup}`).selectAll('circle')
-      .style('fill', d3.schemePaired[0]);
+      .style('fill', () => {
+        if (playerGroup.includes('Player1')) {
+          return d3.schemeTableau10[2];
+        }
+        return d3.schemeTableau10[0];
+      });
     d3.select(`#${playerGroup}`).selectAll('text')
       .classed('selected_years_brush', false);
     if (!s) {
@@ -1260,7 +1268,12 @@ class Player {
         }
         return validCircle;
       })
-      .style('fill', d3.schemePaired[1]);
+      .style('fill', () => {
+        if (playerGroup.includes('Player1')) {
+          return d3.schemeTableau10[2];
+        }
+        return d3.schemeTableau10[0];
+      });
 
     d3.select(`#${playerGroup}`).selectAll('text')
       .filter(function(d, i) {
