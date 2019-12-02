@@ -324,7 +324,7 @@ class Player {
           that.selectedYearIndexPlayer2 = i;
         }
         // Update selected circle in overall view only for player 1.
-        that.updateSelectedYearOverallView([i]);
+        that.updateSelectedYearOverallView([that.selectedYearIndexPlayer1, that.selectedYearIndexPlayer2]);
         that.updateSpiderChartDriver();
       });
 
