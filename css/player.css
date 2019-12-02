@@ -33,7 +33,6 @@
 }
 
 .selectedArc {
-    fill: darkseagreen;
     cursor: pointer;
 }
 
@@ -68,10 +67,6 @@
     stroke-width: 4px !important;
 }
 
-.labelArcs:hover {
-    fill: grey;
-}
-
 .spiderChartDataPointsPlayer1 {
     fill: red;
     stroke: red;
@@ -90,4 +85,9 @@
 
 .dashed {
     stroke-dasharray: 5;
+}
+
+.titleHeader {
+    text-anchor: middle;
+    font-weight: bolder;
 }
