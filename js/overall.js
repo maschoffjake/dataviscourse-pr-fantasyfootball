@@ -1,12 +1,13 @@
 class Overall {
 
-    constructor(data, updateSelectedPlayer) {
+    constructor(data, updateSelectedPlayer, toggleExtremesCallback) {
         this.allData = data;
         this.overallData = data;
         this.player1 = null;
         this.player2 = null;
         this.selectedPlayers = [];
         this.updateSelectedPlayer = updateSelectedPlayer; //will need to extract actual player object from this.allData for selected circle
+        this.toggleExtremesCallback = toggleExtremesCallback;
         this.selectedYear = 0;
         this.compareEnable = false;
         this.showExtremes = false;
@@ -87,7 +88,7 @@ class Overall {
             .text('Overall Player Data')
             .style('font-size', '32px')
             .attr('id', 'chartTitle')
-            .attr('x', 100)
+            .attr('x', 125)
             .attr('y', 50);
         overallDiv
             .select('svg')
@@ -755,22 +756,22 @@ class Overall {
             let playerYValForCategory = this.yIndicator;
             if(this.yIndicator.includes('PASS')) {
                 playerYValForCategory = this.yIndicator.replace('PASS', '');
-                let keys = Object.keys(playerXData);
-                playerYValForCategory = (keys.includes('year')) ? playerXData.year.passing[playerYValForCategory] : playerXData.passing[playerYValForCategory];
+                let keys = Object.keys(playerYData);
+                playerYValForCategory = (keys.includes('year')) ? playerYData.year.passing[playerYValForCategory] : playerYData.passing[playerYValForCategory];
             }
             else if(this.yIndicator.includes('RUSH')) {
                 playerYValForCategory = this.yIndicator.replace('RUSH', '');
-                let keys = Object.keys(playerXData);
-                playerYValForCategory = (keys.includes('year')) ? playerXData.year.rushing[playerYValForCategory] : playerXData.rushing[playerYValForCategory];
+                let keys = Object.keys(playerYData);
+                playerYValForCategory = (keys.includes('year')) ? playerYData.year.rushing[playerYValForCategory] : playerYData.rushing[playerYValForCategory];
             }
             else if(this.yIndicator.includes('REC')) {
                 playerYValForCategory = this.yIndicator.replace('REC', '');
-                let keys = Object.keys(playerXData);
-                playerYValForCategory = (keys.includes('year')) ? playerXData.year.receiving[playerYValForCategory] : playerXData.receiving[playerYValForCategory];
+                let keys = Object.keys(playerYData);
+                playerYValForCategory = (keys.includes('year')) ? playerYData.year.receiving[playerYValForCategory] : playerYData.receiving[playerYValForCategory];
             }
             else {
-                let keys = Object.keys(playerXData);
-                playerYValForCategory = (keys.includes('year')) ? playerXData.year[playerYValForCategory] : playerXData[playerYValForCategory];
+                let keys = Object.keys(playerYData);
+                playerYValForCategory = (keys.includes('year')) ? playerYData.year[playerYValForCategory] : playerYData[playerYValForCategory];
             }
 
             //TODO: maybe make dictionary to display actual team name instead of abbrev.
@@ -804,6 +805,7 @@ class Overall {
             }
         }
         this.showExtremes = !this.showExtremes;
+        this.toggleExtremesCallback(this.showExtremes);
     }
 
     getMaxPlayers() {
