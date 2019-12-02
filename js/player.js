@@ -200,6 +200,11 @@ class Player {
       .attr('y1', this.yearSelectorHeight*.7)
       .attr('x2', this.yearSelectorWidth)
       .attr('y2', this.yearSelectorHeight*.7)
+      .attr('class', () => {
+        if (player === 'Player2') {
+          return 'dashed'
+        }
+      })
       .classed('year_line', true);
 
     yearGroup.append('g')

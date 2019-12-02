@@ -8,6 +8,7 @@ body {
 
 .title h2 {
     margin: 15px;
+    font-size: 45px;
 }
 
 .flex_col {
@@ -80,7 +81,7 @@ body {
     text-align: center;
 }
 
-.text-muted {
+.filter-option-inner-inner small {
     color: lightgoldenrodyellow !important;
     margin-left: 5px;
 }
