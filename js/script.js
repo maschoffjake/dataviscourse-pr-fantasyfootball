@@ -71,28 +71,28 @@ async function loadFile(file) {
                     "year": year,
                     "team": row.Tm,
                     "position": row.FantPos,
-                    "age": isNan(parseInt(row.Age)) ? 0 : parseInt(row.Age),
-                    "games": isNan(parseInt(row.G)) ? 0 : parseInt(row.G),
-                    "gamesStarted": isNan(parseInt(row.GS)) ? 0 : parseInt(row.GS),
+                    "age": isNaN(parseInt(row.Age)) ? 0 : parseInt(row.Age),
+                    "games": isNaN(parseInt(row.G)) ? 0 : parseInt(row.G),
+                    "gamesStarted": isNaN(parseInt(row.GS)) ? 0 : parseInt(row.GS),
                     "passing": {
-                        "completions": isNan(parseInt(row.Cmp)) ? 0 : parseInt(row.Cmp),
-                        "attempts": isNan(parseInt(row.PassAtt)) ? 0 : parseInt(row.PassAtt),
-                        "passingYards": isNan(parseInt(row.PassYds)) ? 0 : parseInt(row.PassYds),
-                        "touchdownPasses": isNan(parseInt(row.PassTD)) ? 0 : parseInt(row.PassTD),
-                        "interceptions": isNan(parseInt(row.Int)) ? 0 : parseInt(row.Int)
+                        "completions": isNaN(parseInt(row.Cmp)) ? 0 : parseInt(row.Cmp),
+                        "attempts": isNaN(parseInt(row.PassAtt)) ? 0 : parseInt(row.PassAtt),
+                        "passingYards": isNaN(parseInt(row.PassYds)) ? 0 : parseInt(row.PassYds),
+                        "touchdownPasses": isNaN(parseInt(row.PassTD)) ? 0 : parseInt(row.PassTD),
+                        "interceptions": isNaN(parseInt(row.Int)) ? 0 : parseInt(row.Int)
                     },
                     "rushing": {
-                        "attempts": isNan(parseInt(row.RushAtt)) ? 0 : parseInt(row.RushAtt),
-                        "rushingYards": isNan(parseInt(row.RushYds)) ? 0 : parseInt(row.RushYds),
+                        "attempts": isNaN(parseInt(row.RushAtt)) ? 0 : parseInt(row.RushAtt),
+                        "rushingYards": isNaN(parseInt(row.RushYds)) ? 0 : parseInt(row.RushYds),
                         "yardsPerAttempt": (row["Y/A"] !== '' || row["Y/A"] > 0) ? row["Y/A"] : '0',
-                        "rushingTouchdowns": isNan(parseInt(row.RushTD)) ? 0 : parseInt(row.RushTD)
+                        "rushingTouchdowns": isNaN(parseInt(row.RushTD)) ? 0 : parseInt(row.RushTD)
                     },
                     "receiving": {
-                        "target": isNan(parseInt(row.Tgt)) ? 0 : parseInt(row.Tgt),
-                        "receptions": isNan(parseInt(row.Rec)) ? 0 : parseInt(row.Rec),
-                        "receivingYards": isNan(parseInt(row.RecYds)) ? 0 : parseInt(row.RecYds),
+                        "target": isNaN(parseInt(row.Tgt)) ? 0 : parseInt(row.Tgt),
+                        "receptions": isNaN(parseInt(row.Rec)) ? 0 : parseInt(row.Rec),
+                        "receivingYards": isNaN(parseInt(row.RecYds)) ? 0 : parseInt(row.RecYds),
                         "yardsPerReception": (row["Y/R"] !== '' || row["Y/R"] > 0) ? row["Y/R"] : '0',
-                        "receivingTouchdowns": isNan(parseInt(row.RecTD)) ? 0 : parseInt(row.RecTD)
+                        "receivingTouchdowns": isNaN(parseInt(row.RecTD)) ? 0 : parseInt(row.RecTD)
                     },
                     "fantasyPoints": (row.FantPt !== '' || row.Fantpt > 0) ? row.FantPt : '0',
                     "ppr": row.PPR,
