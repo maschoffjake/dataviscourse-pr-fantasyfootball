@@ -41,8 +41,6 @@ class Main {
       this.player2 = this.data[11];
 
       this.compareEnable = false;
-
-      console.log(this.data);
     }
 
     setupView() {
@@ -50,7 +48,6 @@ class Main {
 
         // Setup dropdown player selection event listener
         $('#player1Dropdown').on('change', function(){
-            console.log($('select[name=selValue]').val(1));
             $('.selectpicker').selectpicker('refresh')
             let selectedPlayer = $('#player1Dropdown').val();
             that.player1 = that.data.find((d) => {
