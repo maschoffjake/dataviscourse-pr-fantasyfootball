@@ -33,7 +33,7 @@ jQuery.fn.d3Click = function () {
 // Click the arcs to show rotation for the user and get default data
 $(document).ready(function() {
     setTimeout(function() {
-        $('#textPointsFantasy Points').d3Click();
+        $('#textPointsFantasyPoints').d3Click();
         $('#textPassingTouchdowns').d3Click();
         $('#textRushingTouchdowns').d3Click();
         $('#textReceivingTouchdowns').d3Click();
