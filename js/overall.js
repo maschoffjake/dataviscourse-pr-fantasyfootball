@@ -67,12 +67,6 @@ class Overall {
         this.playerXToolTip
             .append("p")
             .attr("id", "playerXToolTipLine1");
-        // this.playerXToolTip
-        //     .append("h6")
-        //     .attr("id", "playerXToolTipLine2");
-        // this.playerXToolTip
-        //     .append("h6")
-        //     .attr("id", "playerXToolTipLine3");
 
         this.playerYToolTip = overallDiv
             .append('div')
@@ -81,18 +75,12 @@ class Overall {
         this.playerYToolTip
             .append("p")
             .attr("id", "playerYToolTipLine1");
-        // this.playerYToolTip
-        //     .append("h6")
-        //     .attr("id", "playerYToolTipLine2");
-        // this.playerYToolTip
-        //     .append("h6")
-        //     .attr("id", "playerYToolTipLine3");
 
         //Create an svg for the chart and add a header
         overallDiv
             .append('svg')
             .attr('width', 500)
-            .attr('height', 650)
+            .attr('height', 700)
             .append('g')
             .attr('id', 'overallChartGroup')
             .append('text')
@@ -159,6 +147,19 @@ class Overall {
 
         yWrapper.append('div').attr('id', 'yDropdown').classed('dropdown', true).append('div').classed('dropdownContent', true)
             .append('select');
+
+        //LEGEND FOR OVERALL CHART
+        d3.select('#overallView').select('svg').append('circle').attr("cx",60).attr("cy",650).attr("r", 6).style("fill", "#00fff7");
+        d3.select('#overallView').select('svg').append('circle').attr("cx",160).attr("cy",650).attr("r", 6).style("fill", "#c40065");
+        d3.select('#overallView').select('svg').append('circle').attr("cx",260).attr("cy",650).attr("r", 6).style("fill", "#79c400");
+        d3.select('#overallView').select('svg').append('circle').attr("cx",360).attr("cy",650).attr("r", 6).style("fill", "#c4ad00");
+        d3.select('#overallView').select('svg').append('circle').attr("cx",460).attr("cy",650).attr("r", 6).style("fill", "#7c00c4");
+
+        d3.select('#overallView').select('svg').append('text').attr("x",70).attr("y",655).text('Selected');
+        d3.select('#overallView').select('svg').append('text').attr("x",170).attr("y",655).text('TE');
+        d3.select('#overallView').select('svg').append('text').attr("x",270).attr("y",655).text('WR');
+        d3.select('#overallView').select('svg').append('text').attr("x",370).attr("y",655).text('QB');
+        d3.select('#overallView').select('svg').append('text').attr("x",470).attr("y",655).text('RB');
 
         this.drawDropDowns();
     }
@@ -339,16 +340,30 @@ class Overall {
                     that.updateSelectedPlayer(selectedPlayer);
                 }
             })
-            .classed('selected', function(d) {
+            // .classed('selected', function(d) {
+            //     if((that.player1 != null) && (d.name === that.player1.name)) {
+            //         d3.select(this).raise();
+            //         return true;
+            //     }
+            //     if((that.player2 != null) && (d.name === that.player2.name)) {
+            //         d3.select(this).raise();
+            //         return true;
+            //     }
+            //     // return (that.player2 != null) && (d.name === that.player2.name);
+            // })
+            .attr('class', function(d) {
                 if((that.player1 != null) && (d.name === that.player1.name)) {
                     d3.select(this).raise();
-                    return true;
+                    return 'selected';
                 }
                 if((that.player2 != null) && (d.name === that.player2.name)) {
                     d3.select(this).raise();
-                    return true;
+                    return 'selected';
                 }
-                // return (that.player2 != null) && (d.name === that.player2.name);
+                if (Object.keys(d).includes('year')) {
+                    return d.year.position;
+                }
+                return d.position;
             })
             .transition()
             .duration(1500)
