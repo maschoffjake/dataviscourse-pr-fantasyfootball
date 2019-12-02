@@ -33,7 +33,6 @@
 }
 
 .selectedArc {
-    fill: darkseagreen;
     cursor: pointer;
 }
 
@@ -68,10 +67,6 @@
     stroke-width: 4px !important;
 }
 
-.labelArcs:hover {
-    fill: grey;
-}
-
 .spiderChartDataPointsPlayer1 {
     fill: #e15759;
     stroke: #e15759;
@@ -90,4 +85,26 @@
 
 .dashed {
     stroke-dasharray: 5;
+}
+
+.titleHeader {
+    text-anchor: middle;
+    font-weight: bolder;
+}
+
+.textData {
+    font-size: 12px;
+}
+
+.spiderChartToolTip {
+    position: absolute;
+    text-align: center;
+    width: 200px;
+    height: 200px;
+    padding: 2px;
+    background: none;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color: black;
 }
