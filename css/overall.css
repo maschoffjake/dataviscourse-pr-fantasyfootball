@@ -56,7 +56,28 @@ div.overallToolTip {
 }
 
 circle.selected {
-    fill: #00a7d1;
+    fill: #00fff7;
+    stroke: black;
+}
+
+circle.TE {
+    fill: #c40065;
+    stroke: black;
+}
+
+circle.WR {
+    fill: #79c400;
+    stroke: black;
+}
+
+circle.QB {
+    fill: #c4ad00;
+    stroke: black;
+}
+
+circle.RB {
+    fill: #7c00c4;
+    stroke: black;
 }
 
 #extremesButton {
@@ -79,8 +100,8 @@ circle.selected {
 }
 
 .faded {
-    fill: lightgrey;
-    stroke: lightgrey;
+    fill: lightgrey !important;
+    stroke: lightgrey !important;
 }
 
 .extremes {

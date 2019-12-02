@@ -11,11 +11,13 @@ class Main {
         function updateSelectedYear(yearIndex) {
             overallView.updateSelectedYear(yearIndex);
         }
+
         let that = this;
         function updateSelectedPlayer(player1) {
-            that.player1 = player1;
-            that.updateView();
-            overallView.updateSelectedYear([0]);
+          that.player1 = player1;
+          that.updateView();
+          overallView.updateSelectedYear([0]);
+          $(".selectpicker").selectpicker("val", player1.name);
         }
 
         this.player1 = this.data[0];
