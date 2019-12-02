@@ -42,6 +42,13 @@
     cursor: pointer;
 }
 
+.labelTextSelected {
+    fill: black;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bolder;
+}
+
 .linesInSpiderChart {
     stroke: cadetblue;
 }
@@ -94,6 +101,10 @@
 
 .textData {
     font-size: 12px;
+}
+
+br {
+    font-weight: 900;
 }
 
 .spiderChartToolTip {

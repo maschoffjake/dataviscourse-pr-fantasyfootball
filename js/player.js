@@ -378,8 +378,6 @@ class Player {
         return yearScale(i) + centerOffset;
       })
       .style('opacity', 1);
-
-    // TODO: change color of selected block w/ brush
   }
 
 
@@ -462,13 +460,18 @@ class Player {
         .attr('transform', `rotate(${rotate})`)
         .duration(1000);
 
-      // Turn off the already selected pie arc
-      d3.select(`#spiderChart${id}`).select('.selectedArc')
-        .attr('class', 'labelArcs');
+      // Turn off the already selected pie text
+      d3.select(`#spiderChart${id}`).select('.labelTextSelected')
+        .attr('class', 'labelText');
 
+
+      const selectorString = `#text${id}${d.data}`;
+      console.log(selectorString);
       // Turn this arc to the select one
-      d3.select(this)
-        .attr('class', 'selectedArc');
+      const arctextToSelect = d3.select(`#spiderChart${id}`).select(selectorString);
+      console.log(arctextToSelect);
+      arctextToSelect
+        .attr('class', 'labelTextSelected');
 
       // Update the spider chart tool tip for the selected arc
       that.updateSpiderChartToolTip(id, d.data);
@@ -493,12 +496,7 @@ class Player {
       .attr('xlink:href', (d) => {return '#labelArc' + id + d;})
       .text(d => {return d;})
       .attr('id', d => {
-        if (d === 'Touchdowns' || d === 'Fantasy Points') {
-          return 'clickOnStartup' + id;
-        }
-        else {
-          return 'noClickOnStartup';
-        }
+        return 'text' + id + d;
       })
       .on('click', function(d) {
         // Find the angle to which to rotate the spider chart
