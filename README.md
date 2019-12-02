@@ -1,6 +1,6 @@
 #Fantasy Football Data Visualization
 ###Live Website: https://fantasyfootball.unityx.io
-###Video: 
+###Video: https://www.youtube.com/watch?v=encb477zWE8
 
 ####Summary:
 This project visualizes Fantasy Football stats from 2008 to 2018. Most of this code is ours which uses D3 
