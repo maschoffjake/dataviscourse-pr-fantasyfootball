@@ -599,7 +599,7 @@ class Overall {
         //Check if comparing players
         if(this.compareEnable) {
             //Check if comparing players for multiple years
-            if(yearIndex.length > 1) {
+            if(typeof yearIndex !== 'number') {
                 //TODO: player two indices are incorrect. need to fix. player1Years & player2Years will
                 // likely be out of bounds when fixed
                 console.log("yearIndex: " + yearIndex);
@@ -621,7 +621,7 @@ class Overall {
             else {
                 //TODO: check if player2 null to select off of correct years
                 let yearObjPlayer1 = this.player1.years[yearIndex[0]];
-                let yearObjPlayer2 = this.player2.years[yearIndex[0]];
+                let yearObjPlayer2 = this.player2.years[yearIndex[1]];
                 let year1 = yearObjPlayer1.year;
                 let year2 = yearObjPlayer2.year;
 
