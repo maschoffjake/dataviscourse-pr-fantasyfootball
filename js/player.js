@@ -1212,6 +1212,8 @@ class Player {
       this.brush.on('start brush end', function () {
         that.updateSelectedYears(this.parentNode.id);
       });
+      d3.selectAll('.brush')
+        .call(this.brush.move, null);
     }
   }
 

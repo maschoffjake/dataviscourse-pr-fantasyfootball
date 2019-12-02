@@ -21,7 +21,13 @@ class Main {
         }
 
         function toggleExtremes(toggleExtremes) {
-          tbat.playerView.setToggleExtremes(toggleExtremes);
+          that.playerView.setToggleExtremes(toggleExtremes);
+          if (toggleExtremes) {
+            $(".selectpicker").prop("disabled", true);
+          } else {
+            $(".selectpicker").prop("disabled", false);
+          }
+
         }
 
         this.player1 = this.data[0];
