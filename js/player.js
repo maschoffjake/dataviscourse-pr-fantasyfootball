@@ -3,6 +3,7 @@ class Player {
     this.player1 = null;
     this.player2 = null;
     this.compareEnable = false;
+    this.toggleExtremes = false;
 
     // Callbacks
     this.updateSelectedYearOverallView = updateSelectedYearOverallView;
@@ -17,7 +18,8 @@ class Player {
       min: 0,
       minYear: 0,
       max: 10,
-      maxYear: 10
+      maxYear: 10,
+
     };
     this.yearRangeIndexPlayer2 = {
       min: 0,
@@ -268,6 +270,9 @@ class Player {
 
     circles
       .on('click', function (d, i) {
+        if (that.toggleExtremes) {
+          return;
+        }
         // Update selected circle.
         d3.select(`#${this.parentNode.id}`).selectAll('circle')
           .classed('selected_year_circle', false);
@@ -1192,6 +1197,22 @@ class Player {
    */
   setCompareMode(compareEnable) {
     this.compareEnable = compareEnable;
+  }
+
+  /**
+   * Set the toggle extremes
+   * @param toggleExtremes
+   */
+  setToggleExtremes(toggleExtremes) {
+    this.toggleExtremes = toggleExtremes;
+    if (toggleExtremes) {
+      this.brush.on('start brush end', null);
+    } else {
+      let that = this;
+      this.brush.on('start brush end', function () {
+        that.updateSelectedYears(this.parentNode.id);
+      });
+    }
   }
 
   /**

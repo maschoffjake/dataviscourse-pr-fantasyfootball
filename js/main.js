@@ -3,7 +3,7 @@ class Main {
     constructor(data, maxData) {
         this.data = data;
         let playerView = new Player(updateSelectedYear, maxData);
-        let overallView = new Overall(this.data, updateSelectedPlayer);
+        let overallView = new Overall(this.data, updateSelectedPlayer, toggleExtremes);
 
         this.playerView = playerView;
         this.overallView = overallView;
@@ -17,7 +17,11 @@ class Main {
           that.player1 = player1;
           that.updateView();
           overallView.updateSelectedYear([0]);
-          $(".selectpicker").selectpicker("val", player1.name);
+          $("#player1Dropdown").selectpicker("val", player1.name);
+        }
+
+        function toggleExtremes(toggleExtremes) {
+          tbat.playerView.setToggleExtremes(toggleExtremes);
         }
 
         this.player1 = this.data[0];
@@ -41,7 +45,8 @@ class Main {
                     return d;
                 }
             });
-            that.updateView();
+          that.updateView();
+          that.overallView.updateSelectedYear([0]);
         });
 
         // Setup dropdown player selection event listener
@@ -52,7 +57,8 @@ class Main {
                     return d;
                 }
             });
-            that.updateView();
+          that.updateView();
+          that.overallView.updateSelectedYear([0]);
         });
 
         // Setup compare button event listener
