@@ -599,10 +599,10 @@ class Overall {
         //Check if comparing players
         if(this.compareEnable) {
             //Check if comparing players for multiple years
-            if(typeof yearIndex !== 'number') {
+            console.log(typeof yearIndex[0] !== typeof 0);
+            if(typeof yearIndex[0] !== typeof 0) {
                 //TODO: player two indices are incorrect. need to fix. player1Years & player2Years will
                 // likely be out of bounds when fixed
-                console.log("yearIndex: " + yearIndex);
                 let years = [];
                 let player1Years = that.player1.years.slice(yearIndex[0][0], yearIndex[0][1] + 1);
                 let player2Years = that.player2.years.slice(yearIndex[1][0], yearIndex[1][1] + 1);
