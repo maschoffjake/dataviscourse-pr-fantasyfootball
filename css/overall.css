@@ -100,8 +100,8 @@ circle.RB {
 }
 
 .faded {
-    fill: lightgrey;
-    stroke: lightgrey;
+    fill: lightgrey !important;
+    stroke: lightgrey !important;
 }
 
 .extremes {

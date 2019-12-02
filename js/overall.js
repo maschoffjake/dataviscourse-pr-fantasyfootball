@@ -149,17 +149,18 @@ class Overall {
             .append('select');
 
         //LEGEND FOR OVERALL CHART
-        d3.select('#overallView').select('svg').append('circle').attr("cx",60).attr("cy",650).attr("r", 6).style("fill", "#00fff7");
-        d3.select('#overallView').select('svg').append('circle').attr("cx",160).attr("cy",650).attr("r", 6).style("fill", "#c40065");
-        d3.select('#overallView').select('svg').append('circle').attr("cx",260).attr("cy",650).attr("r", 6).style("fill", "#79c400");
-        d3.select('#overallView').select('svg').append('circle').attr("cx",360).attr("cy",650).attr("r", 6).style("fill", "#c4ad00");
-        d3.select('#overallView').select('svg').append('circle').attr("cx",460).attr("cy",650).attr("r", 6).style("fill", "#7c00c4");
+        let legend = d3.select('#overallView').select('svg').append('g');
+        legend.append('circle').attr("cx",60).attr("cy",650).attr("r", 6).style("fill", "#00fff7");
+        legend.append('circle').attr("cx",160).attr("cy",650).attr("r", 6).style("fill", "#c40065");
+        legend.append('circle').attr("cx",260).attr("cy",650).attr("r", 6).style("fill", "#79c400");
+        legend.append('circle').attr("cx",360).attr("cy",650).attr("r", 6).style("fill", "#c4ad00");
+        legend.append('circle').attr("cx",460).attr("cy",650).attr("r", 6).style("fill", "#7c00c4");
 
-        d3.select('#overallView').select('svg').append('text').attr("x",70).attr("y",655).text('Selected');
-        d3.select('#overallView').select('svg').append('text').attr("x",170).attr("y",655).text('TE');
-        d3.select('#overallView').select('svg').append('text').attr("x",270).attr("y",655).text('WR');
-        d3.select('#overallView').select('svg').append('text').attr("x",370).attr("y",655).text('QB');
-        d3.select('#overallView').select('svg').append('text').attr("x",470).attr("y",655).text('RB');
+        legend.append('text').attr("x",70).attr("y",655).text('Selected');
+        legend.append('text').attr("x",170).attr("y",655).text('TE');
+        legend.append('text').attr("x",270).attr("y",655).text('WR');
+        legend.append('text').attr("x",370).attr("y",655).text('QB');
+        legend.append('text').attr("x",470).attr("y",655).text('RB');
 
         this.drawDropDowns();
     }
@@ -665,7 +666,7 @@ class Overall {
             d3.select('#extremesButton')
                 .classed('toggleExtremes', false);
 
-            let circles = d3.select('#overallView')
+            let circles = d3.select('#overallChartGroup')
                 .selectAll('circle');
             circles
                 .classed('faded', false)
@@ -674,6 +675,16 @@ class Overall {
             this.selectedPlayers.forEach(function(player) {
                 player.classList = ['selected'];
             });
+
+            this.maxPlayers.forEach(function(player) {
+                if (Object.keys(player.__data__).includes('year')) {
+                    player.classList = [player.__data__.year.position]
+                }
+                else {
+                    player.classList = [player.__data__.position];
+                }
+            });
+
             this.playerXToolTip
                 .transition()
                 .duration(200)
@@ -687,9 +698,9 @@ class Overall {
             d3.select('#extremesButton')
                 .classed('toggleExtremes', true);
 
-            let circles = d3.select('#overallView')
+            let circles = d3.select('#overallChartGroup')
                 .selectAll('circle');
-            let selected = d3.select('#overallView')
+            let selected = d3.select('#overallChartGroup')
                 .selectAll('.selected');
 
             let tempSelected = [];
@@ -705,12 +716,12 @@ class Overall {
                 .classed('faded', true);
 
             //TODO: if the maxPlayerX and maxPlayerY are the same, only display one extreme tooltip.. (like x)
-            let maxPlayers = this.getMaxPlayers();
-            maxPlayers.forEach(function(player) {
+            this.getMaxPlayers();
+            this.maxPlayers.forEach(function(player) {
                 player.classList = ['extremes'];
             });
-            let playerXData = maxPlayers[0].__data__;
-            let playerYData = maxPlayers[1].__data__;
+            let playerXData = this.maxPlayers[0].__data__;
+            let playerYData = this.maxPlayers[1].__data__;
 
             let playerXCategory = this.dropdownData.filter((d) => d[0] === this.xIndicator)[0][1];
             let playerXValForCategory = this.xIndicator;
@@ -768,28 +779,28 @@ class Overall {
             d3.select('#playerYToolTipLine1')
                 .text(`${playerYData.name.split('_')[0].toUpperCase()} had the most ${playerYCategory} out of any player during this season(s) with ${playerYValForCategory} while playing for ${teamY}.`);
 
-            if (maxPlayers[0] !== maxPlayers[1]) {
+            if (this.maxPlayers[0] !== this.maxPlayers[1]) {
                 this.playerXToolTip
                     .transition()
                     .duration(500)
                     .style("opacity", .8)
-                    .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
-                    .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+                    .style("left", `${1100 + this.maxPlayers[0].cx.baseVal.value}` + "px")
+                    .style("top", `${120 + this.maxPlayers[0].cy.baseVal.value}` + "px");
 
                 this.playerYToolTip
                     .transition()
                     .duration(500)
                     .style("opacity", .8)
-                    .style("left", `${1100 + maxPlayers[1].cx.baseVal.value}` + "px")
-                    .style("top", `${maxPlayers[1].cy.baseVal.value}` + "px");
+                    .style("left", `${1100 + this.maxPlayers[1].cx.baseVal.value}` + "px")
+                    .style("top", `${this.maxPlayers[1].cy.baseVal.value}` + "px");
             }
             else {
                 this.playerXToolTip
                     .transition()
                     .duration(500)
                     .style("opacity", .8)
-                    .style("left", `${1100 + maxPlayers[0].cx.baseVal.value}` + "px")
-                    .style("top", `${120 + maxPlayers[0].cy.baseVal.value}` + "px");
+                    .style("left", `${1100 + this.maxPlayers[0].cx.baseVal.value}` + "px")
+                    .style("top", `${120 + this.maxPlayers[0].cy.baseVal.value}` + "px");
             }
         }
         this.showExtremes = !this.showExtremes;
@@ -797,7 +808,7 @@ class Overall {
 
     getMaxPlayers() {
         let that = this;
-        let circles = d3.select('#overallView')
+        let circles = d3.select('#overallChartGroup')
             .selectAll('circle');
 
         let circleObjs = circles._groups[0];
@@ -951,6 +962,6 @@ class Overall {
             });
         }
 
-        return [maxPlayerX, maxPlayerY];
+        this.maxPlayers = [maxPlayerX, maxPlayerY];
     }
 }
