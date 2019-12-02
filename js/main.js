@@ -35,14 +35,16 @@ class Main {
 
         }
 
-        this.player1 = this.data[0];
-        this.player2 = this.data[0];
+      $("#player1Dropdown").selectpicker("val", 'Tom Brady');
+      $("#player2Dropdown").selectpicker("val", 'Aaron Rodgers');
+      this.player1 = this.data[1642];
+      this.player2 = this.data[11];
 
-        this.compareEnable = false;
+      this.compareEnable = false;
 
-        console.log(this.data);
+      console.log(this.data);
     }
-
+  
     setupView() {
         let that = this;
 
